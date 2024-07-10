@@ -8,7 +8,7 @@ const humorCategoryList = [
     description: 'Simple, pun-filled, and often groan-inducing humor.',
     numDailyNew: 10,
     subscriberOnly: true,
-    themeColor: Colors.blue,
+    themeColor: Color.fromARGB(255, 61, 171, 255),
   ),
   Category(
     title: 'Knock-Knock Series',
@@ -17,7 +17,7 @@ const humorCategoryList = [
         'Interactive and pun-based humor, often silly and family-friendly.',
     numDailyNew: 5,
     subscriberOnly: true,
-    themeColor: Colors.red,
+    themeColor: Color.fromARGB(255, 255, 88, 76),
   ),
   Category(
     title: 'One-Liners',
@@ -26,7 +26,7 @@ const humorCategoryList = [
         'Brief, witty, and punchy humor, delivering a quick and impactful punchline.',
     numDailyNew: 7,
     subscriberOnly: true,
-    themeColor: Colors.green,
+    themeColor: Color.fromARGB(255, 115, 216, 119),
   ),
   Category(
     title: 'Dark Humors',
@@ -34,7 +34,7 @@ const humorCategoryList = [
     description: 'Simple, pun-filled, and often groan-inducing humor.',
     numDailyNew: 7,
     subscriberOnly: true,
-    themeColor: Colors.grey,
+    themeColor: Color.fromARGB(255, 186, 186, 186),
   ),
   Category(
     title: 'Tricky Riddles',
@@ -43,7 +43,7 @@ const humorCategoryList = [
         'An enigmatic quiz, often with a clever twist or double meaning',
     numDailyNew: 7,
     subscriberOnly: true,
-    themeColor: Colors.yellow,
+    themeColor: Color.fromARGB(255, 255, 239, 96),
   ),
   Category(
     title: 'Fun Facts',
@@ -51,7 +51,7 @@ const humorCategoryList = [
     description: 'Interesting trivia, often surprising and amusing.',
     numDailyNew: 7,
     subscriberOnly: true,
-    themeColor: Colors.cyan,
+    themeColor: Color.fromARGB(255, 57, 199, 218),
   ),
   Category(
     title: 'Funny Quotes',
@@ -59,7 +59,7 @@ const humorCategoryList = [
     description: 'Witty sayings, often hilarious and clever.',
     numDailyNew: 7,
     subscriberOnly: true,
-    themeColor: Colors.orange,
+    themeColor: Color.fromARGB(255, 255, 177, 60),
   ),
   Category(
     title: 'Story Jokes',
@@ -67,7 +67,7 @@ const humorCategoryList = [
     description: 'Extended anecdotes with a clever and surprising punchline.',
     numDailyNew: 7,
     subscriberOnly: true,
-    themeColor: Colors.brown,
+    themeColor: Color.fromARGB(255, 166, 127, 112),
   ),
   Category(
     title: 'Detective Puzzles',
@@ -76,6 +76,6 @@ const humorCategoryList = [
         'Mystery challenges requiring keen observation and logical deduction.',
     numDailyNew: 7,
     subscriberOnly: true,
-    themeColor: Colors.indigo,
+    themeColor: Color.fromARGB(255, 123, 137, 218),
   ),
 ];

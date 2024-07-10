@@ -29,13 +29,14 @@ class HumorCategoryCard extends StatelessWidget {
                 child: Container(
                   margin: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          lighten(category.themeColor, 0.0),
-                          darken(category.themeColor, 0.0),
-                        ]),
+                    // gradient: LinearGradient(
+                    //     begin: Alignment.topLeft,
+                    //     end: Alignment.bottomRight,
+                    //     colors: [
+                    //       // lighten(category.themeColor, 0.0),
+                    //       // darken(category.themeColor, 0.0),
+                    //       Colors.white,
+                    //     ]),
                     color: category.themeColor,
                     borderRadius: BorderRadius.circular(20),
                   ),
@@ -58,6 +59,7 @@ class HumorCategoryCard extends StatelessWidget {
                           padding: const EdgeInsets.fromLTRB(10, 10, 10, 30),
                           child: Image.asset(
                             category.imgPath,
+                            // color: Color(0xff74b9ff),
                           ),
                         ),
                       ),
@@ -66,7 +68,7 @@ class HumorCategoryCard extends StatelessWidget {
                 ),
               ),
               Container(
-                color: Colors.white,
+                // color: Colors.white,
                 height: 140,
                 padding: const EdgeInsets.fromLTRB(15, 15, 15, 0),
                 child: Column(

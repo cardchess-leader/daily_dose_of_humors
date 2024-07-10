@@ -33,6 +33,7 @@ class _SettingsScreenState extends State<SettingsScreen>
         // backgroundColor: Colors.yellow,
         title: const PageHeaderText(
           heading: 'Settings',
+          subheading: 'Set Your Preferences',
         ),
       ),
     );
