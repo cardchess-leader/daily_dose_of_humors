@@ -1,7 +1,11 @@
+import 'package:daily_dose_of_humors/screens/shop.dart';
 import 'package:flutter/material.dart';
 import 'package:scroll_snap_list/scroll_snap_list.dart';
 import 'package:daily_dose_of_humors/screens/humor_screen.dart';
+import 'package:daily_dose_of_humors/screens/bookmark.dart';
+import 'package:daily_dose_of_humors/screens/settings.dart';
 import 'package:daily_dose_of_humors/widgets/humor_card.dart';
+import 'package:daily_dose_of_humors/widgets/page_header_text.dart';
 import 'package:daily_dose_of_humors/data/category_data.dart';
 
 class TabsScreen extends StatefulWidget {
@@ -29,22 +33,40 @@ class _TabsScreenState extends State<TabsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    Widget activePage = ScrollSnapList(
-      scrollDirection: Axis.vertical,
-      onItemFocus: (index) => (),
-      itemSize: 500,
-      itemCount: humorCategoryList.length,
-      dynamicItemSize: true,
-      dynamicSizeEquation: (distance) => 1 - (distance / 2000).abs(),
-      itemBuilder: (context, index) => InkWell(
-        child: HumorCategoryCard(humorCategoryList[index]),
-        onTap: () => _openHumorCategory(humorCategoryList[index]),
-      ),
-    );
+    late Widget activePage;
 
     switch (_selectedPageIndex) {
+      case 0:
+        activePage = Scaffold(
+          appBar: AppBar(
+            title: const PageHeaderText(
+              heading: 'Daily Dose of Humors',
+              subheading: 'New Humors Added Everyday',
+            ),
+          ),
+          body: ScrollSnapList(
+            scrollDirection: Axis.vertical,
+            onItemFocus: (index) => (),
+            itemSize: 500,
+            itemCount: humorCategoryList.length,
+            dynamicItemSize: true,
+            dynamicSizeEquation: (distance) => 1 - (distance / 2000).abs(),
+            itemBuilder: (context, index) => InkWell(
+              child: HumorCategoryCard(humorCategoryList[index]),
+              onTap: () => _openHumorCategory(humorCategoryList[index]),
+            ),
+          ),
+        );
+        break;
       case 1:
-        activePage = HumorScreen(humorCategoryList[0]);
+        activePage = ShopScreen();
+        break;
+      case 2:
+        activePage = BookmarkScreen();
+        break;
+      case 3:
+      default:
+        activePage = SettingsScreen();
     }
 
     return Scaffold(
@@ -52,24 +74,37 @@ class _TabsScreenState extends State<TabsScreen> {
       bottomNavigationBar: BottomNavigationBar(
         onTap: _selectPage,
         currentIndex: _selectedPageIndex,
-        selectedItemColor: Colors.black,
-        unselectedItemColor: Colors.black,
-        items: const [
+        selectedItemColor: Colors.grey.shade900,
+        unselectedItemColor: Colors.grey.shade500,
+        // selectedIconTheme:
+        //     IconThemeData(size: 22), // Set the size for selected icons
+        // unselectedIconTheme: IconThemeData(size: 22),
+        selectedLabelStyle:
+            TextStyle(fontSize: 10, fontWeight: FontWeight.w600),
+        items: [
           BottomNavigationBarItem(
-            icon: Icon(Icons.dashboard),
+            icon: _selectedPageIndex == 0
+                ? Icon(Icons.dashboard)
+                : Icon(Icons.dashboard_outlined),
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.shopping_cart),
+            icon: _selectedPageIndex == 1
+                ? Icon(Icons.shopping_cart)
+                : Icon(Icons.shopping_cart_outlined),
             label: 'Shop',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.bookmark),
-            label: 'Bookmark',
+            icon: _selectedPageIndex == 2
+                ? Icon(Icons.bookmark)
+                : Icon(Icons.bookmark_outline),
+            label: 'Bookmarks',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Setting',
+            icon: _selectedPageIndex == 3
+                ? Icon(Icons.settings)
+                : Icon(Icons.settings_outlined),
+            label: 'Settings',
           ),
         ],
       ),

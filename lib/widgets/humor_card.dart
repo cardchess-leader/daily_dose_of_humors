@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:daily_dose_of_humors/models/category.dart';
+import 'package:daily_dose_of_humors/util/util.dart';
 
 class HumorCategoryCard extends StatelessWidget {
   final Category category;
@@ -18,36 +19,50 @@ class HumorCategoryCard extends StatelessWidget {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20.0),
         ),
-        color: category.themeColor,
+        color: Colors.white,
         child: ClipRRect(
           borderRadius: BorderRadius.circular(20.0),
           child: Column(
             // crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Expanded(
-                child: Column(
-                  children: [
-                    Container(
-                      margin: const EdgeInsets.all(30),
-                      width: double.infinity,
-                      child: Text(
-                        category.title,
-                        textAlign: TextAlign.left,
-                        style: const TextStyle(
-                          fontSize: 25,
-                          fontWeight: FontWeight.bold,
+                child: Container(
+                  margin: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          lighten(category.themeColor, 0.0),
+                          darken(category.themeColor, 0.0),
+                        ]),
+                    color: category.themeColor,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Column(
+                    children: [
+                      Container(
+                        margin: const EdgeInsets.all(30),
+                        width: double.infinity,
+                        child: Text(
+                          category.title,
+                          textAlign: TextAlign.left,
+                          style: const TextStyle(
+                            fontSize: 25,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
-                    ),
-                    Expanded(
-                      child: Container(
-                        padding: const EdgeInsets.fromLTRB(10, 10, 10, 30),
-                        child: Image.asset(
-                          category.imgPath,
+                      Expanded(
+                        child: Container(
+                          padding: const EdgeInsets.fromLTRB(10, 10, 10, 30),
+                          child: Image.asset(
+                            category.imgPath,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
               Container(
@@ -84,7 +99,7 @@ class HumorCategoryCard extends StatelessWidget {
                                 width: 0, // Border width set to zero
                               ),
                             ),
-                            elevation: 1,
+                            // elevation: 1,
                             shadowColor: Colors.grey.shade100,
                             label: const Text(
                               'Subscribers Only',

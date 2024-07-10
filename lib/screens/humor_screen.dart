@@ -146,6 +146,7 @@ class _HumorScreenState extends State<HumorScreen> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endContained,
       floatingActionButton: FloatingActionButton(
+        elevation: 0,
         onPressed: () {
           // Handle the FAB action
           print('FAB Pressed');
