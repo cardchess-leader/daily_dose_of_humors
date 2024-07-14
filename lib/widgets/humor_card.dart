@@ -63,10 +63,10 @@ class _HumorCategoryCardState extends State<HumorCategoryCard>
                         child: Text(
                           widget.category.title,
                           textAlign: TextAlign.left,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 25,
                             fontWeight: FontWeight.bold,
-                            color: Colors.grey.shade900,
+                            color: Colors.black,
                           ),
                         ),
                       ),
@@ -91,7 +91,7 @@ class _HumorCategoryCardState extends State<HumorCategoryCard>
               Container(
                 // color: Colors.white,
                 height: 140,
-                padding: const EdgeInsets.fromLTRB(15, 15, 15, 0),
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [

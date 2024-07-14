@@ -1,3 +1,4 @@
+import 'package:daily_dose_of_humors/util/util.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_dose_of_humors/models/category.dart';
 import 'package:daily_dose_of_humors/widgets/custom_chip.dart';
@@ -52,19 +53,29 @@ class _HumorScreenState extends State<HumorScreen> {
                       children: [
                         Row(
                           children: [
-                            const CustomChip(
+                            CustomChip(
                                 color: Color.fromARGB(0, 0, 0, 0),
-                                textColor: Color.fromARGB(159, 0, 0, 0),
+                                // textColor: Color.fromARGB(159, 0, 0, 0),
+                                textColor: darken(
+                                  Color.fromARGB(89, 108, 189, 255),
+                                  0.5,
+                                ),
                                 label: 'Dad Jokes'),
-                            SizedBox(width: 10),
-                            const CustomChip(
+                            const SizedBox(width: 10),
+                            CustomChip(
                                 color: Color.fromARGB(0, 33, 149, 243),
-                                textColor: Color.fromARGB(159, 0, 0, 0),
+                                textColor: darken(
+                                  Color.fromARGB(89, 108, 189, 255),
+                                  0.5,
+                                ),
                                 label: '2024-07-10'),
-                            Expanded(child: SizedBox(width: 10)),
-                            const CustomChip(
+                            const Expanded(child: SizedBox(width: 10)),
+                            CustomChip(
                               color: Colors.transparent,
-                              textColor: Color.fromARGB(159, 0, 0, 0),
+                              textColor: darken(
+                                Color.fromARGB(89, 108, 189, 255),
+                                0.5,
+                              ),
                               label: '1/5',
                               // textColor: Colors.grey,
                             ),
@@ -87,10 +98,14 @@ class _HumorScreenState extends State<HumorScreen> {
                                   ),
                                   child: Container(
                                     padding: const EdgeInsets.all(30),
-                                    child: const Center(
+                                    child: Center(
                                       child: Text(
                                         'Why did the scarecrow win an award?',
-                                        style: TextStyle(fontSize: 26),
+                                        style: TextStyle(
+                                          fontSize: 26,
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.grey.shade900,
+                                        ),
                                         textAlign: TextAlign.center,
                                       ),
                                     ),
@@ -106,34 +121,34 @@ class _HumorScreenState extends State<HumorScreen> {
                               width: 10,
                             ),
                             Icon(
-                              Icons.thumb_up,
-                              size: 20,
+                              Icons.sentiment_very_satisfied_rounded,
+                              size: 30,
                             ),
                             SizedBox(
                               width: 5,
                             ),
                             Text(
-                              '123',
-                              style: TextStyle(fontWeight: FontWeight.w500),
+                              'x123',
+                              style: TextStyle(fontWeight: FontWeight.w600),
                             ),
                           ],
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 5,
                         ),
                       ],
                     ),
                   ),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 Expanded(
                   child: Container(
                     width: double.infinity,
                     decoration: BoxDecoration(
-                      color: Color.fromARGB(30, 0, 0, 0),
+                      color: const Color.fromARGB(30, 0, 0, 0),
                       borderRadius: BorderRadius.circular(20),
                     ),
-                    child: Column(
+                    child: const Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       // crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
@@ -147,42 +162,13 @@ class _HumorScreenState extends State<HumorScreen> {
                           style: TextStyle(
                             fontSize: 16,
                             fontStyle: FontStyle.italic,
-                            color: const Color.fromARGB(111, 0, 0, 0),
+                            color: Color.fromARGB(111, 0, 0, 0),
                           ),
                         )
                       ],
                     ),
                   ),
                 ),
-                // Align(
-                //   alignment: Alignment.centerRight,
-                //   child: Container(
-                //     padding:
-                //         const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                //     // color: Colors.grey,
-                //     decoration: BoxDecoration(
-                //       border: Border.all(color: Colors.grey.shade200, width: 1),
-                //       borderRadius: BorderRadius.circular(20),
-                //       color: Colors.grey.shade100,
-                //     ),
-                //     child: const Row(
-                //       mainAxisSize: MainAxisSize.min,
-                //       children: [
-                //         Icon(
-                //           Icons.thumb_up,
-                //           size: 20,
-                //         ),
-                //         SizedBox(
-                //           width: 5,
-                //         ),
-                //         Text(
-                //           'x123',
-                //           style: TextStyle(fontWeight: FontWeight.w500),
-                //         ),
-                //       ],
-                //     ),
-                //   ),
-                // ),
               ],
             ),
           ),
@@ -210,13 +196,16 @@ class _HumorScreenState extends State<HumorScreen> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endContained,
       floatingActionButton: FloatingActionButton(
-        elevation: 0,
+        // elevation: 0,
         onPressed: () {
           // Handle the FAB action
           print('FAB Pressed');
         },
         tooltip: 'Add',
-        child: const Icon(Icons.thumb_up_outlined),
+        child: const Icon(
+          Icons.sentiment_very_satisfied_rounded,
+          size: 30,
+        ),
       ),
     );
   }
