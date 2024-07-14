@@ -2,12 +2,35 @@ import 'package:flutter/material.dart';
 import 'package:daily_dose_of_humors/models/category.dart';
 import 'package:daily_dose_of_humors/util/util.dart';
 
-class HumorCategoryCard extends StatelessWidget {
+class HumorCategoryCard extends StatefulWidget {
   final Category category;
   const HumorCategoryCard(
     this.category, {
     super.key,
   });
+
+  @override
+  State<HumorCategoryCard> createState() => _HumorCategoryCardState();
+}
+
+class _HumorCategoryCardState extends State<HumorCategoryCard>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 1000),
+      vsync: this,
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,17 +50,9 @@ class HumorCategoryCard extends StatelessWidget {
             children: [
               Expanded(
                 child: Container(
-                  margin: const EdgeInsets.all(10),
+                  // margin: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    // gradient: LinearGradient(
-                    //     begin: Alignment.topLeft,
-                    //     end: Alignment.bottomRight,
-                    //     colors: [
-                    //       // lighten(category.themeColor, 0.0),
-                    //       // darken(category.themeColor, 0.0),
-                    //       Colors.white,
-                    //     ]),
-                    color: category.themeColor,
+                    color: widget.category.themeColor,
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Column(
@@ -46,20 +61,26 @@ class HumorCategoryCard extends StatelessWidget {
                         margin: const EdgeInsets.all(30),
                         width: double.infinity,
                         child: Text(
-                          category.title,
+                          widget.category.title,
                           textAlign: TextAlign.left,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 25,
                             fontWeight: FontWeight.bold,
+                            color: Colors.grey.shade900,
                           ),
                         ),
                       ),
                       Expanded(
                         child: Container(
                           padding: const EdgeInsets.fromLTRB(10, 10, 10, 30),
-                          child: Image.asset(
-                            category.imgPath,
-                            // color: Color(0xff74b9ff),
+                          child: ScaleTransition(
+                            scale: _controller.drive(
+                              Tween<double>(begin: 0.9, end: 1.05),
+                            ),
+                            child: Image.asset(widget.category.imgPath,
+                                color: darken(widget.category.themeColor, 0.4)
+                                // color: Color(0xff74b9ff),
+                                ),
                           ),
                         ),
                       ),
@@ -75,23 +96,23 @@ class HumorCategoryCard extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      category.description,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w500,
-                        fontSize: 16,
-                        fontStyle: FontStyle.italic,
-                      ),
+                      widget.category.description,
+                      style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 16,
+                          fontStyle: FontStyle.italic,
+                          color: Colors.grey.shade900),
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          '${category.numDailyNew} new jokes daily',
+                          '${widget.category.numDailyNew} new jokes daily',
                           style: const TextStyle(
                             fontWeight: FontWeight.w700,
                           ),
                         ),
-                        if (category.subscriberOnly)
+                        if (widget.category.subscriberOnly)
                           Chip(
                             avatar: const Icon(Icons.lock),
                             backgroundColor: Colors.grey.shade100,

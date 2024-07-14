@@ -142,13 +142,14 @@ class _HumorScreenState extends State<HumorScreen> {
                           size: 100,
                           color: Color.fromARGB(58, 0, 0, 0),
                         ),
-                        // Text(
-                        //   'Tap here for punchline',
-                        //   style: TextStyle(
-                        //     fontSize: 20,
-                        //     fontStyle: FontStyle.italic,
-                        //   ),
-                        // )
+                        Text(
+                          'Tap to view punchline',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontStyle: FontStyle.italic,
+                            color: const Color.fromARGB(111, 0, 0, 0),
+                          ),
+                        )
                       ],
                     ),
                   ),
