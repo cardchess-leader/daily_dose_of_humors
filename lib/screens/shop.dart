@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:daily_dose_of_humors/widgets/page_header_text.dart';
+import 'package:daily_dose_of_humors/widgets/app_bar.dart';
 
 class ShopScreen extends StatefulWidget {
   const ShopScreen({super.key});
@@ -29,12 +29,11 @@ class _ShopScreenState extends State<ShopScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-          // backgroundColor: Colors.yellow,
-          title: const PageHeaderText(
+      appBar: const CustomAppBar(
         heading: 'Humor Shop',
         subheading: 'Premium Quality Humor Bundles',
-      )),
+        backgroundColor: Color.fromARGB(255, 255, 254, 200),
+      ),
     );
   }
 }

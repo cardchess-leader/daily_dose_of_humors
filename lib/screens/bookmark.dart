@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:daily_dose_of_humors/widgets/page_header_text.dart';
 import 'package:daily_dose_of_humors/data/category_data.dart';
 import 'package:daily_dose_of_humors/util/util.dart';
+import 'package:daily_dose_of_humors/widgets/app_bar.dart';
 
 class BookmarkScreen extends StatefulWidget {
   const BookmarkScreen({super.key});
@@ -33,35 +34,34 @@ class _BookmarkScreenState extends State<BookmarkScreen>
   }
 
   Widget proxyDecorator(Widget child, int index, Animation<double> animation) {
-    print('index from decorator is: ' + index.toString());
     return AnimatedBuilder(
       animation: animation,
       builder: (BuildContext context, Widget? child) {
         final double animValue = Curves.easeInOut.transform(animation.value);
         final double elevation = lerpDouble(1.0, 6.0, animValue)!;
-        final double scale = lerpDouble(1.0, 1.02, animValue)!;
+        final double scale = lerpDouble(1.0, 1.06, animValue)!;
         return Transform.scale(
           scale: scale,
           child: cardBuilder(context, index, elevation: elevation),
         );
       },
+      child: child,
     );
   }
 
-  Widget cardBuilder(context, index, {elevation = 1.0}) {
-    print('index from cardbuilder is: $index');
+  Widget cardBuilder(BuildContext context, int index,
+      {double elevation = 1.0}) {
     return Container(
-      // color: Colors.red,
-      margin: EdgeInsets.symmetric(horizontal: 0, vertical: 15),
+      margin: const EdgeInsets.symmetric(horizontal: 0, vertical: 15),
       key: ValueKey(indexes[index]),
       child: Dismissible(
+        key: ValueKey(indexes[index]),
+        direction: DismissDirection.endToStart,
         onDismissed: (direction) {
           setState(() {
             indexes.removeAt(index);
           });
         },
-        key: ValueKey(index),
-        direction: DismissDirection.endToStart,
         background: Container(
           alignment: Alignment.centerRight,
           child: const Icon(
@@ -74,11 +74,7 @@ class _BookmarkScreenState extends State<BookmarkScreen>
           elevation: elevation,
           color: colorList[indexes[index]],
           child: Container(
-            padding: EdgeInsets.all(25),
-            // decoration: BoxDecoration(
-            //   color: const Color.fromARGB(255, 177, 225, 178),
-            //   borderRadius: BorderRadius.circular(20),
-            // ),
+            padding: const EdgeInsets.all(25),
             child: Stack(
               children: [
                 Positioned(
@@ -88,13 +84,13 @@ class _BookmarkScreenState extends State<BookmarkScreen>
                     'assets/images/fist.png',
                     width: 80,
                     height: 80,
-                    color: Color.fromARGB(21, 0, 0, 0),
+                    color: const Color.fromARGB(21, 0, 0, 0),
                   ),
                 ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Text(
+                    const Text(
                       'What do you call a pig that does a karate? Also, what do you call a sleeping bull?',
                       overflow: TextOverflow.ellipsis,
                       maxLines: 2,
@@ -103,9 +99,7 @@ class _BookmarkScreenState extends State<BookmarkScreen>
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                    SizedBox(
-                      height: 5,
-                    ),
+                    const SizedBox(height: 5),
                     Text(
                       '- From Dad Jokes',
                       style: TextStyle(
@@ -145,19 +139,18 @@ class _BookmarkScreenState extends State<BookmarkScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const PageHeaderText(
-          heading: 'Bookmarks',
+      appBar: CustomAppBar(
+          heading: 'Humor Bookmarks',
           subheading: 'Your Favorite Humors',
-        ),
-        bottom: TabBar(
-          controller: _tabController,
-          tabs: const [
-            Tab(text: 'Bookmarks'),
-            Tab(text: 'Library'),
-          ],
-        ),
-      ),
+          additionalHeight: 50,
+          backgroundColor: const Color.fromARGB(255, 248, 255, 242),
+          bottom: TabBar(
+            controller: _tabController,
+            tabs: const [
+              Tab(text: 'Bookmarks'),
+              Tab(text: 'Library'),
+            ],
+          )),
       body: TabBarView(
         controller: _tabController,
         children: [
@@ -165,7 +158,7 @@ class _BookmarkScreenState extends State<BookmarkScreen>
             proxyDecorator: proxyDecorator,
             itemCount: indexes.length,
             onReorder: _onReorder,
-            padding: EdgeInsets.symmetric(horizontal: 25),
+            padding: const EdgeInsets.symmetric(horizontal: 25),
             itemBuilder: cardBuilder,
           ),
           const Center(

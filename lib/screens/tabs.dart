@@ -5,8 +5,9 @@ import 'package:daily_dose_of_humors/screens/humor_screen.dart';
 import 'package:daily_dose_of_humors/screens/bookmark.dart';
 import 'package:daily_dose_of_humors/screens/settings.dart';
 import 'package:daily_dose_of_humors/widgets/humor_card.dart';
-import 'package:daily_dose_of_humors/widgets/page_header_text.dart';
 import 'package:daily_dose_of_humors/data/category_data.dart';
+import 'package:daily_dose_of_humors/widgets/background.dart';
+import 'package:daily_dose_of_humors/widgets/app_bar.dart';
 
 class TabsScreen extends StatefulWidget {
   const TabsScreen({super.key});
@@ -38,23 +39,37 @@ class _TabsScreenState extends State<TabsScreen> {
     switch (_selectedPageIndex) {
       case 0:
         activePage = Scaffold(
-          appBar: AppBar(
-            title: const PageHeaderText(
-              heading: 'Daily Dose of Humors',
-              subheading: 'New Humors Added Everyday',
-            ),
+          appBar: const CustomAppBar(
+            heading: 'Daily Dose of Humors',
+            subheading: 'New Humors Added Everyday',
           ),
-          body: ScrollSnapList(
-            scrollDirection: Axis.vertical,
-            onItemFocus: (index) => (),
-            itemSize: 500,
-            itemCount: humorCategoryList.length,
-            dynamicItemSize: true,
-            dynamicSizeEquation: (distance) => 1 - (distance / 2000).abs(),
-            itemBuilder: (context, index) => InkWell(
-              child: HumorCategoryCard(humorCategoryList[index]),
-              onTap: () => _openHumorCategory(humorCategoryList[index]),
-            ),
+          body: Stack(
+            children: [
+              const ScrollingBackground(
+                imagePathList: [
+                  'assets/images/smile-background-0.png',
+                  'assets/images/smile-background-1.png',
+                  'assets/images/smile-background-2.png',
+                  'assets/images/smile-background-3.png',
+                ],
+                imageSize: 25,
+                imageMargin: 50,
+                scrollTime: 10000,
+                patternLength: 2,
+              ),
+              ScrollSnapList(
+                scrollDirection: Axis.vertical,
+                onItemFocus: (index) => (),
+                itemSize: 500,
+                itemCount: humorCategoryList.length,
+                dynamicItemSize: true,
+                dynamicSizeEquation: (distance) => 1 - (distance / 2000).abs(),
+                itemBuilder: (context, index) => InkWell(
+                  child: HumorCategoryCard(humorCategoryList[index]),
+                  onTap: () => _openHumorCategory(humorCategoryList[index]),
+                ),
+              )
+            ],
           ),
         );
         break;

@@ -1,3 +1,4 @@
+import 'package:daily_dose_of_humors/widgets/app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_dose_of_humors/widgets/page_header_text.dart';
 
@@ -28,13 +29,21 @@ class _SettingsScreenState extends State<SettingsScreen>
 
   @override
   Widget build(BuildContext context) {
+    // return Scaffold(
+    //   appBar: AppBar(
+    //     // backgroundColor: Colors.yellow,
+    //     title: const PageHeaderText(
+    //       heading: 'Settings',
+    //       subheading: 'Set Your Preferences',
+    //     ),
+    //   ),
+    // );
+
     return Scaffold(
-      appBar: AppBar(
-        // backgroundColor: Colors.yellow,
-        title: const PageHeaderText(
-          heading: 'Settings',
-          subheading: 'Set Your Preferences',
-        ),
+      appBar: const CustomAppBar(
+        heading: 'Settings',
+        subheading: 'Set Your Preferences',
+        backgroundColor: Color.fromARGB(255, 218, 230, 255),
       ),
     );
   }

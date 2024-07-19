@@ -64,7 +64,7 @@ class _HumorCategoryCardState extends State<HumorCategoryCard>
                           widget.category.title,
                           textAlign: TextAlign.left,
                           style: const TextStyle(
-                            fontSize: 25,
+                            fontSize: 30,
                             fontWeight: FontWeight.bold,
                             color: Colors.black,
                           ),
@@ -94,12 +94,14 @@ class _HumorCategoryCardState extends State<HumorCategoryCard>
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       widget.category.description,
+                      textAlign: TextAlign.left,
                       style: TextStyle(
                           fontWeight: FontWeight.w600,
-                          fontSize: 16,
+                          fontSize: 18,
                           fontStyle: FontStyle.italic,
                           color: Colors.grey.shade900),
                     ),

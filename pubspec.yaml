@@ -75,6 +75,12 @@ flutter:
     - assets/images/open-book.png
     - assets/images/detective.png
     - assets/images/punch.png
+    - assets/images/tongue.png
+    - assets/images/smiley-face.png
+    - assets/images/smile-background-0.png
+    - assets/images/smile-background-1.png
+    - assets/images/smile-background-2.png
+    - assets/images/smile-background-3.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

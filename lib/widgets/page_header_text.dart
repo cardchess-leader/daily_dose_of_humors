@@ -14,6 +14,7 @@ class PageHeaderText extends StatelessWidget {
         Text(
           heading,
           style: const TextStyle(
+            fontSize: 30,
             // color: Colors.white,
             fontWeight: FontWeight.bold,
             // fontStyle: FontStyle.italic,
@@ -24,9 +25,10 @@ class PageHeaderText extends StatelessWidget {
           Text(
             subheading,
             style: TextStyle(
-                color: Colors.grey.shade500,
-                fontWeight: FontWeight.bold,
-                fontSize: 14),
+              color: Colors.grey.shade500,
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+            ),
           ),
           const SizedBox(
             height: 5,
