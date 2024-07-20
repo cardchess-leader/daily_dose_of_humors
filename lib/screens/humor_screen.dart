@@ -2,6 +2,7 @@ import 'package:daily_dose_of_humors/util/util.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_dose_of_humors/models/category.dart';
 import 'package:daily_dose_of_humors/widgets/custom_chip.dart';
+import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class HumorScreen extends StatefulWidget {
   final Category selectedCategory;
@@ -15,6 +16,8 @@ class HumorScreen extends StatefulWidget {
 
 class _HumorScreenState extends State<HumorScreen> {
   late Category _selectedCategory;
+  int _currentPage = 0;
+  final controller = PageController(viewportFraction: 0.8, keepPage: true);
 
   @override
   void initState() {
@@ -40,7 +43,6 @@ class _HumorScreenState extends State<HumorScreen> {
             padding: const EdgeInsets.all(20),
             child: Column(
               children: [
-                // const SizedBox(height: 15),
                 Expanded(
                   flex: 2,
                   child: Container(
@@ -77,43 +79,55 @@ class _HumorScreenState extends State<HumorScreen> {
                                 0.5,
                               ),
                               label: '1/5',
-                              // textColor: Colors.grey,
                             ),
                           ],
-                          // [
-                          // Text('Dad Jokes'),
-                          // SizedBox(width: 10),
-                          // Text('2024-07-10'),
-                          // SizedBox(width: 10),
-                          // Text('New'),
-                          // ],
                         ),
                         Expanded(
-                          child: LayoutBuilder(
-                            builder: (context, constraints) {
-                              return SingleChildScrollView(
-                                child: ConstrainedBox(
-                                  constraints: BoxConstraints(
-                                    minHeight: constraints.maxHeight,
-                                  ),
-                                  child: Container(
-                                    padding: const EdgeInsets.all(30),
-                                    child: Center(
-                                      child: Text(
-                                        'Why did the scarecrow win an award?',
-                                        style: TextStyle(
-                                          fontSize: 26,
-                                          fontWeight: FontWeight.w600,
-                                          color: Colors.grey.shade900,
+                          child: PageView.builder(
+                            itemCount: 3,
+                            onPageChanged: (pageIndex) {
+                              print(pageIndex);
+                            },
+                            controller: controller,
+                            itemBuilder: (context, index) {
+                              return LayoutBuilder(
+                                builder: (context, constraints) {
+                                  return SingleChildScrollView(
+                                    child: ConstrainedBox(
+                                      constraints: BoxConstraints(
+                                        minHeight: constraints.maxHeight,
+                                      ),
+                                      child: Container(
+                                        // color: Colors.red,
+                                        padding: const EdgeInsets.all(30),
+                                        child: Center(
+                                          child: Text(
+                                            'What did the Fox say?',
+                                            style: TextStyle(
+                                              fontSize: 26,
+                                              fontWeight: FontWeight.w600,
+                                              color: Colors.grey.shade900,
+                                            ),
+                                            textAlign: TextAlign.center,
+                                          ),
                                         ),
-                                        textAlign: TextAlign.center,
                                       ),
                                     ),
-                                  ),
-                                ),
+                                  );
+                                },
                               );
                             },
                           ),
+                        ),
+                        SmoothPageIndicator(
+                          controller: controller, // PageController
+                          count: 3,
+                          effect: const WormEffect(), // your preferred effect
+                          onDotClicked: (index) {
+                            controller.animateToPage(index,
+                                duration: const Duration(milliseconds: 300),
+                                curve: Curves.easeInOut);
+                          },
                         ),
                         const Row(
                           children: [
