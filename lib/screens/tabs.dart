@@ -60,6 +60,7 @@ class _TabsScreenState extends State<TabsScreen> {
               ScrollSnapList(
                 scrollDirection: Axis.vertical,
                 onItemFocus: (index) => (),
+                duration: 300,
                 itemSize: 500,
                 itemCount: humorCategoryList.length,
                 dynamicItemSize: true,
@@ -68,7 +69,7 @@ class _TabsScreenState extends State<TabsScreen> {
                   child: HumorCategoryCard(humorCategoryList[index]),
                   onTap: () => _openHumorCategory(humorCategoryList[index]),
                 ),
-              )
+              ),
             ],
           ),
         );
