@@ -16,7 +16,7 @@ class HumorScreen extends StatefulWidget {
 
 class _HumorScreenState extends State<HumorScreen> {
   late Category _selectedCategory;
-  int _currentPage = 0;
+  // int _currentPage = 0;
   final controller = PageController(viewportFraction: 0.8, keepPage: true);
 
   @override

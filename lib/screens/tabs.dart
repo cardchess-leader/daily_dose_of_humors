@@ -1,6 +1,6 @@
-import 'package:daily_dose_of_humors/screens/shop.dart';
 import 'package:flutter/material.dart';
 import 'package:scroll_snap_list/scroll_snap_list.dart';
+import 'package:daily_dose_of_humors/screens/shop.dart';
 import 'package:daily_dose_of_humors/screens/humor_screen.dart';
 import 'package:daily_dose_of_humors/screens/bookmark.dart';
 import 'package:daily_dose_of_humors/screens/settings.dart';

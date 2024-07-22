@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:daily_dose_of_humors/widgets/app_bar.dart';
 import 'package:scroll_snap_list/scroll_snap_list.dart';
 import 'package:daily_dose_of_humors/screens/shop_category.dart';
+import 'package:daily_dose_of_humors/screens/product.dart';
 
 class ShopScreen extends StatefulWidget {
   const ShopScreen({super.key});
@@ -58,7 +59,15 @@ class _ShopScreenState extends State<ShopScreen> {
               width: 140,
               child: IntrinsicHeight(
                 child: InkWell(
-                  onTap: () => {},
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (ctx) => ProductScreen(
+                          productName: 'Best Dad Jokes of 2023',
+                        ),
+                      ),
+                    );
+                  },
                   child: const Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [

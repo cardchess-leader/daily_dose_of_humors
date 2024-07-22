@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:daily_dose_of_humors/screens/product.dart';
 
 class ShopCategoryScreen extends StatelessWidget {
   final String title;
@@ -36,7 +37,15 @@ class ShopCategoryScreen extends StatelessWidget {
                 (index) => SizedBox(
                   width: itemWidth,
                   child: InkWell(
-                    onTap: () => {},
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (ctx) => ProductScreen(
+                            productName: 'Best Dad Jokes of 2023',
+                          ),
+                        ),
+                      );
+                    },
                     child: const Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -45,10 +54,6 @@ class ShopCategoryScreen extends StatelessWidget {
                           child: Card(
                             color: Colors.amber,
                             margin: EdgeInsets.zero,
-                            child: SizedBox(
-                              width: double.infinity,
-                              // height: 200,
-                            ),
                           ),
                         ),
                         SizedBox(height: 10),
