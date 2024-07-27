@@ -1,6 +1,6 @@
 import 'package:daily_dose_of_humors/widgets/app_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:daily_dose_of_humors/widgets/page_header_text.dart';
+// import 'package:daily_dose_of_humors/widgets/page_header_text.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});

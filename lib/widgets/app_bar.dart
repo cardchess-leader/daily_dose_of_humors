@@ -18,6 +18,15 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+    Color? titleColor = DefaultTextStyle.of(context).style.color;
+    if (Theme.of(context).brightness == Brightness.dark) {
+      if (backgroundColor != null) {
+        titleColor = Colors.black;
+      } else {
+        titleColor = Colors.grey.shade100;
+      }
+    }
+
     return AppBar(
       backgroundColor: backgroundColor,
       title: Column(
@@ -25,9 +34,10 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         children: [
           Text(
             heading,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 30, // Adjusted for better fit in AppBar
               fontWeight: FontWeight.bold,
+              color: titleColor,
             ),
           ),
           if (subheading.isNotEmpty) ...[

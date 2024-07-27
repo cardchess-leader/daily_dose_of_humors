@@ -42,6 +42,7 @@ class _TabsScreenState extends State<TabsScreen> {
           appBar: const CustomAppBar(
             heading: 'Daily Dose of Humors',
             subheading: 'New Humors Added Everyday',
+            // backgroundColor: Colors.white,
           ),
           body: Stack(
             children: [

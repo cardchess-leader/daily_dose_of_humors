@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:daily_dose_of_humors/models/category.dart';
 import 'package:daily_dose_of_humors/util/util.dart';
+import 'package:lottie/lottie.dart';
 
 class HumorCategoryCard extends StatefulWidget {
   final Category category;
@@ -34,6 +35,13 @@ class _HumorCategoryCardState extends State<HumorCategoryCard>
 
   @override
   Widget build(BuildContext context) {
+    bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    Color darkenThemeColor = darken(widget.category.themeColor, 0.5);
+    Color lightenThemeColor = lighten(widget.category.themeColor, 0.25);
+    // Color adaptiveTextColor =
+    //     isDarkMode ? Colors.grey.shade200 : Colors.grey.shade900;
+    Color adaptiveTextColor =
+        isDarkMode ? lightenThemeColor : Colors.grey.shade900;
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 25),
       // width: 500,
@@ -42,7 +50,7 @@ class _HumorCategoryCardState extends State<HumorCategoryCard>
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20.0),
         ),
-        color: Colors.white,
+        color: isDarkMode ? darkenThemeColor : Colors.white,
         child: ClipRRect(
           borderRadius: BorderRadius.circular(20.0),
           child: Column(
@@ -52,7 +60,10 @@ class _HumorCategoryCardState extends State<HumorCategoryCard>
                 child: Container(
                   // margin: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: widget.category.themeColor,
+                    color: isDarkMode
+                        ? lightenThemeColor
+                        // ? darken(widget.category.themeColor, 0.2)
+                        : widget.category.themeColor,
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Column(
@@ -63,10 +74,10 @@ class _HumorCategoryCardState extends State<HumorCategoryCard>
                         child: Text(
                           widget.category.title,
                           textAlign: TextAlign.left,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 30,
                             fontWeight: FontWeight.bold,
-                            color: Colors.black,
+                            color: isDarkMode ? darkenThemeColor : Colors.black,
                           ),
                         ),
                       ),
@@ -77,10 +88,25 @@ class _HumorCategoryCardState extends State<HumorCategoryCard>
                             scale: _controller.drive(
                               Tween<double>(begin: 0.9, end: 1.05),
                             ),
-                            child: Image.asset(widget.category.imgPath,
-                                color: darken(widget.category.themeColor, 0.4)
-                                // color: Color(0xff74b9ff),
-                                ),
+                            // child: Image.asset(
+                            //   widget.category.imgPath,
+                            //   color: darkenThemeColor,
+                            // ),
+                            child: Lottie.asset(
+                              // widget.category.imgPath,
+                              // color: darkenThemeColor,
+                              'assets/lottie/lottie2.json',
+                              fit: BoxFit.contain,
+                              delegates: LottieDelegates(
+                                values: [
+                                  ValueDelegate.colorFilter(
+                                    ['**'],
+                                    value: ColorFilter.mode(
+                                        darkenThemeColor, BlendMode.src),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
                         ),
                       ),
@@ -103,33 +129,45 @@ class _HumorCategoryCardState extends State<HumorCategoryCard>
                           fontWeight: FontWeight.w600,
                           fontSize: 18,
                           fontStyle: FontStyle.italic,
-                          color: Colors.grey.shade900),
+                          color: adaptiveTextColor),
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
                           '${widget.category.numDailyNew} new jokes daily',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontWeight: FontWeight.w700,
+                            color: adaptiveTextColor,
                           ),
                         ),
                         if (widget.category.subscriberOnly)
                           Chip(
-                            avatar: const Icon(Icons.lock),
-                            backgroundColor: Colors.grey.shade100,
-                            shape: const StadiumBorder(
+                            avatar: Icon(
+                              Icons.lock,
+                              color: isDarkMode ? lightenThemeColor : null,
+                            ),
+                            backgroundColor: isDarkMode
+                                ? darkenThemeColor
+                                : Colors.grey.shade100,
+                            shape: StadiumBorder(
                               side: BorderSide(
-                                color: Colors.transparent, // No border color
-                                width: 0, // Border width set to zero
+                                color: isDarkMode
+                                    ? lightenThemeColor
+                                    : Colors.transparent, // No border color
+                                width: isDarkMode
+                                    ? 0.5
+                                    : 0, // Border width set to zero
                               ),
                             ),
                             // elevation: 1,
-                            shadowColor: Colors.grey.shade100,
-                            label: const Text(
+                            shadowColor:
+                                isDarkMode ? null : Colors.grey.shade100,
+                            label: Text(
                               'Subscribers Only',
                               style: TextStyle(
                                 fontWeight: FontWeight.w700,
+                                color: isDarkMode ? lightenThemeColor : null,
                               ),
                             ),
                           ),

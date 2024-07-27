@@ -1,6 +1,5 @@
-import 'package:flutter/material.dart';
 import 'dart:ui';
-import 'package:daily_dose_of_humors/widgets/page_header_text.dart';
+import 'package:flutter/material.dart';
 import 'package:daily_dose_of_humors/data/category_data.dart';
 import 'package:daily_dose_of_humors/util/util.dart';
 import 'package:daily_dose_of_humors/widgets/app_bar.dart';

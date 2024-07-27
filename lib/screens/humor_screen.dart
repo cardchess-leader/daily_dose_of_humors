@@ -1,8 +1,7 @@
-import 'package:daily_dose_of_humors/util/util.dart';
 import 'package:flutter/material.dart';
-import 'package:daily_dose_of_humors/models/category.dart';
-import 'package:daily_dose_of_humors/widgets/custom_chip.dart';
+import 'package:lottie/lottie.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+import 'package:daily_dose_of_humors/models/category.dart';
 
 class HumorScreen extends StatefulWidget {
   final Category selectedCategory;
@@ -35,50 +34,90 @@ class _HumorScreenState extends State<HumorScreen> {
 
   @override
   Widget build(BuildContext context) {
+    bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    Color blackOrWhite = isDarkMode ? Colors.white : Colors.black;
+
     return Scaffold(
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        title: Text(
+          _selectedCategory.title,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        backgroundColor: _selectedCategory.themeColor,
+        centerTitle: true,
+      ),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
           child: Column(
             children: [
               Expanded(
                 flex: 2,
                 child: Container(
-                  padding: EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: Color.fromARGB(89, 108, 189, 255),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Column(
                     children: [
-                      Row(
-                        children: [
-                          CustomChip(
-                              color: Color.fromARGB(0, 0, 0, 0),
-                              // textColor: Color.fromARGB(159, 0, 0, 0),
-                              textColor: darken(
-                                Color.fromARGB(89, 108, 189, 255),
-                                0.5,
-                              ),
-                              label: 'Dad Jokes'),
-                          const SizedBox(width: 10),
-                          CustomChip(
-                              color: Color.fromARGB(0, 33, 149, 243),
-                              textColor: darken(
-                                Color.fromARGB(89, 108, 189, 255),
-                                0.5,
-                              ),
-                              label: '2024-07-10'),
-                          const Expanded(child: SizedBox(width: 10)),
-                          CustomChip(
-                            color: Colors.transparent,
-                            textColor: darken(
-                              Color.fromARGB(89, 108, 189, 255),
-                              0.5,
-                            ),
-                            label: '1/5',
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Container(
+                          padding: const EdgeInsets.only(right: 10),
+                          decoration: BoxDecoration(
+                            // color: Colors.black,
+                            borderRadius: BorderRadius.circular(20),
                           ),
-                        ],
+                          clipBehavior: Clip.hardEdge,
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Lottie.asset(
+                                // widget.category.imgPath,
+                                // color: darkenThemeColor,
+                                'assets/lottie/lottie2.json',
+                                width: 50,
+                                height: 50,
+                                delegates: LottieDelegates(
+                                  values: [
+                                    ValueDelegate.colorFilter(
+                                      ['**'],
+                                      value: ColorFilter.mode(
+                                        // _selectedCategory.themeColor,
+                                        blackOrWhite,
+                                        BlendMode.src,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Text(
+                                'x  123',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: isDarkMode
+                                      ? Colors.grey.shade100
+                                      : Colors.grey.shade900,
+                                ),
+                              ),
+                              Expanded(
+                                child: Container(),
+                              ),
+                              Text(
+                                '2024/07/27 #1',
+                                style: TextStyle(
+                                  color: blackOrWhite,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
                       Expanded(
                         child: PageView.builder(
@@ -104,7 +143,7 @@ class _HumorScreenState extends State<HumorScreen> {
                                           style: TextStyle(
                                             fontSize: 26,
                                             fontWeight: FontWeight.w600,
-                                            color: Colors.grey.shade900,
+                                            color: blackOrWhite,
                                           ),
                                           textAlign: TextAlign.center,
                                         ),
@@ -120,9 +159,10 @@ class _HumorScreenState extends State<HumorScreen> {
                       SmoothPageIndicator(
                         controller: controller, // PageController
                         count: 3,
-                        effect: const WormEffect(
+                        effect: WormEffect(
                           dotWidth: 12,
                           dotHeight: 12,
+                          activeDotColor: _selectedCategory.themeColor,
                         ), // your preferred effect
                         onDotClicked: (index) {
                           controller.animateToPage(
@@ -132,56 +172,9 @@ class _HumorScreenState extends State<HumorScreen> {
                           );
                         },
                       ),
-                      const Row(
-                        children: [
-                          SizedBox(
-                            width: 10,
-                          ),
-                          Icon(
-                            Icons.sentiment_very_satisfied_rounded,
-                            size: 30,
-                          ),
-                          SizedBox(
-                            width: 5,
-                          ),
-                          Text(
-                            'x123',
-                            style: TextStyle(fontWeight: FontWeight.w600),
-                          ),
-                        ],
-                      ),
                       const SizedBox(
                         height: 5,
                       ),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 10),
-              Expanded(
-                child: Container(
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: const Color.fromARGB(30, 0, 0, 0),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: const Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    // crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Icon(
-                        Icons.touch_app_rounded,
-                        size: 100,
-                        color: Color.fromARGB(58, 0, 0, 0),
-                      ),
-                      Text(
-                        'Tap to view punchline',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontStyle: FontStyle.italic,
-                          color: Color.fromARGB(111, 0, 0, 0),
-                        ),
-                      )
                     ],
                   ),
                 ),
@@ -191,7 +184,8 @@ class _HumorScreenState extends State<HumorScreen> {
         ),
       ),
       bottomNavigationBar: BottomAppBar(
-        // shape: CircularNotchedRectangle(),
+        // color: Colors.transparent,
+        color: _selectedCategory.themeColor,
         notchMargin: 6.0,
         child: Row(
           children: [
@@ -212,15 +206,19 @@ class _HumorScreenState extends State<HumorScreen> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endContained,
       floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.amber.shade400,
+        // backgroundColor: _selectedCategory.themeColor,
         // elevation: 0,
         onPressed: () {
           // Handle the FAB action
           print('FAB Pressed');
         },
         tooltip: 'Add',
-        child: const Icon(
-          Icons.sentiment_very_satisfied_rounded,
-          size: 30,
+        child: Lottie.asset(
+          'assets/lottie/lottie-test.json',
+          fit: BoxFit.contain,
+          // width: 10,
+          // height: 10,
         ),
       ),
     );

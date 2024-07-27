@@ -9,15 +9,17 @@ const humorCategoryList = [
     numDailyNew: 10,
     subscriberOnly: true,
     themeColor: Color.fromARGB(255, 61, 171, 255),
+    themeColor2: Color.fromARGB(255, 207, 229, 255),
   ),
   Category(
-    title: 'Knock-Knock Series',
+    title: 'Knock-Knock Jokes',
     imgPath: 'assets/images/fist.png',
     description:
         'Interactive and pun-based humor, often silly and family-friendly.',
     numDailyNew: 5,
     subscriberOnly: true,
-    themeColor: Color.fromARGB(255, 255, 88, 76),
+    themeColor: Color.fromARGB(255, 255, 76, 91),
+    themeColor2: Color.fromARGB(255, 255, 227, 227),
   ),
   Category(
     title: 'One-Liners',
@@ -27,6 +29,7 @@ const humorCategoryList = [
     numDailyNew: 7,
     subscriberOnly: true,
     themeColor: Color.fromARGB(255, 115, 216, 119),
+    themeColor2: Color.fromARGB(255, 225, 242, 225),
   ),
   Category(
     title: 'Dark Humors',
@@ -35,6 +38,7 @@ const humorCategoryList = [
     numDailyNew: 7,
     subscriberOnly: true,
     themeColor: Color.fromARGB(255, 186, 186, 186),
+    themeColor2: Color.fromARGB(255, 234, 234, 234),
   ),
   Category(
     title: 'Tricky Riddles',
@@ -44,14 +48,16 @@ const humorCategoryList = [
     numDailyNew: 7,
     subscriberOnly: true,
     themeColor: Color.fromARGB(255, 255, 239, 96),
+    themeColor2: Color.fromARGB(255, 255, 248, 188),
   ),
   Category(
-    title: 'Fun Facts',
+    title: 'OX Quiz',
     imgPath: 'assets/images/light-bulb.png',
-    description: 'Interesting trivia, often surprising and amusing.',
+    description: 'Quiz of interesting trivia, often surprising and amusing.',
     numDailyNew: 7,
     subscriberOnly: true,
     themeColor: Color.fromARGB(255, 57, 199, 218),
+    themeColor2: Color.fromARGB(255, 198, 230, 234),
   ),
   Category(
     title: 'Funny Quotes',
@@ -60,6 +66,7 @@ const humorCategoryList = [
     numDailyNew: 7,
     subscriberOnly: true,
     themeColor: Color.fromARGB(255, 255, 177, 60),
+    themeColor2: Color.fromARGB(255, 255, 230, 192),
   ),
   Category(
     title: 'Story Jokes',
@@ -68,6 +75,7 @@ const humorCategoryList = [
     numDailyNew: 7,
     subscriberOnly: true,
     themeColor: Color.fromARGB(255, 166, 127, 112),
+    themeColor2: Color.fromARGB(255, 213, 193, 185),
   ),
   Category(
     title: 'Detective Puzzles',

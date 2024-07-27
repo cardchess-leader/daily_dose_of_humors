@@ -7,6 +7,7 @@ class Category {
   final int numDailyNew;
   final bool subscriberOnly;
   final Color themeColor;
+  final Color themeColor2;
   // final List<Color> themeColorGradient;
   const Category({
     required this.title,
@@ -15,6 +16,7 @@ class Category {
     required this.numDailyNew,
     this.subscriberOnly = false,
     required this.themeColor,
+    this.themeColor2 = Colors.white,
     // required this.themeColorGradient,
   });
 }
