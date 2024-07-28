@@ -29,7 +29,12 @@ class _ShopScreenState extends State<ShopScreen> {
               fontSize: 20,
             ),
           ),
-          subtitle: Text(subtitle),
+          subtitle: Text(
+            subtitle,
+            style: const TextStyle(
+                // fontWeight: FontWeight.w600,
+                ),
+          ),
           trailing: const Icon(Icons.arrow_forward_rounded),
           onTap: () => {
             Navigator.of(context).push(
@@ -85,11 +90,17 @@ class _ShopScreenState extends State<ShopScreen> {
                         ' Best Dad Jokes of 2023',
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                       Text(
                         ' \$2.24',
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                            // fontWeight: FontWeight.w600,
+                            ),
                       ),
                     ],
                   ),
@@ -98,6 +109,7 @@ class _ShopScreenState extends State<ShopScreen> {
             ),
           ),
         ),
+        const SizedBox(height: 30),
       ],
     );
   }

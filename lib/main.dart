@@ -21,22 +21,22 @@ class MyApp extends StatelessWidget {
         textTheme: GoogleFonts.patrickHandTextTheme(
           Theme.of(context).textTheme,
         ),
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
       darkTheme: ThemeData.dark().copyWith(
         brightness: Brightness.dark,
-        primaryColor: Colors.grey[900],
-        scaffoldBackgroundColor: Colors.grey[850],
+        // primaryColor: Colors.grey[900],
+        scaffoldBackgroundColor: Colors.grey[900],
         colorScheme: ColorScheme.dark(
           primary: Colors.grey.shade900,
-          secondary: Colors.blueGrey.shade300,
           surface: Colors
-              .grey[850]!, // Use surface color for cards and other surfaces
+              .grey[900]!, // Use surface color for cards and other surfaces
         ),
-        // colorScheme: kDarkColorScheme,
         textTheme: GoogleFonts.patrickHandTextTheme(
-          Theme.of(context).textTheme,
+          Theme.of(context).textTheme.apply(
+                bodyColor: Colors.white,
+                displayColor: Colors.white,
+              ),
         ),
       ),
       home: const TabsScreen(),

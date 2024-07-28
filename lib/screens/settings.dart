@@ -12,6 +12,9 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
+  bool themeValue = true;
+  bool vibValue = true;
+  bool notiValue = true;
   @override
   void initState() {
     super.initState();
@@ -57,6 +60,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       appBar: const CustomAppBar(
         heading: 'Settings',
@@ -88,8 +92,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
               scale: 0.8,
               alignment: Alignment.centerRight,
               child: Switch(
-                value: true,
-                onChanged: (value) => {},
+                value: themeValue,
+                onChanged: (value) => {setState(() => themeValue = value)},
+                activeColor: Colors.white,
+                activeTrackColor: isDarkMode
+                    ? Colors.amberAccent
+                    : Colors.blueAccent.shade200,
+                inactiveThumbColor:
+                    isDarkMode ? Colors.grey.shade300 : Colors.grey.shade600,
+                inactiveTrackColor: Colors.transparent,
               ),
             ),
             // const Icon(Icons.keyboard_arrow_right_rounded),
@@ -101,8 +112,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
               scale: 0.8,
               alignment: Alignment.centerRight,
               child: Switch(
-                value: true,
-                onChanged: (value) => {},
+                value: vibValue,
+                onChanged: (value) => {setState(() => vibValue = value)},
+                activeColor: Colors.white,
+                activeTrackColor: isDarkMode
+                    ? Colors.amberAccent
+                    : Colors.blueAccent.shade200,
+                inactiveThumbColor:
+                    isDarkMode ? Colors.grey.shade300 : Colors.grey.shade600,
+                inactiveTrackColor: Colors.transparent,
               ),
             ),
           ),
@@ -113,8 +131,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
               scale: 0.8,
               alignment: Alignment.centerRight,
               child: Switch(
-                value: true,
-                onChanged: (value) => {},
+                value: notiValue,
+                onChanged: (value) => {setState(() => notiValue = value)},
+                activeColor: Colors.white,
+                activeTrackColor: isDarkMode
+                    ? Colors.amberAccent
+                    : Colors.blueAccent.shade200,
+                inactiveThumbColor:
+                    isDarkMode ? Colors.grey.shade300 : Colors.grey.shade600,
+                inactiveTrackColor: Colors.transparent,
               ),
             ),
           ),

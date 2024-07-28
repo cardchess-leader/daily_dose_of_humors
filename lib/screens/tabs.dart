@@ -34,6 +34,7 @@ class _TabsScreenState extends State<TabsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
     late Widget activePage;
 
     switch (_selectedPageIndex) {
@@ -89,15 +90,14 @@ class _TabsScreenState extends State<TabsScreen> {
     return Scaffold(
       body: activePage,
       bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: Colors.amber,
         onTap: _selectPage,
         currentIndex: _selectedPageIndex,
-        selectedItemColor: Colors.grey.shade900,
+        selectedItemColor:
+            isDarkMode ? Colors.grey.shade100 : Colors.grey.shade900,
         unselectedItemColor: Colors.grey.shade500,
-        // selectedIconTheme:
-        //     IconThemeData(size: 22), // Set the size for selected icons
-        // unselectedIconTheme: IconThemeData(size: 22),
         selectedLabelStyle:
-            TextStyle(fontSize: 10, fontWeight: FontWeight.w600),
+            const TextStyle(fontSize: 10, fontWeight: FontWeight.w600),
         items: [
           BottomNavigationBarItem(
             icon: _selectedPageIndex == 0

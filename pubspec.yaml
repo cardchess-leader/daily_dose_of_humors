@@ -62,27 +62,8 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - assets/images/knock-icon.png
-    - assets/images/dad-joke-icon.png
-    - assets/images/one-line-icon.png
-    - assets/images/line.png
-    - assets/images/mask.png
-    - assets/images/knot.png
-    - assets/images/knocking.png
-    - assets/images/fist.png
-    - assets/images/moustache.png
-    - assets/images/light-bulb.png
-    - assets/images/quotation-marks.png
-    - assets/images/quotation.png
-    - assets/images/open-book.png
-    - assets/images/detective.png
-    - assets/images/punch.png
-    - assets/images/tongue.png
-    - assets/images/smiley-face.png
-    - assets/images/smile-background-0.png
-    - assets/images/smile-background-1.png
-    - assets/images/smile-background-2.png
-    - assets/images/smile-background-3.png
+    - assets/icons/
+    - assets/images/
     - assets/lottie/
 
   # An image asset can refer to one or more resolution-specific "variants", see

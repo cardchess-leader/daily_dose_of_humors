@@ -137,19 +137,31 @@ class _BookmarkScreenState extends State<BookmarkScreen>
 
   @override
   Widget build(BuildContext context) {
+    bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    Color blackOrWhite = isDarkMode ? Colors.white : Colors.black;
+
     return Scaffold(
       appBar: CustomAppBar(
-          heading: 'Humor Bookmarks',
-          subheading: 'Your Favorite Humors',
-          additionalHeight: 50,
-          backgroundColor: const Color.fromARGB(255, 248, 255, 242),
-          bottom: TabBar(
-            controller: _tabController,
-            tabs: const [
-              Tab(text: 'Bookmarks'),
-              Tab(text: 'Library'),
-            ],
-          )),
+        heading: 'Humor Bookmarks',
+        subheading: 'Your Favorite Humors',
+        additionalHeight: 50,
+        backgroundColor: const Color.fromARGB(255, 248, 255, 242),
+        bottom: TabBar(
+          // indicatorColor: Colors.white,
+          labelStyle: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            fontFamily: Theme.of(context).textTheme.bodyMedium?.fontFamily,
+            color: Colors.black,
+          ),
+          unselectedLabelColor: Colors.grey.shade500,
+          controller: _tabController,
+          tabs: const [
+            Tab(text: 'Bookmarks'),
+            Tab(text: 'Library'),
+          ],
+        ),
+      ),
       body: TabBarView(
         controller: _tabController,
         children: [
@@ -160,12 +172,29 @@ class _BookmarkScreenState extends State<BookmarkScreen>
             padding: const EdgeInsets.symmetric(horizontal: 25),
             itemBuilder: cardBuilder,
           ),
-          const Center(
-            child: Text('Wow, such empty!'),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Image.asset(
+                'assets/icons/wow.png',
+                width: 40,
+                height: 40,
+                color: blackOrWhite,
+              ),
+              const SizedBox(height: 10),
+              const Text(
+                'Wow, such empty!',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+            ],
           ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.amber.shade400,
         elevation: 2,
         onPressed: () {
           // Handle the FAB action

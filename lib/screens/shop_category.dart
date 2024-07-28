@@ -61,11 +61,15 @@ class ShopCategoryScreen extends StatelessWidget {
                           ' Best Dad Jokes of 2023',
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                         Text(
                           ' \$2.24',
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
+                          style: TextStyle(),
                         ),
                       ],
                     ),
