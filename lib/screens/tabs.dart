@@ -77,14 +77,14 @@ class _TabsScreenState extends State<TabsScreen> {
         );
         break;
       case 1:
-        activePage = ShopScreen();
+        activePage = const ShopScreen();
         break;
       case 2:
-        activePage = BookmarkScreen();
+        activePage = const BookmarkScreen();
         break;
       case 3:
       default:
-        activePage = SettingsScreen();
+        activePage = const SettingsScreen();
     }
 
     return Scaffold(
@@ -101,26 +101,26 @@ class _TabsScreenState extends State<TabsScreen> {
         items: [
           BottomNavigationBarItem(
             icon: _selectedPageIndex == 0
-                ? Icon(Icons.dashboard)
-                : Icon(Icons.dashboard_outlined),
+                ? const Icon(Icons.dashboard)
+                : const Icon(Icons.dashboard_outlined),
             label: 'Home',
           ),
           BottomNavigationBarItem(
             icon: _selectedPageIndex == 1
-                ? Icon(Icons.shopping_cart)
-                : Icon(Icons.shopping_cart_outlined),
+                ? const Icon(Icons.shopping_cart)
+                : const Icon(Icons.shopping_cart_outlined),
             label: 'Shop',
           ),
           BottomNavigationBarItem(
             icon: _selectedPageIndex == 2
-                ? Icon(Icons.bookmark)
-                : Icon(Icons.bookmark_outline),
+                ? const Icon(Icons.bookmark)
+                : const Icon(Icons.bookmark_outline),
             label: 'Bookmarks',
           ),
           BottomNavigationBarItem(
             icon: _selectedPageIndex == 3
-                ? Icon(Icons.settings)
-                : Icon(Icons.settings_outlined),
+                ? const Icon(Icons.settings)
+                : const Icon(Icons.settings_outlined),
             label: 'Settings',
           ),
         ],

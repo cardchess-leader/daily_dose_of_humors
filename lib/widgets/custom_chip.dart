@@ -19,7 +19,7 @@ class CustomChip extends StatelessWidget {
         color: color,
         borderRadius: BorderRadius.circular(20),
       ),
-      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
       child: Text(
         label,
         style: TextStyle(color: textColor, fontWeight: FontWeight.bold),

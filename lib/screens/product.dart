@@ -163,7 +163,7 @@ class ProductScreen extends StatelessWidget {
                         ),
                       ),
                     )),
-                SizedBox(
+                const SizedBox(
                   // The Product Description Part //
                   width: double.infinity,
                   child: Column(

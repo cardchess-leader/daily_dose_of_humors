@@ -33,6 +33,7 @@ class _ShopScreenState extends State<ShopScreen> {
             subtitle,
             style: const TextStyle(
                 // fontWeight: FontWeight.w600,
+                // color: Colors.white,
                 ),
           ),
           trailing: const Icon(Icons.arrow_forward_rounded),
