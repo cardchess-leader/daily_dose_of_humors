@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:lottie/lottie.dart';
 import 'package:scroll_snap_list/scroll_snap_list.dart';
 import 'package:daily_dose_of_humors/screens/shop.dart';
 import 'package:daily_dose_of_humors/screens/humor_screen.dart';
@@ -18,8 +20,35 @@ class TabsScreen extends StatefulWidget {
   }
 }
 
-class _TabsScreenState extends State<TabsScreen> {
+class _TabsScreenState extends State<TabsScreen>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
   int _selectedPageIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 1), // Duration of the animation
+    )..addStatusListener((status) {
+        if (status == AnimationStatus.completed) {
+          Future.delayed(const Duration(seconds: 1), () {
+            // Delay of 1 second
+            _controller.reset();
+            _controller.forward();
+          });
+        }
+      }); // Start the animation automatically
+
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   void _selectPage(int index) {
     setState(() {
@@ -30,6 +59,42 @@ class _TabsScreenState extends State<TabsScreen> {
   void _openHumorCategory(selectedCategory) {
     Navigator.of(context).push(
         MaterialPageRoute(builder: (ctx) => HumorScreen(selectedCategory)));
+  }
+
+  Widget getBottomNavLottie(String assetPath) {
+    return Lottie.asset(
+      assetPath,
+      width: 24,
+      controller: _controller,
+      delegates: LottieDelegates(
+        values: [
+          ValueDelegate.colorFilter(
+            ['**'],
+            value: ColorFilter.mode(Colors.grey.shade500, BlendMode.src),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget getBottomNavSVG(String assetPath, bool isDarkMode) {
+    return SvgPicture.asset(
+      assetPath,
+      colorFilter: ColorFilter.mode(
+          isDarkMode
+              ? Colors.white.withOpacity(1)
+              : Colors.black.withOpacity(1),
+          BlendMode.srcIn),
+      width: 24,
+    );
+  }
+
+  Widget getBottomNavPNG(String assetPath, bool isDarkMode) {
+    return Image.asset(
+      assetPath,
+      color: isDarkMode ? Colors.white : Colors.black,
+      width: 24,
+    );
   }
 
   @override
@@ -101,26 +166,26 @@ class _TabsScreenState extends State<TabsScreen> {
         items: [
           BottomNavigationBarItem(
             icon: _selectedPageIndex == 0
-                ? const Icon(Icons.dashboard)
-                : const Icon(Icons.dashboard_outlined),
+                ? getBottomNavPNG('assets/icons/home.png', isDarkMode)
+                : getBottomNavLottie('assets/lottie/home-1.json'),
             label: 'Home',
           ),
           BottomNavigationBarItem(
             icon: _selectedPageIndex == 1
-                ? const Icon(Icons.shopping_cart)
-                : const Icon(Icons.shopping_cart_outlined),
+                ? getBottomNavPNG('assets/icons/shop.png', isDarkMode)
+                : getBottomNavLottie('assets/lottie/shop-1.json'),
             label: 'Shop',
           ),
           BottomNavigationBarItem(
             icon: _selectedPageIndex == 2
-                ? const Icon(Icons.bookmark)
-                : const Icon(Icons.bookmark_outline),
+                ? getBottomNavPNG('assets/icons/bookmark.png', isDarkMode)
+                : getBottomNavLottie('assets/lottie/bookmark-3.json'),
             label: 'Bookmarks',
           ),
           BottomNavigationBarItem(
             icon: _selectedPageIndex == 3
-                ? const Icon(Icons.settings)
-                : const Icon(Icons.settings_outlined),
+                ? getBottomNavPNG('assets/icons/settings.png', isDarkMode)
+                : getBottomNavLottie('assets/lottie/settings-1.json'),
             label: 'Settings',
           ),
         ],
