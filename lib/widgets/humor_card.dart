@@ -64,6 +64,7 @@ class _HumorCategoryCardState extends State<HumorCategoryCard>
                         ? lightenThemeColor
                         // ? darken(widget.category.themeColor, 0.2)
                         : widget.category.themeColor,
+                    // : Colors.white,
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Column(
@@ -86,27 +87,30 @@ class _HumorCategoryCardState extends State<HumorCategoryCard>
                           padding: const EdgeInsets.fromLTRB(10, 10, 10, 30),
                           child: ScaleTransition(
                             scale: _controller.drive(
-                              Tween<double>(begin: 0.9, end: 1.05),
+                              // Tween<double>(begin: 0.9, end: 1.05),
+                              Tween<double>(begin: 1, end: 1.0),
                             ),
-                            // child: Image.asset(
-                            //   widget.category.imgPath,
-                            //   color: darkenThemeColor,
-                            // ),
-                            child: Lottie.asset(
-                              // widget.category.imgPath,
+                            child: Image.asset(
+                              widget.category.imgPath,
+                              width: widget.category.imgSize,
+                              // fit: BoxFit.contain,
                               // color: darkenThemeColor,
-                              'assets/lottie/lottie2.json',
-                              fit: BoxFit.contain,
-                              delegates: LottieDelegates(
-                                values: [
-                                  ValueDelegate.colorFilter(
-                                    ['**'],
-                                    value: ColorFilter.mode(
-                                        darkenThemeColor, BlendMode.src),
-                                  ),
-                                ],
-                              ),
                             ),
+                            // child: Lottie.asset(
+                            //   // widget.category.imgPath,
+                            //   // color: darkenThemeColor,
+                            //   'assets/lottie/lottie2.json',
+                            //   fit: BoxFit.contain,
+                            //   delegates: LottieDelegates(
+                            //     values: [
+                            //       ValueDelegate.colorFilter(
+                            //         ['**'],
+                            //         value: ColorFilter.mode(
+                            //             darkenThemeColor, BlendMode.src),
+                            //       ),
+                            //     ],
+                            //   ),
+                            // ),
                           ),
                         ),
                       ),

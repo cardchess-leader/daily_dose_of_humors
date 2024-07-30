@@ -13,15 +13,54 @@ class HumorScreen extends StatefulWidget {
   }
 }
 
-class _HumorScreenState extends State<HumorScreen> {
+class _HumorScreenState extends State<HumorScreen>
+    with TickerProviderStateMixin {
   late Category _selectedCategory;
+  late AnimationController _infoAnimController;
+  late AnimationController _shareAnimController;
+  late AnimationController _bookmarkAnimController;
   // int _currentPage = 0;
   final controller = PageController(viewportFraction: 0.8, keepPage: true);
+  var bookmarkLottieAsset = 'assets/lottie/regular-marked-bookmark.json';
+  var bookmarked = false;
 
   @override
   void initState() {
     super.initState();
     _selectedCategory = widget.selectedCategory;
+    _infoAnimController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 1),
+    )..addStatusListener(_infoAnimationStatusListener);
+    _infoAnimController.forward();
+    _shareAnimController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 1),
+    );
+    _bookmarkAnimController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 1),
+    );
+  }
+
+  @override
+  void dispose() {
+    _infoAnimController.removeStatusListener(_infoAnimationStatusListener);
+    _infoAnimController.dispose();
+    _shareAnimController.dispose();
+    _bookmarkAnimController.dispose();
+    super.dispose();
+  }
+
+  void _infoAnimationStatusListener(AnimationStatus status) {
+    if (status == AnimationStatus.completed) {
+      Future.delayed(const Duration(seconds: 1), () {
+        if (mounted) {
+          _infoAnimController.reset();
+          _infoAnimController.forward();
+        }
+      });
+    }
   }
 
   void _onItemTapped(int index) {
@@ -29,7 +68,41 @@ class _HumorScreenState extends State<HumorScreen> {
       case 0:
         Navigator.of(context).pop();
         break;
+      case 1:
+        _shareAnimController.reset();
+        _shareAnimController.forward();
+        break;
+      case 2:
+        setState(() {
+          bookmarked = !bookmarked;
+          if (bookmarked) {
+            bookmarkLottieAsset = 'assets/lottie/regular-marked-bookmark.json';
+          } else {
+            bookmarkLottieAsset =
+                'assets/lottie/regular-unmarked-bookmark.json';
+          }
+          _bookmarkAnimController.reset();
+          _bookmarkAnimController.forward();
+        });
+        break;
     }
+  }
+
+  Widget getBottomNavLottie(
+      String assetPath, Color color, AnimationController controller) {
+    return Lottie.asset(
+      assetPath,
+      width: 24,
+      controller: controller,
+      delegates: LottieDelegates(
+        values: [
+          ValueDelegate.colorFilter(
+            ['**'],
+            value: ColorFilter.mode(color, BlendMode.src),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -44,15 +117,49 @@ class _HumorScreenState extends State<HumorScreen> {
           _selectedCategory.title,
           style: const TextStyle(
             fontWeight: FontWeight.bold,
-            // color: Colors.white,
+            fontSize: 25,
           ),
         ),
         backgroundColor: _selectedCategory.themeColor,
+        // backgroundColor: Colors.amber,
         centerTitle: true,
         actions: [
           IconButton(
             onPressed: () => {},
-            icon: const Icon(Icons.question_mark_rounded),
+            icon: Stack(
+              children: [
+                Container(
+                  width: 45.0,
+                  height: 45.0,
+                  alignment: Alignment.center,
+                  child: Container(
+                    width: 30,
+                    height: 30,
+                    decoration: BoxDecoration(
+                      color: blackOrWhite, // Set the circle color
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                ),
+                Lottie.asset(
+                  'assets/lottie/help-1.json',
+                  width: 45,
+                  height: 45,
+                  controller: _infoAnimController,
+                  delegates: LottieDelegates(
+                    values: [
+                      ValueDelegate.colorFilter(
+                        ['**'],
+                        value: ColorFilter.mode(
+                          _selectedCategory.themeColor,
+                          BlendMode.src,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -145,7 +252,7 @@ class _HumorScreenState extends State<HumorScreen> {
                                     padding: const EdgeInsets.all(30),
                                     child: Center(
                                       child: Text(
-                                        'What did the Fox say?',
+                                        "¿Qué acabas de decir?",
                                         style: TextStyle(
                                           fontSize: 26,
                                           fontWeight: FontWeight.w600,
@@ -195,24 +302,21 @@ class _HumorScreenState extends State<HumorScreen> {
         child: Row(
           children: [
             IconButton(
-              icon: const Icon(
-                Icons.arrow_back,
-                // color: Colors.white,
+              icon: Transform(
+                alignment: Alignment.center,
+                transform: Matrix4.identity()..scale(-1.0, 1.0, 1.0),
+                child: Image.asset('assets/icons/arrow-right.png', width: 24),
               ),
               onPressed: () => _onItemTapped(0),
             ),
             IconButton(
-              icon: const Icon(
-                Icons.share_outlined,
-                // color: Colors.white,
-              ),
+              icon: getBottomNavLottie('assets/lottie/share.json', blackOrWhite,
+                  _shareAnimController),
               onPressed: () => _onItemTapped(1),
             ),
             IconButton(
-              icon: const Icon(
-                Icons.bookmark_add_outlined,
-                // color: Colors.white,
-              ),
+              icon: getBottomNavLottie(
+                  bookmarkLottieAsset, blackOrWhite, _bookmarkAnimController),
               onPressed: () => _onItemTapped(2),
             ),
           ],

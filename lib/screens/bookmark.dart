@@ -143,7 +143,7 @@ class _BookmarkScreenState extends State<BookmarkScreen>
       appBar: CustomAppBar(
         heading: 'Humor Bookmarks',
         subheading: 'Your Favorite Humors',
-        additionalHeight: 50,
+        additionalHeight: 98,
         backgroundColor: const Color.fromARGB(255, 248, 255, 242),
         bottom: TabBar(
           // indicatorColor: Colors.white,

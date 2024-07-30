@@ -10,7 +10,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   const CustomAppBar({
     super.key,
     required this.heading,
-    this.additionalHeight = 25,
+    this.additionalHeight = 50,
     this.subheading = '',
     this.backgroundColor,
     this.bottom,
@@ -28,10 +28,12 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     }
 
     return AppBar(
-      backgroundColor: backgroundColor,
+      toolbarHeight: kToolbarHeight + additionalHeight,
       title: Column(
+        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          const SizedBox(height: 20),
           Text(
             heading,
             style: TextStyle(
@@ -50,7 +52,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                 fontSize: 16,
               ),
             ),
-            const SizedBox(height: 5),
+            const SizedBox(height: 20),
           ],
         ],
       ),
