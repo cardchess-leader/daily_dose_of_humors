@@ -21,7 +21,7 @@ class _HumorScreenState extends State<HumorScreen>
   late AnimationController _bookmarkAnimController;
   // int _currentPage = 0;
   final controller = PageController(viewportFraction: 0.8, keepPage: true);
-  var bookmarkLottieAsset = 'assets/lottie/regular-marked-bookmark.json';
+  var bookmarkLottieAsset = 'assets/lottie/bookmark-mark.json';
   var bookmarked = false;
 
   @override
@@ -76,11 +76,21 @@ class _HumorScreenState extends State<HumorScreen>
         setState(() {
           bookmarked = !bookmarked;
           if (bookmarked) {
-            bookmarkLottieAsset = 'assets/lottie/regular-marked-bookmark.json';
+            bookmarkLottieAsset = 'assets/lottie/bookmark-mark.json';
           } else {
-            bookmarkLottieAsset =
-                'assets/lottie/regular-unmarked-bookmark.json';
+            bookmarkLottieAsset = 'assets/lottie/bookmark-unmark.json';
           }
+          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Bookmark ${bookmarked ? 'Added' : 'Removed'}'),
+              action: SnackBarAction(
+                label: 'Undo',
+                textColor: Colors.amber,
+                onPressed: () => {},
+              ),
+            ),
+          );
           _bookmarkAnimController.reset();
           _bookmarkAnimController.forward();
         });
@@ -121,7 +131,6 @@ class _HumorScreenState extends State<HumorScreen>
           ),
         ),
         backgroundColor: _selectedCategory.themeColor,
-        // backgroundColor: Colors.amber,
         centerTitle: true,
         actions: [
           IconButton(
@@ -142,7 +151,7 @@ class _HumorScreenState extends State<HumorScreen>
                   ),
                 ),
                 Lottie.asset(
-                  'assets/lottie/help-1.json',
+                  'assets/lottie/help.json',
                   width: 45,
                   height: 45,
                   controller: _infoAnimController,
@@ -163,140 +172,134 @@ class _HumorScreenState extends State<HumorScreen>
           ),
         ],
       ),
-      body: Padding(
+      body: Container(
+        // color: Colors.amber,
         padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
         child: Column(
           children: [
             Expanded(
               flex: 2,
-              child: Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Column(
-                  children: [
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Container(
-                        padding: const EdgeInsets.only(right: 10),
-                        decoration: BoxDecoration(
-                          // color: Colors.black,
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        clipBehavior: Clip.hardEdge,
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Lottie.asset(
-                              // widget.category.imgPath,
-                              // color: darkenThemeColor,
-                              'assets/lottie/lottie2.json',
-                              width: 45,
-                              height: 45,
-                              delegates: LottieDelegates(
-                                values: [
-                                  ValueDelegate.colorFilter(
-                                    ['**'],
-                                    value: ColorFilter.mode(
-                                      // _selectedCategory.themeColor,
-                                      blackOrWhite,
-                                      BlendMode.src,
-                                    ),
+              child: Column(
+                children: [
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Container(
+                      padding: const EdgeInsets.only(right: 10),
+                      decoration: BoxDecoration(
+                        // color: Colors.black,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      clipBehavior: Clip.hardEdge,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Lottie.asset(
+                            // widget.category.imgPath,
+                            // color: darkenThemeColor,
+                            'assets/lottie/lottie2.json',
+                            width: 45,
+                            height: 45,
+                            delegates: LottieDelegates(
+                              values: [
+                                ValueDelegate.colorFilter(
+                                  ['**'],
+                                  value: ColorFilter.mode(
+                                    // _selectedCategory.themeColor,
+                                    blackOrWhite,
+                                    BlendMode.src,
                                   ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
-                            Text(
-                              'x  123',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: isDarkMode
-                                    ? Colors.grey.shade100
-                                    : Colors.grey.shade900,
-                              ),
+                          ),
+                          Text(
+                            'x  123',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: isDarkMode
+                                  ? Colors.grey.shade100
+                                  : Colors.grey.shade900,
                             ),
-                            Expanded(
-                              child: Container(),
+                          ),
+                          Expanded(
+                            child: Container(),
+                          ),
+                          Text(
+                            '2024/07/27 #1',
+                            style: TextStyle(
+                              color: blackOrWhite,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 16,
                             ),
-                            Text(
-                              '2024/07/27 #1',
-                              style: TextStyle(
-                                color: blackOrWhite,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 16,
-                              ),
-                            ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
-                    Expanded(
-                      child: PageView.builder(
-                        itemCount: 3,
-                        onPageChanged: (pageIndex) {
-                          print(pageIndex);
-                        },
-                        controller: controller,
-                        itemBuilder: (context, index) {
-                          return LayoutBuilder(
-                            builder: (context, constraints) {
-                              return SingleChildScrollView(
-                                child: ConstrainedBox(
-                                  constraints: BoxConstraints(
-                                    minHeight: constraints.maxHeight,
-                                  ),
-                                  child: Container(
-                                    // color: Colors.red,
-                                    padding: const EdgeInsets.all(30),
-                                    child: Center(
-                                      child: Text(
-                                        "¿Qué acabas de decir?",
-                                        style: TextStyle(
-                                          fontSize: 26,
-                                          fontWeight: FontWeight.w600,
-                                          color: blackOrWhite,
-                                        ),
-                                        textAlign: TextAlign.center,
+                  ),
+                  Expanded(
+                    child: PageView.builder(
+                      itemCount: 3,
+                      onPageChanged: (pageIndex) {
+                        print(pageIndex);
+                      },
+                      controller: controller,
+                      itemBuilder: (context, index) {
+                        return LayoutBuilder(
+                          builder: (context, constraints) {
+                            return SingleChildScrollView(
+                              child: ConstrainedBox(
+                                constraints: BoxConstraints(
+                                  minHeight: constraints.maxHeight,
+                                ),
+                                child: Container(
+                                  // color: Colors.red,
+                                  padding: const EdgeInsets.all(30),
+                                  child: Center(
+                                    child: Text(
+                                      "¿Qué acabas de decir?",
+                                      style: TextStyle(
+                                        fontSize: 26,
+                                        fontWeight: FontWeight.w600,
+                                        color: blackOrWhite,
                                       ),
+                                      textAlign: TextAlign.center,
                                     ),
                                   ),
                                 ),
-                              );
-                            },
-                          );
-                        },
-                      ),
-                    ),
-                    SmoothPageIndicator(
-                      controller: controller, // PageController
-                      count: 3,
-                      effect: WormEffect(
-                        dotWidth: 12,
-                        dotHeight: 12,
-                        activeDotColor: _selectedCategory.themeColor,
-                      ), // your preferred effect
-                      onDotClicked: (index) {
-                        controller.animateToPage(
-                          index,
-                          duration: const Duration(milliseconds: 300),
-                          curve: Curves.easeInOut,
+                              ),
+                            );
+                          },
                         );
                       },
                     ),
-                    const SizedBox(
-                      height: 5,
-                    ),
-                  ],
-                ),
+                  ),
+                  SmoothPageIndicator(
+                    controller: controller, // PageController
+                    count: 3,
+                    effect: WormEffect(
+                      dotWidth: 12,
+                      dotHeight: 12,
+                      activeDotColor: _selectedCategory.themeColor,
+                    ), // your preferred effect
+                    onDotClicked: (index) {
+                      controller.animateToPage(
+                        index,
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeInOut,
+                      );
+                    },
+                  ),
+                  const SizedBox(
+                    height: 5,
+                  ),
+                ],
               ),
             ),
           ],
         ),
       ),
       bottomNavigationBar: BottomAppBar(
-        // color: Colors.transparent,
         color: _selectedCategory.themeColor,
         notchMargin: 6.0,
         child: Row(
@@ -305,7 +308,11 @@ class _HumorScreenState extends State<HumorScreen>
               icon: Transform(
                 alignment: Alignment.center,
                 transform: Matrix4.identity()..scale(-1.0, 1.0, 1.0),
-                child: Image.asset('assets/icons/arrow-right.png', width: 24),
+                child: Image.asset(
+                  'assets/icons/arrow-right.png',
+                  width: 24,
+                  color: blackOrWhite,
+                ),
               ),
               onPressed: () => _onItemTapped(0),
             ),
@@ -325,8 +332,6 @@ class _HumorScreenState extends State<HumorScreen>
       floatingActionButtonLocation: FloatingActionButtonLocation.endContained,
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.amber.shade400,
-        // backgroundColor: _selectedCategory.themeColor,
-        // elevation: 0,
         onPressed: () {
           // Handle the FAB action
           print('FAB Pressed');

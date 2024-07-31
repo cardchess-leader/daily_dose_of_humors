@@ -103,14 +103,19 @@ class ProductScreen extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       // SizedBox(width: 10),
-                      const Column(
+                      Column(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Icon(
-                            Icons.category_rounded,
-                            size: 30,
+                          Container(
+                            padding: const EdgeInsets.only(top: 5),
+                            child: Image.asset(
+                              'assets/icons/category.png',
+                              width: 28,
+                              height: 28,
+                              color: Colors.white,
+                            ),
                           ),
-                          Text(
+                          const Text(
                             'Dad Jokes',
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
@@ -141,9 +146,15 @@ class ProductScreen extends StatelessWidget {
                       const Column(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Icon(Icons.category_rounded),
                           Text(
-                            'Dad Jokes',
+                            'EN',
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Text(
+                            'Language',
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                             ),

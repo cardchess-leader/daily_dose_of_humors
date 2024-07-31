@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:daily_dose_of_humors/util/util.dart';
 import 'package:daily_dose_of_humors/widgets/app_bar.dart';
+import 'package:lottie/lottie.dart';
 
 class BookmarkScreen extends StatefulWidget {
   const BookmarkScreen({super.key});
@@ -13,8 +14,10 @@ class BookmarkScreen extends StatefulWidget {
 }
 
 class _BookmarkScreenState extends State<BookmarkScreen>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   late TabController _tabController;
+  late AnimationController _trashAnimController;
+  late AnimationController _humanAnimController;
 
   List<int> indexes = List.generate(10, (index) => index);
   List<Color> colorList = generateRandomColors(10);
@@ -23,12 +26,49 @@ class _BookmarkScreenState extends State<BookmarkScreen>
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    _trashAnimController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    )..addStatusListener(_trashAnimationStatusListener);
+    _trashAnimController.forward();
+
+    _humanAnimController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1000),
+    )..addStatusListener(_humanAnimationStatusListener);
+    _humanAnimController.forward();
   }
 
   @override
   void dispose() {
+    _trashAnimController.removeStatusListener(_trashAnimationStatusListener);
+    _humanAnimController.removeStatusListener(_humanAnimationStatusListener);
+    _trashAnimController.dispose();
+    _humanAnimController.dispose();
     _tabController.dispose();
     super.dispose();
+  }
+
+  void _trashAnimationStatusListener(AnimationStatus status) {
+    if (status == AnimationStatus.completed) {
+      Future.delayed(const Duration(milliseconds: 400), () {
+        if (mounted) {
+          _trashAnimController.reset();
+          _trashAnimController.forward();
+        }
+      });
+    }
+  }
+
+  void _humanAnimationStatusListener(AnimationStatus status) {
+    if (status == AnimationStatus.completed) {
+      Future.delayed(const Duration(milliseconds: 800), () {
+        if (mounted) {
+          _humanAnimController.reset();
+          _humanAnimController.forward();
+        }
+      });
+    }
   }
 
   Widget proxyDecorator(Widget child, int index, Animation<double> animation) {
@@ -58,14 +98,33 @@ class _BookmarkScreenState extends State<BookmarkScreen>
         onDismissed: (direction) {
           setState(() {
             indexes.removeAt(index);
+            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: const Text('Bookmark Removed'),
+                action: SnackBarAction(
+                  label: 'Undo',
+                  textColor: Colors.amber,
+                  onPressed: () => {},
+                ),
+              ),
+            );
           });
         },
         background: Container(
           alignment: Alignment.centerRight,
-          child: const Icon(
-            Icons.delete_forever_rounded,
-            color: Colors.grey,
-            size: 35,
+          child: Lottie.asset(
+            'assets/lottie/trash.json',
+            width: 30,
+            controller: _trashAnimController,
+            delegates: LottieDelegates(
+              values: [
+                ValueDelegate.colorFilter(
+                  ['**'],
+                  value: const ColorFilter.mode(Colors.grey, BlendMode.src),
+                ),
+              ],
+            ),
           ),
         ),
         child: Card(
@@ -139,6 +198,54 @@ class _BookmarkScreenState extends State<BookmarkScreen>
     bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
     Color blackOrWhite = isDarkMode ? Colors.white : Colors.black;
 
+    final emptyPlaceHolder = Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Stack(
+          children: [
+            Container(
+              width: 45.0,
+              height: 45.0,
+              alignment: Alignment.center,
+              child: Container(
+                width: 30,
+                height: 30,
+                decoration: BoxDecoration(
+                  color: blackOrWhite, // Set the circle color
+                  shape: BoxShape.circle,
+                ),
+              ),
+            ),
+            Lottie.asset(
+              'assets/lottie/human.json',
+              width: 45,
+              height: 45,
+              controller: _humanAnimController,
+              delegates: LottieDelegates(
+                values: [
+                  ValueDelegate.colorFilter(
+                    ['**'],
+                    value: ColorFilter.mode(
+                      Theme.of(context).scaffoldBackgroundColor,
+                      BlendMode.src,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        const Text(
+          'Wow, such empty!',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+          ),
+        ),
+      ],
+    );
+
     return Scaffold(
       appBar: CustomAppBar(
         heading: 'Humor Bookmarks',
@@ -146,7 +253,7 @@ class _BookmarkScreenState extends State<BookmarkScreen>
         additionalHeight: 98,
         backgroundColor: const Color.fromARGB(255, 248, 255, 242),
         bottom: TabBar(
-          // indicatorColor: Colors.white,
+          indicatorColor: isDarkMode ? Colors.grey.shade900 : Colors.grey,
           labelStyle: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
@@ -164,32 +271,17 @@ class _BookmarkScreenState extends State<BookmarkScreen>
       body: TabBarView(
         controller: _tabController,
         children: [
-          ReorderableListView.builder(
-            proxyDecorator: proxyDecorator,
-            itemCount: indexes.length,
-            onReorder: _onReorder,
-            padding: const EdgeInsets.symmetric(horizontal: 25),
-            itemBuilder: cardBuilder,
-          ),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Image.asset(
-                'assets/icons/wow.png',
-                width: 40,
-                height: 40,
-                color: blackOrWhite,
-              ),
-              const SizedBox(height: 10),
-              const Text(
-                'Wow, such empty!',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                ),
-              ),
-            ],
-          ),
+          if (indexes.isNotEmpty)
+            ReorderableListView.builder(
+              proxyDecorator: proxyDecorator,
+              itemCount: indexes.length,
+              onReorder: _onReorder,
+              padding: const EdgeInsets.symmetric(horizontal: 25),
+              itemBuilder: cardBuilder,
+            )
+          else
+            emptyPlaceHolder,
+          emptyPlaceHolder,
         ],
       ),
       floatingActionButton: FloatingActionButton(
