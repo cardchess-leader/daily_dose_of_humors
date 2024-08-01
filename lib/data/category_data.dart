@@ -4,8 +4,8 @@ import 'package:daily_dose_of_humors/models/category.dart';
 const humorCategoryList = [
   Category(
     title: 'Dad Jokes',
-    imgPath: 'assets/temp/dark.png',
-    imgSize: 160,
+    imgPath: 'assets/lottie/card-lottie/dad-jokes.json',
+    imgSize: 200,
     description: 'Simple, pun-filled, and often groan-inducing humor.',
     numDailyNew: 10,
     subscriberOnly: true,
@@ -14,8 +14,8 @@ const humorCategoryList = [
   ),
   Category(
     title: 'Knock-Knock Jokes',
-    imgPath: 'assets/temp/knok.png',
-    imgSize: 135,
+    imgPath: 'assets/lottie/card-lottie/knock-knock-jokes.json',
+    imgSize: 200,
     description:
         'Interactive and pun-based humor, often silly and family-friendly.',
     numDailyNew: 5,
@@ -25,8 +25,8 @@ const humorCategoryList = [
   ),
   Category(
     title: 'One-Liners',
-    imgPath: 'assets/temp/line.png',
-    imgSize: 160,
+    imgPath: 'assets/lottie/card-lottie/one-liners.json',
+    imgSize: 200,
     description:
         'Brief, witty, and punchy humor, delivering a quick and impactful punchline.',
     numDailyNew: 7,
@@ -36,8 +36,8 @@ const humorCategoryList = [
   ),
   Category(
     title: 'Dark Humors',
-    imgPath: 'assets/temp/mask.png',
-    imgSize: 130,
+    imgPath: 'assets/lottie/card-lottie/dark-humors.json',
+    imgSize: 200,
     description: 'Simple, pun-filled, and often groan-inducing humor.',
     numDailyNew: 7,
     subscriberOnly: true,
@@ -46,8 +46,8 @@ const humorCategoryList = [
   ),
   Category(
     title: 'Tricky Riddles',
-    imgPath: 'assets/temp/tricky.png',
-    imgSize: 210,
+    imgPath: 'assets/lottie/card-lottie/tricky-riddles.json',
+    imgSize: 300,
     description:
         'An enigmatic quiz, often with a clever twist or double meaning',
     numDailyNew: 7,
@@ -57,8 +57,8 @@ const humorCategoryList = [
   ),
   Category(
     title: 'OX Quiz',
-    imgPath: 'assets/temp/ox2.png',
-    imgSize: 150,
+    imgPath: 'assets/lottie/card-lottie/ox-quiz.json',
+    imgSize: 200,
     description: 'Quiz of interesting trivia, often surprising and amusing.',
     numDailyNew: 7,
     subscriberOnly: true,
@@ -67,8 +67,8 @@ const humorCategoryList = [
   ),
   Category(
     title: 'Funny Quotes',
-    imgPath: 'assets/temp/quotes2.png',
-    imgSize: 180,
+    imgPath: 'assets/lottie/card-lottie/funny-quotes.json',
+    imgSize: 200,
     description: 'Witty sayings, often hilarious and clever.',
     numDailyNew: 7,
     subscriberOnly: true,
@@ -77,8 +77,8 @@ const humorCategoryList = [
   ),
   Category(
     title: 'Story Jokes',
-    imgPath: 'assets/temp/book.png',
-    imgSize: 150,
+    imgPath: 'assets/lottie/card-lottie/story-jokes.json',
+    imgSize: 200,
     description: 'Extended anecdotes with a clever and surprising punchline.',
     numDailyNew: 7,
     subscriberOnly: true,
@@ -87,8 +87,8 @@ const humorCategoryList = [
   ),
   Category(
     title: 'Detective Puzzles',
-    imgPath: 'assets/temp/detective.png',
-    imgSize: 180,
+    imgPath: 'assets/lottie/card-lottie/detective-puzzles.json',
+    imgSize: 200,
     description:
         'Mystery challenges requiring keen observation and logical deduction.',
     numDailyNew: 7,

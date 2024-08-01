@@ -73,6 +73,7 @@ flutter:
     - assets/icons/
     - assets/images/
     - assets/lottie/
+    - assets/lottie/card-lottie/
     - assets/svg/
     - assets/temp/
 

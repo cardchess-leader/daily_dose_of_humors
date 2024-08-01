@@ -84,33 +84,25 @@ class _HumorCategoryCardState extends State<HumorCategoryCard>
                       ),
                       Expanded(
                         child: Container(
-                          padding: const EdgeInsets.fromLTRB(10, 10, 10, 30),
-                          child: ScaleTransition(
-                            scale: _controller.drive(
-                              // Tween<double>(begin: 0.9, end: 1.05),
-                              Tween<double>(begin: 1, end: 1.0),
-                            ),
-                            child: Image.asset(
+                          // padding: const EdgeInsets.fromLTRB(10, 10, 10, 30),
+                          child: Transform.scale(
+                            scale: widget.category.title == 'Tricky Riddles'
+                                ? 1.2
+                                : 1,
+                            child: Lottie.asset(
                               widget.category.imgPath,
-                              width: widget.category.imgSize,
-                              // fit: BoxFit.contain,
-                              // color: darkenThemeColor,
+                              // width: widget.category.imgSize,
+                              fit: BoxFit.contain,
+                              delegates: LottieDelegates(
+                                values: [
+                                  ValueDelegate.colorFilter(
+                                    ['**'],
+                                    value: ColorFilter.mode(
+                                        darkenThemeColor, BlendMode.src),
+                                  ),
+                                ],
+                              ),
                             ),
-                            // child: Lottie.asset(
-                            //   // widget.category.imgPath,
-                            //   // color: darkenThemeColor,
-                            //   'assets/lottie/lottie2.json',
-                            //   fit: BoxFit.contain,
-                            //   delegates: LottieDelegates(
-                            //     values: [
-                            //       ValueDelegate.colorFilter(
-                            //         ['**'],
-                            //         value: ColorFilter.mode(
-                            //             darkenThemeColor, BlendMode.src),
-                            //       ),
-                            //     ],
-                            //   ),
-                            // ),
                           ),
                         ),
                       ),
