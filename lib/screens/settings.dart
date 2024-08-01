@@ -1,18 +1,20 @@
+import 'package:daily_dose_of_humors/providers/app_state.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lottie/lottie.dart';
 import 'package:daily_dose_of_humors/widgets/app_bar.dart';
 // import 'package:daily_dose_of_humors/widgets/page_header_text.dart';
 
-class SettingsScreen extends StatefulWidget {
+class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
 
   @override
-  State<SettingsScreen> createState() {
+  ConsumerState<SettingsScreen> createState() {
     return _SettingsScreenState();
   }
 }
 
-class _SettingsScreenState extends State<SettingsScreen>
+class _SettingsScreenState extends ConsumerState<SettingsScreen>
     with TickerProviderStateMixin {
   late AnimationController _animController;
   bool themeValue = true;
@@ -106,7 +108,7 @@ class _SettingsScreenState extends State<SettingsScreen>
 
   @override
   Widget build(BuildContext context) {
-    bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    bool isDarkMode = ref.watch(darkModeProvider);
     return Scaffold(
       appBar: const CustomAppBar(
         heading: 'Settings',
@@ -142,8 +144,9 @@ class _SettingsScreenState extends State<SettingsScreen>
               scale: 0.8,
               alignment: Alignment.centerRight,
               child: Switch(
-                value: themeValue,
-                onChanged: (value) => {setState(() => themeValue = value)},
+                value: isDarkMode,
+                onChanged: (value) =>
+                    {ref.read(darkModeProvider.notifier).toggleDarkMode()},
                 activeColor: Colors.white,
                 activeTrackColor: isDarkMode
                     ? Colors.amberAccent

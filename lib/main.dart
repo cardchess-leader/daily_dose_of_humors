@@ -1,15 +1,39 @@
 import 'package:flutter/material.dart';
-import 'package:daily_dose_of_humors/screens/tabs.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:daily_dose_of_humors/providers/app_state.dart'; // Import your provider
+import 'package:daily_dose_of_humors/screens/tabs.dart';
 
 final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
 
 void main() {
-  runApp(const MyApp());
+  WidgetsFlutterBinding
+      .ensureInitialized(); // Ensure the WidgetsBinding is initialized
+  runApp(
+    const ProviderScope(
+      child: MyApp(),
+    ),
+  );
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerStatefulWidget {
   const MyApp({super.key});
+
+  @override
+  ConsumerState<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends ConsumerState<MyApp> {
+  @override
+  void initState() {
+    super.initState();
+    // Initialize dark mode based on platform brightness
+    Future.microtask(() {
+      final isDarkMode =
+          MediaQuery.of(context).platformBrightness == Brightness.dark;
+      ref.read(darkModeProvider.notifier).initDarkMode(isDarkMode);
+    });
+  }
 
   TextTheme _getTextTheme(BuildContext context, Brightness brightness) {
     final textTheme = Theme.of(context).textTheme;
@@ -24,9 +48,10 @@ class MyApp extends StatelessWidget {
     );
   }
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = ref.watch(darkModeProvider);
+
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
@@ -42,6 +67,7 @@ class MyApp extends StatelessWidget {
         ),
         textTheme: _getTextTheme(context, Brightness.dark),
       ),
+      themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
       home: const TabsScreen(),
       navigatorObservers: [routeObserver],
     );

@@ -1,26 +1,34 @@
+// import 'package:flutter/material.dart';
 import 'package:riverpod/riverpod.dart';
 
-enum AppStateKey {
-  darkMode,
-  vibration,
-}
+// class DarkModeNotifier extends ChangeNotifier {
+//   bool _isDarkMode;
 
-class AppStateNotifier extends StateNotifier<Map<AppStateKey, bool>> {
-  AppStateNotifier()
-      : super({
-          AppStateKey.darkMode: false,
-          AppStateKey.vibration: false,
-        });
+//   DarkModeNotifier(this._isDarkMode);
+
+//   bool get isDarkMode => _isDarkMode;
+
+//   void toggleDarkMode() {
+//     _isDarkMode = !_isDarkMode;
+//     notifyListeners();
+//   }
+// }
+
+class DarkModeNotifier extends StateNotifier<bool> {
+  DarkModeNotifier() : super(false);
 
   void toggleDarkMode() {
-    state = {
-      ...state,
-      AppStateKey.darkMode: !state[AppStateKey.darkMode]!,
-    };
+    state = !state;
+    // Perform any side effects here if needed
+    print('Dark mode toggled: $state');
+  }
+
+  void initDarkMode(bool darkMode) {
+    state = darkMode;
   }
 }
 
-final appStateProvider =
-    StateNotifierProvider<AppStateNotifier, Map<AppStateKey, bool>>(
-  (ref) => AppStateNotifier(),
-);
+final darkModeProvider = StateNotifierProvider<DarkModeNotifier, bool>((ref) {
+  // Initially set the dark mode to false, it will be updated in the widget
+  return DarkModeNotifier();
+});

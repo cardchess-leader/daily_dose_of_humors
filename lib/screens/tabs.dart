@@ -3,7 +3,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:lottie/lottie.dart';
 import 'package:daily_dose_of_humors/screens/home.dart';
 import 'package:daily_dose_of_humors/screens/shop.dart';
-import 'package:daily_dose_of_humors/screens/humor_screen.dart';
 import 'package:daily_dose_of_humors/screens/bookmark.dart';
 import 'package:daily_dose_of_humors/screens/settings.dart';
 
