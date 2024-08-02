@@ -66,8 +66,12 @@ class _HumorCategoryCardState extends State<HumorCategoryCard>
     if (status == AnimationStatus.completed) {
       Future.delayed(const Duration(milliseconds: 1000), () {
         if (mounted) {
-          _controller.reset();
-          _controller.forward();
+          if (widget.playLottieAnim) {
+            _controller.reset();
+            _controller.forward();
+          } else {
+            _controller.stop();
+          }
         }
       });
     }
