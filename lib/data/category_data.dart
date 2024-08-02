@@ -12,6 +12,7 @@ const humorCategoryList = [
     subscriberOnly: true,
     themeColor: Color.fromARGB(255, 61, 171, 255),
     themeColor2: Color.fromARGB(255, 207, 229, 255),
+    categoryCode: CategoryCode.DAD_JOKES,
   ),
   Category(
     title: 'Knock-Knock Jokes',
@@ -24,6 +25,7 @@ const humorCategoryList = [
     subscriberOnly: true,
     themeColor: Color.fromARGB(255, 255, 76, 91),
     themeColor2: Color.fromARGB(255, 255, 227, 227),
+    categoryCode: CategoryCode.KNOCK_KNOCK_JOKES,
   ),
   Category(
     title: 'One-Liners',
@@ -36,6 +38,7 @@ const humorCategoryList = [
     subscriberOnly: true,
     themeColor: Color.fromARGB(255, 115, 216, 119),
     themeColor2: Color.fromARGB(255, 225, 242, 225),
+    categoryCode: CategoryCode.ONE_LINERS,
   ),
   Category(
     title: 'Dark Humors',
@@ -47,6 +50,7 @@ const humorCategoryList = [
     subscriberOnly: true,
     themeColor: Color.fromARGB(255, 186, 186, 186),
     themeColor2: Color.fromARGB(255, 234, 234, 234),
+    categoryCode: CategoryCode.DARK_HUMORS,
   ),
   Category(
     title: 'Tricky Riddles',
@@ -59,6 +63,7 @@ const humorCategoryList = [
     subscriberOnly: true,
     themeColor: Color.fromARGB(255, 255, 239, 96),
     themeColor2: Color.fromARGB(255, 255, 248, 188),
+    categoryCode: CategoryCode.TRICKY_RIDDLES,
   ),
   Category(
     title: 'OX Quiz',
@@ -70,6 +75,7 @@ const humorCategoryList = [
     subscriberOnly: true,
     themeColor: Color.fromARGB(255, 57, 199, 218),
     themeColor2: Color.fromARGB(255, 198, 230, 234),
+    categoryCode: CategoryCode.OX_QUIZ,
   ),
   Category(
     title: 'Funny Quotes',
@@ -81,6 +87,7 @@ const humorCategoryList = [
     subscriberOnly: true,
     themeColor: Color.fromARGB(255, 255, 177, 60),
     themeColor2: Color.fromARGB(255, 255, 230, 192),
+    categoryCode: CategoryCode.FUNNY_QUOTES,
   ),
   Category(
     title: 'Story Jokes',
@@ -92,6 +99,7 @@ const humorCategoryList = [
     subscriberOnly: true,
     themeColor: Color.fromARGB(255, 166, 127, 112),
     themeColor2: Color.fromARGB(255, 213, 193, 185),
+    categoryCode: CategoryCode.STORY_JOKES,
   ),
   Category(
     title: 'Detective Puzzles',
@@ -103,5 +111,6 @@ const humorCategoryList = [
     numDailyNew: 7,
     subscriberOnly: true,
     themeColor: Color.fromARGB(255, 123, 137, 218),
+    categoryCode: CategoryCode.DETECTIVE_PUZZLES,
   ),
 ];

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:daily_dose_of_humors/models/category.dart';
+import 'package:daily_dose_of_humors/data/humor_data.dart';
 
 class HumorScreen extends StatefulWidget {
   final Category selectedCategory;
@@ -257,7 +258,7 @@ class _HumorScreenState extends State<HumorScreen>
                                   padding: const EdgeInsets.all(30),
                                   child: Center(
                                     child: Text(
-                                      "¿Qué acabas de decir?",
+                                      todayHumorList[0].context,
                                       style: TextStyle(
                                         fontSize: 26,
                                         fontWeight: FontWeight.w600,

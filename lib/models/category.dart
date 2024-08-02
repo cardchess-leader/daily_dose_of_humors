@@ -1,5 +1,17 @@
 import 'package:flutter/material.dart';
 
+enum CategoryCode {
+  DAD_JOKES,
+  KNOCK_KNOCK_JOKES,
+  ONE_LINERS,
+  DARK_HUMORS,
+  TRICKY_RIDDLES,
+  OX_QUIZ,
+  FUNNY_QUOTES,
+  STORY_JOKES,
+  DETECTIVE_PUZZLES,
+}
+
 class Category {
   final String title;
   final String description;
@@ -10,6 +22,7 @@ class Category {
   final bool subscriberOnly;
   final Color themeColor;
   final Color themeColor2;
+  final CategoryCode categoryCode;
 
   // final List<Color> themeColorGradient;
   const Category({
@@ -23,5 +36,6 @@ class Category {
     required this.themeColor,
     this.themeColor2 = Colors.white,
     // required this.themeColorGradient,
+    required this.categoryCode,
   });
 }
