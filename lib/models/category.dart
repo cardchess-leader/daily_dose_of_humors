@@ -5,6 +5,7 @@ class Category {
   final String description;
   final String imgPath;
   final double imgSize;
+  final int animDuration;
   final int numDailyNew;
   final bool subscriberOnly;
   final Color themeColor;
@@ -16,6 +17,7 @@ class Category {
     required this.description,
     required this.imgPath,
     this.imgSize = 200,
+    this.animDuration = 1000,
     required this.numDailyNew,
     this.subscriberOnly = false,
     required this.themeColor,

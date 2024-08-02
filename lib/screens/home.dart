@@ -6,9 +6,15 @@ import 'package:daily_dose_of_humors/widgets/app_bar.dart';
 import 'package:daily_dose_of_humors/widgets/humor_card.dart';
 import 'package:daily_dose_of_humors/screens/humor_screen.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  var _focusCardIndex = 0;
   void _openHumorCategory(selectedCategory, context) {
     Navigator.of(context).push(
         MaterialPageRoute(builder: (ctx) => HumorScreen(selectedCategory)));
@@ -39,14 +45,18 @@ class HomeScreen extends StatelessWidget {
           ),
           ScrollSnapList(
             scrollDirection: Axis.vertical,
-            onItemFocus: (index) => (),
             duration: 200,
             itemSize: 500,
             itemCount: humorCategoryList.length,
             dynamicItemSize: true,
             dynamicSizeEquation: (distance) => 1 - (distance / 2000).abs(),
+            onItemFocus: (index) => (setState(() {
+              print(index);
+              _focusCardIndex = index;
+            })),
             itemBuilder: (context, index) => InkWell(
-              child: HumorCategoryCard(humorCategoryList[index]),
+              child: HumorCategoryCard(
+                  humorCategoryList[index], index == _focusCardIndex),
               onTap: () =>
                   _openHumorCategory(humorCategoryList[index], context),
             ),

@@ -5,8 +5,11 @@ import 'package:lottie/lottie.dart';
 
 class HumorCategoryCard extends StatefulWidget {
   final Category category;
+  final bool playLottieAnim;
+
   const HumorCategoryCard(
-    this.category, {
+    this.category,
+    this.playLottieAnim, {
     super.key,
   });
 
@@ -22,15 +25,52 @@ class _HumorCategoryCardState extends State<HumorCategoryCard>
   void initState() {
     super.initState();
     _controller = AnimationController(
-      duration: const Duration(milliseconds: 1000),
       vsync: this,
-    )..repeat(reverse: true);
+      duration: Duration(milliseconds: widget.category.animDuration),
+    )..addStatusListener(_animationStatusListener);
+
+    if (widget.playLottieAnim) {
+      _startAnimationWithDelay();
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant HumorCategoryCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.playLottieAnim != oldWidget.playLottieAnim) {
+      if (widget.playLottieAnim) {
+        _startAnimationWithDelay();
+      } else {
+        _controller.reset();
+        _controller.stop();
+      }
+    }
+  }
+
+  void _startAnimationWithDelay() {
+    Future.delayed(const Duration(milliseconds: 500), () {
+      if (mounted && widget.playLottieAnim) {
+        _controller.forward();
+      }
+    });
   }
 
   @override
   void dispose() {
+    _controller.removeStatusListener(_animationStatusListener);
     _controller.dispose();
     super.dispose();
+  }
+
+  void _animationStatusListener(AnimationStatus status) {
+    if (status == AnimationStatus.completed) {
+      Future.delayed(const Duration(milliseconds: 1000), () {
+        if (mounted) {
+          _controller.reset();
+          _controller.forward();
+        }
+      });
+    }
   }
 
   @override
@@ -38,13 +78,11 @@ class _HumorCategoryCardState extends State<HumorCategoryCard>
     bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
     Color darkenThemeColor = darken(widget.category.themeColor, 0.5);
     Color lightenThemeColor = lighten(widget.category.themeColor, 0.25);
-    // Color adaptiveTextColor =
-    //     isDarkMode ? Colors.grey.shade200 : Colors.grey.shade900;
     Color adaptiveTextColor =
         isDarkMode ? lightenThemeColor : Colors.grey.shade900;
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 25),
-      // width: 500,
       height: 500,
       child: Card(
         shape: RoundedRectangleBorder(
@@ -54,17 +92,13 @@ class _HumorCategoryCardState extends State<HumorCategoryCard>
         child: ClipRRect(
           borderRadius: BorderRadius.circular(20.0),
           child: Column(
-            // crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Expanded(
                 child: Container(
-                  // margin: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
                     color: isDarkMode
                         ? lightenThemeColor
-                        // ? darken(widget.category.themeColor, 0.2)
                         : widget.category.themeColor,
-                    // : Colors.white,
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Column(
@@ -83,25 +117,22 @@ class _HumorCategoryCardState extends State<HumorCategoryCard>
                         ),
                       ),
                       Expanded(
-                        child: Container(
-                          // padding: const EdgeInsets.fromLTRB(10, 10, 10, 30),
-                          child: Transform.scale(
-                            scale: widget.category.title == 'Tricky Riddles'
-                                ? 1.2
-                                : 1,
-                            child: Lottie.asset(
-                              widget.category.imgPath,
-                              // width: widget.category.imgSize,
-                              fit: BoxFit.contain,
-                              delegates: LottieDelegates(
-                                values: [
-                                  ValueDelegate.colorFilter(
-                                    ['**'],
-                                    value: ColorFilter.mode(
-                                        darkenThemeColor, BlendMode.src),
-                                  ),
-                                ],
-                              ),
+                        child: Transform.scale(
+                          scale: widget.category.title == 'Tricky Riddles'
+                              ? 1.2
+                              : 1,
+                          child: Lottie.asset(
+                            widget.category.imgPath,
+                            fit: BoxFit.contain,
+                            controller: _controller,
+                            delegates: LottieDelegates(
+                              values: [
+                                ValueDelegate.colorFilter(
+                                  ['**'],
+                                  value: ColorFilter.mode(
+                                      darkenThemeColor, BlendMode.srcATop),
+                                ),
+                              ],
                             ),
                           ),
                         ),
@@ -111,7 +142,6 @@ class _HumorCategoryCardState extends State<HumorCategoryCard>
                 ),
               ),
               Container(
-                // color: Colors.white,
                 height: 140,
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
                 child: Column(
@@ -150,13 +180,10 @@ class _HumorCategoryCardState extends State<HumorCategoryCard>
                               side: BorderSide(
                                 color: isDarkMode
                                     ? lightenThemeColor
-                                    : Colors.transparent, // No border color
-                                width: isDarkMode
-                                    ? 0.5
-                                    : 0, // Border width set to zero
+                                    : Colors.transparent,
+                                width: isDarkMode ? 0.5 : 0,
                               ),
                             ),
-                            // elevation: 1,
                             shadowColor:
                                 isDarkMode ? null : Colors.grey.shade100,
                             label: Text(
