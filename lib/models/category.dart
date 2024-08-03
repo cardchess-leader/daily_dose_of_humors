@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:daily_dose_of_humors/data/category_data.dart';
 
 enum CategoryCode {
   DAD_JOKES,
@@ -38,4 +39,11 @@ class Category {
     // required this.themeColorGradient,
     required this.categoryCode,
   });
+
+  static Category getCategoryByCode(CategoryCode code) {
+    return humorCategoryList.firstWhere(
+      (category) => category.categoryCode == code,
+      orElse: () => humorCategoryList[0],
+    );
+  }
 }

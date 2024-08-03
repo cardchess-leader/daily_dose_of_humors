@@ -3,6 +3,8 @@ import 'package:lottie/lottie.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:daily_dose_of_humors/models/category.dart';
 import 'package:daily_dose_of_humors/data/humor_data.dart';
+import 'package:daily_dose_of_humors/models/humor.dart';
+import 'package:daily_dose_of_humors/widgets/humor_view.dart';
 
 class HumorScreen extends StatefulWidget {
   final Category selectedCategory;
@@ -21,9 +23,10 @@ class _HumorScreenState extends State<HumorScreen>
   late AnimationController _shareAnimController;
   late AnimationController _bookmarkAnimController;
   // int _currentPage = 0;
-  final controller = PageController(viewportFraction: 0.8, keepPage: true);
+  final controller = PageController(keepPage: true);
   var bookmarkLottieAsset = 'assets/lottie/bookmark-mark.json';
   var bookmarked = false;
+  var viewPunchLine = false;
 
   @override
   void initState() {
@@ -116,6 +119,63 @@ class _HumorScreenState extends State<HumorScreen>
     );
   }
 
+  Widget centerContentWidget(String text, Color color) {
+    return Center(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 20),
+        child: Text(
+          text,
+          style: TextStyle(
+            fontSize: 26,
+            fontWeight: FontWeight.w600,
+            color: color,
+          ),
+          textAlign: TextAlign.center,
+        ),
+      ),
+    );
+  }
+
+  Widget generateHumorContent(Humor humor) {
+    Widget mainContent = Column(
+      children: [
+        Expanded(
+          child: PageView.builder(
+            itemCount: 3,
+            onPageChanged: (pageIndex) {
+              print(pageIndex);
+            },
+            controller: controller,
+            itemBuilder: (context, index) {
+              return centerContentWidget(humor.context, Colors.black);
+            },
+          ),
+        ),
+        SmoothPageIndicator(
+          controller: controller, // PageController
+          count: 3,
+          effect: WormEffect(
+            dotWidth: 12,
+            dotHeight: 12,
+            activeDotColor: _selectedCategory.themeColor,
+          ), // your preferred effect
+          onDotClicked: (index) {
+            controller.animateToPage(
+              index,
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeInOut,
+            );
+          },
+        ),
+      ],
+    );
+
+    if (viewPunchLine) {
+      mainContent = centerContentWidget(humor.punchLine, Colors.black);
+    }
+    return mainContent;
+  }
+
   @override
   Widget build(BuildContext context) {
     bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
@@ -173,132 +233,9 @@ class _HumorScreenState extends State<HumorScreen>
           ),
         ],
       ),
-      body: Container(
-        // color: Colors.amber,
-        padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
-        child: Column(
-          children: [
-            Expanded(
-              flex: 2,
-              child: Column(
-                children: [
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Container(
-                      padding: const EdgeInsets.only(right: 10),
-                      decoration: BoxDecoration(
-                        // color: Colors.black,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      clipBehavior: Clip.hardEdge,
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Lottie.asset(
-                            // widget.category.imgPath,
-                            // color: darkenThemeColor,
-                            'assets/lottie/lottie2.json',
-                            width: 45,
-                            height: 45,
-                            delegates: LottieDelegates(
-                              values: [
-                                ValueDelegate.colorFilter(
-                                  ['**'],
-                                  value: ColorFilter.mode(
-                                    // _selectedCategory.themeColor,
-                                    blackOrWhite,
-                                    BlendMode.src,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Text(
-                            'x  123',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: isDarkMode
-                                  ? Colors.grey.shade100
-                                  : Colors.grey.shade900,
-                            ),
-                          ),
-                          Expanded(
-                            child: Container(),
-                          ),
-                          Text(
-                            '2024/07/27 #1',
-                            style: TextStyle(
-                              color: blackOrWhite,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 16,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: PageView.builder(
-                      itemCount: 3,
-                      onPageChanged: (pageIndex) {
-                        print(pageIndex);
-                      },
-                      controller: controller,
-                      itemBuilder: (context, index) {
-                        return LayoutBuilder(
-                          builder: (context, constraints) {
-                            return SingleChildScrollView(
-                              child: ConstrainedBox(
-                                constraints: BoxConstraints(
-                                  minHeight: constraints.maxHeight,
-                                ),
-                                child: Container(
-                                  // color: Colors.red,
-                                  padding: const EdgeInsets.all(30),
-                                  child: Center(
-                                    child: Text(
-                                      todayHumorList[0].context,
-                                      style: TextStyle(
-                                        fontSize: 26,
-                                        fontWeight: FontWeight.w600,
-                                        color: blackOrWhite,
-                                      ),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            );
-                          },
-                        );
-                      },
-                    ),
-                  ),
-                  SmoothPageIndicator(
-                    controller: controller, // PageController
-                    count: 3,
-                    effect: WormEffect(
-                      dotWidth: 12,
-                      dotHeight: 12,
-                      activeDotColor: _selectedCategory.themeColor,
-                    ), // your preferred effect
-                    onDotClicked: (index) {
-                      controller.animateToPage(
-                        index,
-                        duration: const Duration(milliseconds: 300),
-                        curve: Curves.easeInOut,
-                      );
-                    },
-                  ),
-                  const SizedBox(
-                    height: 5,
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
+      body: PageView.builder(
+        itemCount: todayHumorList.length,
+        itemBuilder: (context, index) => HumorView(todayHumorList[index]),
       ),
       bottomNavigationBar: BottomAppBar(
         color: _selectedCategory.themeColor,
