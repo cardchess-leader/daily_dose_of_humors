@@ -42,6 +42,7 @@ dependencies:
   riverpod: ^2.5.1
   flutter_riverpod: ^2.5.1
   riverpod_annotation: ^2.3.5
+  google_mobile_ads: ^5.1.0
 
 dev_dependencies:
   flutter_test:

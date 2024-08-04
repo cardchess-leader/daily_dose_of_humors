@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:daily_dose_of_humors/providers/app_state.dart'; // Import your provider
@@ -9,6 +10,8 @@ final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
 void main() {
   WidgetsFlutterBinding
       .ensureInitialized(); // Ensure the WidgetsBinding is initialized
+  MobileAds.instance.initialize();
+
   runApp(
     const ProviderScope(
       child: MyApp(),

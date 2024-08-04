@@ -1,22 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
-import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:daily_dose_of_humors/models/category.dart';
 import 'package:daily_dose_of_humors/data/humor_data.dart';
-import 'package:daily_dose_of_humors/models/humor.dart';
 import 'package:daily_dose_of_humors/widgets/humor_view.dart';
+import 'package:daily_dose_of_humors/widgets/banner_ad.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:daily_dose_of_humors/providers/app_state.dart';
 
-class HumorScreen extends StatefulWidget {
+class HumorScreen extends ConsumerStatefulWidget {
   final Category selectedCategory;
   const HumorScreen(this.selectedCategory, {super.key});
 
   @override
-  State<HumorScreen> createState() {
+  ConsumerState<HumorScreen> createState() {
     return _HumorScreenState();
   }
 }
 
-class _HumorScreenState extends State<HumorScreen>
+class _HumorScreenState extends ConsumerState<HumorScreen>
     with TickerProviderStateMixin {
   late Category _selectedCategory;
   late AnimationController _infoAnimController;
@@ -119,63 +120,6 @@ class _HumorScreenState extends State<HumorScreen>
     );
   }
 
-  Widget centerContentWidget(String text, Color color) {
-    return Center(
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 20),
-        child: Text(
-          text,
-          style: TextStyle(
-            fontSize: 26,
-            fontWeight: FontWeight.w600,
-            color: color,
-          ),
-          textAlign: TextAlign.center,
-        ),
-      ),
-    );
-  }
-
-  Widget generateHumorContent(Humor humor) {
-    Widget mainContent = Column(
-      children: [
-        Expanded(
-          child: PageView.builder(
-            itemCount: 3,
-            onPageChanged: (pageIndex) {
-              print(pageIndex);
-            },
-            controller: controller,
-            itemBuilder: (context, index) {
-              return centerContentWidget(humor.context, Colors.black);
-            },
-          ),
-        ),
-        SmoothPageIndicator(
-          controller: controller, // PageController
-          count: 3,
-          effect: WormEffect(
-            dotWidth: 12,
-            dotHeight: 12,
-            activeDotColor: _selectedCategory.themeColor,
-          ), // your preferred effect
-          onDotClicked: (index) {
-            controller.animateToPage(
-              index,
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.easeInOut,
-            );
-          },
-        ),
-      ],
-    );
-
-    if (viewPunchLine) {
-      mainContent = centerContentWidget(humor.punchLine, Colors.black);
-    }
-    return mainContent;
-  }
-
   @override
   Widget build(BuildContext context) {
     bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
@@ -233,9 +177,19 @@ class _HumorScreenState extends State<HumorScreen>
           ),
         ],
       ),
-      body: PageView.builder(
-        itemCount: todayHumorList.length,
-        itemBuilder: (context, index) => HumorView(todayHumorList[index]),
+      body: Column(
+        children: [
+          Expanded(
+            child: PageView.builder(
+              itemCount: todayHumorList.length,
+              itemBuilder: (context, index) => HumorView(todayHumorList[index]),
+              onPageChanged: (pageIndex) {
+                ref.watch(adProvider.notifier).incrementCounter();
+              },
+            ),
+          ),
+          const BannerAdWidget(),
+        ],
       ),
       bottomNavigationBar: BottomAppBar(
         color: _selectedCategory.themeColor,
