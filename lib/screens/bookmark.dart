@@ -1,8 +1,9 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:daily_dose_of_humors/util/util.dart';
 import 'package:daily_dose_of_humors/widgets/app_bar.dart';
 import 'package:lottie/lottie.dart';
+import 'package:daily_dose_of_humors/models/humor.dart';
+import 'package:daily_dose_of_humors/db/db.dart';
 
 class BookmarkScreen extends StatefulWidget {
   const BookmarkScreen({super.key});
@@ -18,9 +19,7 @@ class _BookmarkScreenState extends State<BookmarkScreen>
   late TabController _tabController;
   late AnimationController _trashAnimController;
   late AnimationController _humanAnimController;
-
-  List<int> indexes = List.generate(10, (index) => index);
-  List<Color> colorList = generateRandomColors(10);
+  late Future<List<Humor>> _futureBookmarks;
 
   @override
   void initState() {
@@ -37,6 +36,13 @@ class _BookmarkScreenState extends State<BookmarkScreen>
       duration: const Duration(milliseconds: 1000),
     )..addStatusListener(_humanAnimationStatusListener);
     _humanAnimController.forward();
+
+    _futureBookmarks = _loadBookmarks();
+  }
+
+  Future<List<Humor>> _loadBookmarks() async {
+    final dbHelper = DatabaseHelper();
+    return await dbHelper.getBookmarks();
   }
 
   @override
@@ -80,24 +86,25 @@ class _BookmarkScreenState extends State<BookmarkScreen>
         final double scale = lerpDouble(1.0, 1.06, animValue)!;
         return Transform.scale(
           scale: scale,
-          child: cardBuilder(context, index, elevation: elevation),
+          child: child,
         );
       },
       child: child,
     );
   }
 
-  Widget cardBuilder(BuildContext context, int index,
+  Widget cardBuilder(BuildContext context, int index, List<Humor> bookmarks,
       {double elevation = 1.0}) {
+    final humor = bookmarks[index];
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 0, vertical: 15),
-      key: ValueKey(indexes[index]),
+      key: ValueKey(humor.id),
       child: Dismissible(
-        key: ValueKey(indexes[index]),
+        key: ValueKey(humor.id),
         direction: DismissDirection.endToStart,
         onDismissed: (direction) {
           setState(() {
-            indexes.removeAt(index);
+            bookmarks.removeAt(index);
             ScaffoldMessenger.of(context).hideCurrentSnackBar();
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -129,7 +136,7 @@ class _BookmarkScreenState extends State<BookmarkScreen>
         ),
         child: Card(
           elevation: elevation,
-          color: colorList[indexes[index]],
+          color: Colors.white,
           child: Container(
             padding: const EdgeInsets.all(25),
             child: Stack(
@@ -147,11 +154,11 @@ class _BookmarkScreenState extends State<BookmarkScreen>
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    const Text(
-                      'What do you call a pig that does a karate? Also, what do you call a sleeping bull?',
+                    Text(
+                      humor.context,
                       overflow: TextOverflow.ellipsis,
                       maxLines: 2,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w600,
                       ),
@@ -167,7 +174,7 @@ class _BookmarkScreenState extends State<BookmarkScreen>
                     ),
                     const SizedBox(height: 40),
                     Text(
-                      'Added on 2024-07-14',
+                      'Added on ${humor.addedDate ?? ''}',
                       style: TextStyle(
                         fontWeight: FontWeight.w600,
                         color: Colors.grey.shade700,
@@ -183,13 +190,13 @@ class _BookmarkScreenState extends State<BookmarkScreen>
     );
   }
 
-  void _onReorder(int oldIndex, int newIndex) {
+  void _onReorder(int oldIndex, int newIndex, List<Humor> bookmarks) {
     setState(() {
       if (newIndex > oldIndex) {
         newIndex -= 1;
       }
-      final item = indexes.removeAt(oldIndex);
-      indexes.insert(newIndex, item);
+      final item = bookmarks.removeAt(oldIndex);
+      bookmarks.insert(newIndex, item);
     });
   }
 
@@ -271,16 +278,30 @@ class _BookmarkScreenState extends State<BookmarkScreen>
       body: TabBarView(
         controller: _tabController,
         children: [
-          if (indexes.isNotEmpty)
-            ReorderableListView.builder(
-              proxyDecorator: proxyDecorator,
-              itemCount: indexes.length,
-              onReorder: _onReorder,
-              padding: const EdgeInsets.symmetric(horizontal: 25),
-              itemBuilder: cardBuilder,
-            )
-          else
-            emptyPlaceHolder,
+          FutureBuilder<List<Humor>>(
+            future: _futureBookmarks,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (snapshot.hasError) {
+                return Center(child: Text('Error: ${snapshot.error}'));
+              } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                return emptyPlaceHolder;
+              } else {
+                final bookmarks = snapshot.data!;
+                return ReorderableListView.builder(
+                  proxyDecorator: (child, index, animation) =>
+                      proxyDecorator(child, index, animation),
+                  itemCount: bookmarks.length,
+                  onReorder: (oldIndex, newIndex) =>
+                      _onReorder(oldIndex, newIndex, bookmarks),
+                  padding: const EdgeInsets.symmetric(horizontal: 25),
+                  itemBuilder: (context, index) =>
+                      cardBuilder(context, index, bookmarks),
+                );
+              }
+            },
+          ),
           emptyPlaceHolder,
         ],
       ),

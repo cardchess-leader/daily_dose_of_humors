@@ -36,46 +36,43 @@ class _HumorViewState extends State<HumorView> with TickerProviderStateMixin {
 
   Widget generateHumorContent(Humor humor) {
     if (viewPunchLine) {
-      return centerContentWidget(humor.punchLine, Colors.black);
-    } else {
-      if (humor.contextList.isNotEmpty) {
-        return Column(
-          children: [
-            Expanded(
-              child: PageView.builder(
-                itemCount: humor.contextList.length,
-                onPageChanged: (pageIndex) {
-                  print(pageIndex);
-                },
-                controller: controller,
-                itemBuilder: (context, index) {
-                  return centerContentWidget(
-                      humor.contextList[index], Colors.black);
-                },
-              ),
+      return centerContentWidget(humor.punchline, Colors.black);
+    } else if (humor.contextList?.isNotEmpty ?? false) {
+      return Column(
+        children: [
+          Expanded(
+            child: PageView.builder(
+              itemCount: humor.contextList!.length,
+              onPageChanged: (pageIndex) {
+                print(pageIndex);
+              },
+              controller: controller,
+              itemBuilder: (context, index) {
+                return centerContentWidget(
+                    humor.contextList![index], Colors.black);
+              },
             ),
-            if (humor.contextList.isNotEmpty)
-              SmoothPageIndicator(
-                controller: controller, // PageController
-                count: humor.contextList.length,
-                effect: WormEffect(
-                  dotWidth: 12,
-                  dotHeight: 12,
-                  activeDotColor: humor.getCategoryData().themeColor,
-                ), // your preferred effect
-                onDotClicked: (index) {
-                  controller.animateToPage(
-                    index,
-                    duration: const Duration(milliseconds: 300),
-                    curve: Curves.easeInOut,
-                  );
-                },
-              ),
-          ],
-        );
-      } else {
-        return centerContentWidget(humor.context, Colors.black);
-      }
+          ),
+          SmoothPageIndicator(
+            controller: controller, // PageController
+            count: humor.contextList!.length,
+            effect: WormEffect(
+              dotWidth: 12,
+              dotHeight: 12,
+              activeDotColor: humor.getCategoryData().themeColor,
+            ), // your preferred effect
+            onDotClicked: (index) {
+              controller.animateToPage(
+                index,
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+              );
+            },
+          ),
+        ],
+      );
+    } else {
+      return centerContentWidget(humor.context, Colors.black);
     }
   }
 
@@ -95,7 +92,6 @@ class _HumorViewState extends State<HumorView> with TickerProviderStateMixin {
         child: Column(
           children: [
             Container(
-              // color: Colors.amber,
               padding: const EdgeInsets.only(right: 10),
               decoration: BoxDecoration(
                 color: Colors.amber,
@@ -114,7 +110,6 @@ class _HumorViewState extends State<HumorView> with TickerProviderStateMixin {
                         ValueDelegate.colorFilter(
                           ['**'],
                           value: ColorFilter.mode(
-                            // _selectedCategory.themeColor,
                             blackOrWhite,
                             BlendMode.src,
                           ),
@@ -132,9 +127,7 @@ class _HumorViewState extends State<HumorView> with TickerProviderStateMixin {
                           : Colors.grey.shade900,
                     ),
                   ),
-                  Expanded(
-                    child: Container(),
-                  ),
+                  Expanded(child: Container()),
                   Text(
                     '2024/07/27 #1',
                     style: TextStyle(
@@ -147,9 +140,7 @@ class _HumorViewState extends State<HumorView> with TickerProviderStateMixin {
               ),
             ),
             Expanded(child: generateHumorContent(widget.humor)),
-            const SizedBox(
-              height: 5,
-            ),
+            const SizedBox(height: 5),
           ],
         ),
       ),
