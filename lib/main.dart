@@ -1,42 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-// import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:google_fonts/google_fonts.dart';
-// import 'package:shared_preferences/shared_preferences.dart';
 import 'package:daily_dose_of_humors/providers/app_state.dart';
 import 'package:daily_dose_of_humors/screens/tabs.dart';
-// import 'package:daily_dose_of_humors/db/db.dart';
 
 final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
 
 void main() async {
   WidgetsFlutterBinding
       .ensureInitialized(); // Ensure the WidgetsBinding is initialized
-  // FlutterNativeSplash.preserve(
-  //     widgetsBinding: WidgetsFlutterBinding.ensureInitialized());
   MobileAds.instance.initialize();
-  // await initializeApp();
-  // FlutterNativeSplash.remove();
   runApp(
     const ProviderScope(
       child: MyApp(),
     ),
   );
 }
-
-// Future<void> initializeApp() async {
-//   final prefs = await SharedPreferences.getInstance();
-//   final isInitialized = prefs.getBool('isInitialized') ?? false;
-
-//   if (!isInitialized) {
-//     // Run your initialization code here
-//     await DatabaseHelper()._initDatabase();
-
-//     // Set the flag to true after initialization
-//     await prefs.setBool('isInitialized', true);
-//   }
-// }
 
 class MyApp extends ConsumerStatefulWidget {
   const MyApp({super.key});

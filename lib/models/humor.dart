@@ -14,35 +14,35 @@ source: string (under 50 chars)
 */
 
 class Humor {
-  final int id;
+  final String uuid;
   final DateTime? createDate;
   final DateTime? addedDate;
   final CategoryCode categoryCode;
   final String? title;
-  final String context;
+  final String? context;
   final List<String>? contextList;
-  final String punchline;
+  final String? punchline;
   final String? author;
   final String? sender;
   final String? source;
 
   // final List<Color> themeColorGradient;
   Humor({
-    required this.id,
+    required this.uuid,
     this.createDate,
     this.addedDate,
     required this.categoryCode,
     this.title,
-    required this.context,
+    this.context,
     this.contextList,
-    required this.punchline,
+    this.punchline,
     this.author,
     this.sender,
     this.source,
   });
 
   Humor.fromDocument(Map<String, dynamic> document)
-      : id = document['id'],
+      : uuid = document['uuid'],
         createDate = document['create_date'] == null
             ? null
             : DateTime.parse(document['create_date']),
@@ -64,8 +64,8 @@ class Humor {
 
   Map<String, dynamic> humorToMap() {
     final Map<String, dynamic> map = {
-      'categoryCode': categoryCode.index,
-      'context': context,
+      'uuid': uuid,
+      'category': categoryCode.index,
       'punchline': punchline,
     };
 
@@ -77,6 +77,9 @@ class Humor {
     }
     if (title != null) {
       map['title'] = title;
+    }
+    if (context != null) {
+      map['context'] = context;
     }
     if (contextList != null) {
       map['context_list'] = contextList!.join('@@@');

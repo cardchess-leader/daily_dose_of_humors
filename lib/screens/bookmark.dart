@@ -20,6 +20,7 @@ class _BookmarkScreenState extends State<BookmarkScreen>
   late AnimationController _trashAnimController;
   late AnimationController _humanAnimController;
   late Future<List<Humor>> _futureBookmarks;
+  List<Humor>? bookmarks;
 
   @override
   void initState() {
@@ -52,6 +53,7 @@ class _BookmarkScreenState extends State<BookmarkScreen>
     _trashAnimController.dispose();
     _humanAnimController.dispose();
     _tabController.dispose();
+    print('bookmark dispose length: ${bookmarks?.length}');
     super.dispose();
   }
 
@@ -93,18 +95,18 @@ class _BookmarkScreenState extends State<BookmarkScreen>
     );
   }
 
-  Widget cardBuilder(BuildContext context, int index, List<Humor> bookmarks,
+  Widget cardBuilder(BuildContext context, int index,
       {double elevation = 1.0}) {
-    final humor = bookmarks[index];
+    final humor = bookmarks![index];
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 0, vertical: 15),
-      key: ValueKey(humor.id),
+      key: ValueKey(humor.uuid),
       child: Dismissible(
-        key: ValueKey(humor.id),
+        key: ValueKey(humor.uuid),
         direction: DismissDirection.endToStart,
         onDismissed: (direction) {
           setState(() {
-            bookmarks.removeAt(index);
+            bookmarks!.removeAt(index);
             ScaffoldMessenger.of(context).hideCurrentSnackBar();
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -136,7 +138,7 @@ class _BookmarkScreenState extends State<BookmarkScreen>
         ),
         child: Card(
           elevation: elevation,
-          color: Colors.white,
+          color: humor.getCategoryData().themeColor,
           child: Container(
             padding: const EdgeInsets.all(25),
             child: Stack(
@@ -155,7 +157,7 @@ class _BookmarkScreenState extends State<BookmarkScreen>
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Text(
-                      humor.context,
+                      humor.context ?? humor.contextList?[0] ?? '',
                       overflow: TextOverflow.ellipsis,
                       maxLines: 2,
                       style: const TextStyle(
@@ -165,7 +167,7 @@ class _BookmarkScreenState extends State<BookmarkScreen>
                     ),
                     const SizedBox(height: 5),
                     Text(
-                      '- From Dad Jokes',
+                      '- From ${humor.getCategoryData().title}',
                       style: TextStyle(
                         fontWeight: FontWeight.w600,
                         fontSize: 16,
@@ -190,13 +192,13 @@ class _BookmarkScreenState extends State<BookmarkScreen>
     );
   }
 
-  void _onReorder(int oldIndex, int newIndex, List<Humor> bookmarks) {
+  void _onReorder(int oldIndex, int newIndex) {
     setState(() {
       if (newIndex > oldIndex) {
         newIndex -= 1;
       }
-      final item = bookmarks.removeAt(oldIndex);
-      bookmarks.insert(newIndex, item);
+      final item = bookmarks!.removeAt(oldIndex);
+      bookmarks!.insert(newIndex, item);
     });
   }
 
@@ -288,16 +290,18 @@ class _BookmarkScreenState extends State<BookmarkScreen>
               } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                 return emptyPlaceHolder;
               } else {
-                final bookmarks = snapshot.data!;
+                bookmarks = snapshot.data!;
+                print('is this part run again?');
+                print('bookmark length is: ${bookmarks!.length}');
+                print('snapshot.data ${snapshot.data!.length}');
                 return ReorderableListView.builder(
                   proxyDecorator: (child, index, animation) =>
                       proxyDecorator(child, index, animation),
-                  itemCount: bookmarks.length,
+                  itemCount: bookmarks!.length,
                   onReorder: (oldIndex, newIndex) =>
-                      _onReorder(oldIndex, newIndex, bookmarks),
+                      _onReorder(oldIndex, newIndex),
                   padding: const EdgeInsets.symmetric(horizontal: 25),
-                  itemBuilder: (context, index) =>
-                      cardBuilder(context, index, bookmarks),
+                  itemBuilder: (context, index) => cardBuilder(context, index),
                 );
               }
             },

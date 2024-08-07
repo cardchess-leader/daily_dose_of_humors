@@ -4,8 +4,13 @@ import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:daily_dose_of_humors/models/humor.dart';
 
 class HumorView extends StatefulWidget {
-  final Humor humor;
-  const HumorView(this.humor, {super.key});
+  final Humor? humor;
+  final void Function(Humor humor) setHumor;
+  const HumorView({
+    super.key,
+    this.humor,
+    required this.setHumor,
+  });
 
   @override
   State<HumorView> createState() {
@@ -16,6 +21,13 @@ class HumorView extends StatefulWidget {
 class _HumorViewState extends State<HumorView> with TickerProviderStateMixin {
   final controller = PageController(keepPage: true);
   var viewPunchLine = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // when humor is loaded, invoke setHumor
+    widget.setHumor(widget.humor!);
+  }
 
   Widget centerContentWidget(String text, Color color) {
     return Center(
@@ -36,7 +48,7 @@ class _HumorViewState extends State<HumorView> with TickerProviderStateMixin {
 
   Widget generateHumorContent(Humor humor) {
     if (viewPunchLine) {
-      return centerContentWidget(humor.punchline, Colors.black);
+      return centerContentWidget(humor.punchline ?? '', Colors.black);
     } else if (humor.contextList?.isNotEmpty ?? false) {
       return Column(
         children: [
@@ -72,7 +84,7 @@ class _HumorViewState extends State<HumorView> with TickerProviderStateMixin {
         ],
       );
     } else {
-      return centerContentWidget(humor.context, Colors.black);
+      return centerContentWidget(humor.context!, Colors.black);
     }
   }
 
@@ -139,7 +151,7 @@ class _HumorViewState extends State<HumorView> with TickerProviderStateMixin {
                 ],
               ),
             ),
-            Expanded(child: generateHumorContent(widget.humor)),
+            Expanded(child: generateHumorContent(widget.humor!)),
             const SizedBox(height: 5),
           ],
         ),

@@ -5,6 +5,7 @@ import 'package:daily_dose_of_humors/widgets/background.dart';
 import 'package:daily_dose_of_humors/widgets/app_bar.dart';
 import 'package:daily_dose_of_humors/widgets/humor_card.dart';
 import 'package:daily_dose_of_humors/screens/humor_screen.dart';
+import 'package:daily_dose_of_humors/data/humor_data.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -16,8 +17,13 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   var _focusCardIndex = 0;
   void _openHumorCategory(selectedCategory, context) {
-    Navigator.of(context).push(
-        MaterialPageRoute(builder: (ctx) => HumorScreen(selectedCategory)));
+    Navigator.of(context).push(MaterialPageRoute(
+        builder: (ctx) => HumorScreen(
+              selectedCategory,
+              buildHumorScreenFrom: BuildHumorScreenFrom.bookmark,
+              humorList: todayHumorList,
+              initIndexInBookmark: 0,
+            )));
   }
 
   // This widget is the root of your application.
