@@ -20,7 +20,7 @@ class _BookmarkScreenState extends State<BookmarkScreen>
   late AnimationController _trashAnimController;
   late AnimationController _humanAnimController;
   late Future<List<Humor>> _futureBookmarks;
-  List<Humor>? bookmarks;
+  List<Humor> bookmarks = [];
 
   @override
   void initState() {
@@ -53,8 +53,17 @@ class _BookmarkScreenState extends State<BookmarkScreen>
     _trashAnimController.dispose();
     _humanAnimController.dispose();
     _tabController.dispose();
-    print('bookmark dispose length: ${bookmarks?.length}');
+    _updateBookmarks();
     super.dispose();
+  }
+
+  void _updateBookmarks() async {
+    if (bookmarks.isEmpty) {
+      return;
+    }
+    final dbHelper = DatabaseHelper();
+    await dbHelper.clearBookmarks();
+    await dbHelper.addBookmarks(bookmarks);
   }
 
   void _trashAnimationStatusListener(AnimationStatus status) {
@@ -97,7 +106,7 @@ class _BookmarkScreenState extends State<BookmarkScreen>
 
   Widget cardBuilder(BuildContext context, int index,
       {double elevation = 1.0}) {
-    final humor = bookmarks![index];
+    final humor = bookmarks[index];
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 0, vertical: 15),
       key: ValueKey(humor.uuid),
@@ -105,20 +114,25 @@ class _BookmarkScreenState extends State<BookmarkScreen>
         key: ValueKey(humor.uuid),
         direction: DismissDirection.endToStart,
         onDismissed: (direction) {
+          final removedHumor = bookmarks[index];
           setState(() {
-            bookmarks!.removeAt(index);
-            ScaffoldMessenger.of(context).hideCurrentSnackBar();
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: const Text('Bookmark Removed'),
-                action: SnackBarAction(
-                  label: 'Undo',
-                  textColor: Colors.amber,
-                  onPressed: () => {},
-                ),
-              ),
-            );
+            bookmarks.removeAt(index);
           });
+          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text('Bookmark Removed'),
+              action: SnackBarAction(
+                label: 'Undo',
+                textColor: Colors.amber,
+                onPressed: () {
+                  setState(() {
+                    bookmarks.insert(index, removedHumor);
+                  });
+                },
+              ),
+            ),
+          );
         },
         background: Container(
           alignment: Alignment.centerRight,
@@ -197,8 +211,8 @@ class _BookmarkScreenState extends State<BookmarkScreen>
       if (newIndex > oldIndex) {
         newIndex -= 1;
       }
-      final item = bookmarks!.removeAt(oldIndex);
-      bookmarks!.insert(newIndex, item);
+      final item = bookmarks.removeAt(oldIndex);
+      bookmarks.insert(newIndex, item);
     });
   }
 
@@ -271,9 +285,9 @@ class _BookmarkScreenState extends State<BookmarkScreen>
           ),
           unselectedLabelColor: Colors.grey.shade500,
           controller: _tabController,
-          tabs: const [
-            Tab(text: 'Bookmarks'),
-            Tab(text: 'Library'),
+          tabs: [
+            Tab(text: 'Bookmarks (${bookmarks.length}/500)'),
+            const Tab(text: 'Library (0)'),
           ],
         ),
       ),
@@ -291,13 +305,10 @@ class _BookmarkScreenState extends State<BookmarkScreen>
                 return emptyPlaceHolder;
               } else {
                 bookmarks = snapshot.data!;
-                print('is this part run again?');
-                print('bookmark length is: ${bookmarks!.length}');
-                print('snapshot.data ${snapshot.data!.length}');
                 return ReorderableListView.builder(
                   proxyDecorator: (child, index, animation) =>
                       proxyDecorator(child, index, animation),
-                  itemCount: bookmarks!.length,
+                  itemCount: bookmarks.length,
                   onReorder: (oldIndex, newIndex) =>
                       _onReorder(oldIndex, newIndex),
                   padding: const EdgeInsets.symmetric(horizontal: 25),

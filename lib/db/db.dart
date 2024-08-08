@@ -72,6 +72,20 @@ class DatabaseHelper {
     }
   }
 
+  /// Add bookmarks in batch
+  Future<void> addBookmarks(List<Humor> humors) async {
+    final db = await database;
+    await db.transaction((txn) async {
+      for (final humor in humors) {
+        await txn.insert(
+          'bookmarks',
+          humor.humorToMap(),
+          conflictAlgorithm: ConflictAlgorithm.replace,
+        );
+      }
+    });
+  }
+
   Future<bool> removeBookmark(String uuid) async {
     final db = await database;
     try {
@@ -92,6 +106,7 @@ class DatabaseHelper {
   //   return await db.query('bookmarks');
   // }
 
+  /// Get all bookmarks
   Future<List<Humor>> getBookmarks() async {
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.query('bookmarks');
@@ -109,5 +124,10 @@ class DatabaseHelper {
       return false;
     }
     return true;
+  }
+
+  Future<void> clearBookmarks() async {
+    final db = await database;
+    await db.delete('bookmarks');
   }
 }
