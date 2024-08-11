@@ -6,7 +6,7 @@ final todayHumorList = [
     uuid: '7cd0636c-17ee-47a4-a966-72bf0fd8b2a8',
     categoryCode: CategoryCode.DAD_JOKES,
     context: 'Can a frog jump higher than a house?',
-    punchline: 'Of course, a house can\'t jump.1231 23123',
+    punchline: 'Of course, a house can\'t jump.',
   ),
   Humor(
     uuid: '8b82fbd8-20b5-4a7f-9e2c-75b6fc3f5dab',

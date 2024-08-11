@@ -1,9 +1,8 @@
 import 'package:daily_dose_of_humors/providers/app_state.dart';
+import 'package:daily_dose_of_humors/widgets/lottie_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lottie/lottie.dart';
 import 'package:daily_dose_of_humors/widgets/app_bar.dart';
-// import 'package:daily_dose_of_humors/widgets/page_header_text.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -14,9 +13,7 @@ class SettingsScreen extends ConsumerStatefulWidget {
   }
 }
 
-class _SettingsScreenState extends ConsumerState<SettingsScreen>
-    with TickerProviderStateMixin {
-  late AnimationController _animController;
+class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   bool themeValue = true;
   bool vibValue = true;
   bool notiValue = true;
@@ -24,34 +21,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
   @override
   void initState() {
     super.initState();
-    _animController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1800),
-    )..addStatusListener(_animationStatusListener);
-
-    Future.delayed(const Duration(milliseconds: 1500), () {
-      if (mounted) {
-        _animController.forward();
-      }
-    });
   }
 
   @override
   void dispose() {
-    _animController.removeStatusListener(_animationStatusListener);
-    _animController.dispose();
     super.dispose();
-  }
-
-  void _animationStatusListener(AnimationStatus status) {
-    if (status == AnimationStatus.completed) {
-      Future.delayed(const Duration(milliseconds: 1500), () {
-        if (mounted) {
-          _animController.reset();
-          _animController.forward();
-        }
-      });
-    }
   }
 
   Widget generateHeader(String headerText) {
@@ -69,7 +43,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
   }
 
   Widget generateSettingTile({
-    required String assetPath,
+    required String lottiePath,
     required String title,
     required bool isDarkMode,
     Widget? trailingWidget,
@@ -85,19 +59,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
         ),
       ),
       child: ListTile(
-        leading: Lottie.asset(
-          assetPath,
-          width: 24,
-          controller: _animController,
-          delegates: LottieDelegates(
-            values: [
-              ValueDelegate.colorFilter(
-                ['**'],
-                value: ColorFilter.mode(
-                    isDarkMode ? Colors.white : Colors.black, BlendMode.src),
-              ),
-            ],
-          ),
+        leading: LottieIcon(
+          duration: 1800,
+          delay: 1500,
+          initDelay: 500,
+          size: 24,
+          lottiePath: lottiePath,
+          color: isDarkMode ? Colors.white : Colors.black,
         ),
         title: Text(title, style: const TextStyle(fontWeight: FontWeight.w500)),
         trailing: trailingWidget,
@@ -116,19 +84,18 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
         backgroundColor: Color.fromARGB(255, 218, 230, 255),
       ),
       body: ListView(
-        // padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 10),
         children: [
           const SizedBox(height: 16),
           generateHeader('Subscription'),
           generateSettingTile(
-            assetPath: 'assets/lottie/takeoff.json',
+            lottiePath: 'assets/lottie/takeoff.json',
             title: 'My Subscription: Free',
             isDarkMode: isDarkMode,
             trailingWidget: const Icon(Icons.keyboard_arrow_right_rounded),
             onTap: () => {},
           ),
           generateSettingTile(
-            assetPath: 'assets/lottie/history.json',
+            lottiePath: 'assets/lottie/history.json',
             title: 'Restore Purchases',
             isDarkMode: isDarkMode,
             onTap: () => {},
@@ -136,10 +103,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
           const SizedBox(height: 24),
           generateHeader('App Preferences'),
           generateSettingTile(
-            assetPath: 'assets/lottie/bulb.json',
+            lottiePath: 'assets/lottie/bulb.json',
             title: 'Current Theme: Light',
             isDarkMode: isDarkMode,
-
             trailingWidget: Transform.scale(
               scale: 0.8,
               alignment: Alignment.centerRight,
@@ -156,10 +122,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                 inactiveTrackColor: Colors.transparent,
               ),
             ),
-            // const Icon(Icons.keyboard_arrow_right_rounded),
           ),
           generateSettingTile(
-            assetPath: 'assets/lottie/vibration.json',
+            lottiePath: 'assets/lottie/vibration.json',
             title: 'Vibration: On',
             isDarkMode: isDarkMode,
             trailingWidget: Transform.scale(
@@ -179,7 +144,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
             ),
           ),
           generateSettingTile(
-            assetPath: 'assets/lottie/notification.json',
+            lottiePath: 'assets/lottie/notification.json',
             title: 'Notification: On',
             isDarkMode: isDarkMode,
             trailingWidget: Transform.scale(
@@ -201,13 +166,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
           const SizedBox(height: 24),
           generateHeader('Support'),
           generateSettingTile(
-            assetPath: 'assets/lottie/thumbs.json',
+            lottiePath: 'assets/lottie/thumbs.json',
             title: 'Rate Us',
             isDarkMode: isDarkMode,
             onTap: () => {},
           ),
           generateSettingTile(
-            assetPath: 'assets/lottie/mail-open.json',
+            lottiePath: 'assets/lottie/mail-open.json',
             title: 'Contact Us',
             isDarkMode: isDarkMode,
             onTap: () => {},
@@ -215,13 +180,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
           const SizedBox(height: 24),
           generateHeader('Legal'),
           generateSettingTile(
-            assetPath: 'assets/lottie/file.json',
+            lottiePath: 'assets/lottie/file.json',
             title: 'Terms Of Service',
             isDarkMode: isDarkMode,
             onTap: () => {},
           ),
           generateSettingTile(
-            assetPath: 'assets/lottie/verified.json',
+            lottiePath: 'assets/lottie/verified.json',
             title: 'Privacy Policy',
             isDarkMode: isDarkMode,
             onTap: () => {},

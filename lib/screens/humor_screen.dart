@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:daily_dose_of_humors/providers/app_state.dart';
 import 'package:daily_dose_of_humors/models/humor.dart';
 import 'package:daily_dose_of_humors/db/db.dart';
+import 'package:daily_dose_of_humors/widgets/lottie_icon.dart';
 
 enum BuildHumorScreenFrom {
   daily,
@@ -39,7 +40,6 @@ class HumorScreen extends ConsumerStatefulWidget {
 class _HumorScreenState extends ConsumerState<HumorScreen>
     with TickerProviderStateMixin {
   late Category _selectedCategory;
-  late AnimationController _infoAnimController;
   late AnimationController _shareAnimController;
   late AnimationController _bookmarkAnimController;
   int _humorIndex = 0;
@@ -54,11 +54,6 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
   void initState() {
     super.initState();
     _selectedCategory = widget.selectedCategory;
-    _infoAnimController = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 1),
-    )..addStatusListener(_infoAnimationStatusListener);
-    _infoAnimController.forward();
     _shareAnimController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 1),
@@ -80,8 +75,6 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
 
   @override
   void dispose() {
-    _infoAnimController.removeStatusListener(_infoAnimationStatusListener);
-    _infoAnimController.dispose();
     _shareAnimController.dispose();
     _bookmarkAnimController.dispose();
     super.dispose();
@@ -101,17 +94,6 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
           : 'assets/lottie/bookmark-unmark.json';
       _bookmarkAnimController.value = 1.0;
     });
-  }
-
-  void _infoAnimationStatusListener(AnimationStatus status) {
-    if (status == AnimationStatus.completed) {
-      Future.delayed(const Duration(seconds: 1), () {
-        if (mounted) {
-          _infoAnimController.reset();
-          _infoAnimController.forward();
-        }
-      });
-    }
   }
 
   void updateBookmark(Humor? humor) async {
@@ -230,22 +212,12 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
                     ),
                   ),
                 ),
-                Lottie.asset(
-                  'assets/lottie/help.json',
-                  width: 45,
-                  height: 45,
-                  controller: _infoAnimController,
-                  delegates: LottieDelegates(
-                    values: [
-                      ValueDelegate.colorFilter(
-                        ['**'],
-                        value: ColorFilter.mode(
-                          _selectedCategory.themeColor,
-                          BlendMode.src,
-                        ),
-                      ),
-                    ],
-                  ),
+                LottieIcon(
+                  duration: 1000,
+                  delay: 1000,
+                  size: 45,
+                  lottiePath: 'assets/lottie/help.json',
+                  color: _selectedCategory.themeColor,
                 ),
               ],
             ),

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lottie/lottie.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:daily_dose_of_humors/models/humor.dart';
+import 'package:daily_dose_of_humors/providers/app_state.dart';
 
-class HumorView extends StatefulWidget {
+class HumorView extends ConsumerStatefulWidget {
   final Humor? humor;
   final void Function(Humor humor) setHumor;
   const HumorView({
@@ -13,14 +15,16 @@ class HumorView extends StatefulWidget {
   });
 
   @override
-  State<HumorView> createState() {
+  ConsumerState<HumorView> createState() {
     return _HumorViewState();
   }
 }
 
-class _HumorViewState extends State<HumorView> with TickerProviderStateMixin {
+class _HumorViewState extends ConsumerState<HumorView>
+    with TickerProviderStateMixin {
   final controller = PageController(keepPage: true);
   var viewPunchLine = false;
+  Color textColor = Colors.black;
 
   @override
   void initState() {
@@ -29,7 +33,7 @@ class _HumorViewState extends State<HumorView> with TickerProviderStateMixin {
     widget.setHumor(widget.humor!);
   }
 
-  Widget centerContentWidget(String text, Color color) {
+  Widget centerContentWidget(String text) {
     return Center(
       child: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 20),
@@ -38,7 +42,7 @@ class _HumorViewState extends State<HumorView> with TickerProviderStateMixin {
           style: TextStyle(
             fontSize: 26,
             fontWeight: FontWeight.w600,
-            color: color,
+            color: textColor,
           ),
           textAlign: TextAlign.center,
         ),
@@ -48,7 +52,7 @@ class _HumorViewState extends State<HumorView> with TickerProviderStateMixin {
 
   Widget generateHumorContent(Humor humor) {
     if (viewPunchLine) {
-      return centerContentWidget(humor.punchline ?? '', Colors.black);
+      return centerContentWidget(humor.punchline ?? '');
     } else if (humor.contextList?.isNotEmpty ?? false) {
       return Column(
         children: [
@@ -60,8 +64,7 @@ class _HumorViewState extends State<HumorView> with TickerProviderStateMixin {
               },
               controller: controller,
               itemBuilder: (context, index) {
-                return centerContentWidget(
-                    humor.contextList![index], Colors.black);
+                return centerContentWidget(humor.contextList![index]);
               },
             ),
           ),
@@ -84,14 +87,15 @@ class _HumorViewState extends State<HumorView> with TickerProviderStateMixin {
         ],
       );
     } else {
-      return centerContentWidget(humor.context!, Colors.black);
+      return centerContentWidget(humor.context!);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    Color blackOrWhite = isDarkMode ? Colors.white : Colors.black;
+    bool isDarkMode = ref.watch(darkModeProvider);
+    textColor = isDarkMode ? Colors.white : Colors.black;
+    // textColor = blackOrWhite;
 
     return GestureDetector(
       onDoubleTap: () {
@@ -122,7 +126,7 @@ class _HumorViewState extends State<HumorView> with TickerProviderStateMixin {
                         ValueDelegate.colorFilter(
                           ['**'],
                           value: ColorFilter.mode(
-                            blackOrWhite,
+                            textColor,
                             BlendMode.src,
                           ),
                         ),
@@ -134,16 +138,14 @@ class _HumorViewState extends State<HumorView> with TickerProviderStateMixin {
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: isDarkMode
-                          ? Colors.grey.shade100
-                          : Colors.grey.shade900,
+                      color: textColor,
                     ),
                   ),
                   Expanded(child: Container()),
                   Text(
                     '2024/07/27 #1',
                     style: TextStyle(
-                      color: blackOrWhite,
+                      color: textColor,
                       fontWeight: FontWeight.w600,
                       fontSize: 16,
                     ),

@@ -1,9 +1,9 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:daily_dose_of_humors/widgets/app_bar.dart';
-import 'package:lottie/lottie.dart';
 import 'package:daily_dose_of_humors/models/humor.dart';
 import 'package:daily_dose_of_humors/db/db.dart';
+import 'package:daily_dose_of_humors/widgets/lottie_icon.dart';
 
 class BookmarkScreen extends StatefulWidget {
   const BookmarkScreen({super.key});
@@ -17,8 +17,6 @@ class BookmarkScreen extends StatefulWidget {
 class _BookmarkScreenState extends State<BookmarkScreen>
     with TickerProviderStateMixin {
   late TabController _tabController;
-  late AnimationController _trashAnimController;
-  late AnimationController _humanAnimController;
   late Future<List<Humor>> _futureBookmarks;
   List<Humor> bookmarks = [];
 
@@ -26,18 +24,6 @@ class _BookmarkScreenState extends State<BookmarkScreen>
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    _trashAnimController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 800),
-    )..addStatusListener(_trashAnimationStatusListener);
-    _trashAnimController.forward();
-
-    _humanAnimController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1000),
-    )..addStatusListener(_humanAnimationStatusListener);
-    _humanAnimController.forward();
-
     _futureBookmarks = _loadBookmarks();
   }
 
@@ -48,10 +34,6 @@ class _BookmarkScreenState extends State<BookmarkScreen>
 
   @override
   void dispose() {
-    _trashAnimController.removeStatusListener(_trashAnimationStatusListener);
-    _humanAnimController.removeStatusListener(_humanAnimationStatusListener);
-    _trashAnimController.dispose();
-    _humanAnimController.dispose();
     _tabController.dispose();
     _updateBookmarks();
     super.dispose();
@@ -64,28 +46,6 @@ class _BookmarkScreenState extends State<BookmarkScreen>
     final dbHelper = DatabaseHelper();
     await dbHelper.clearBookmarks();
     await dbHelper.addBookmarks(bookmarks);
-  }
-
-  void _trashAnimationStatusListener(AnimationStatus status) {
-    if (status == AnimationStatus.completed) {
-      Future.delayed(const Duration(milliseconds: 400), () {
-        if (mounted) {
-          _trashAnimController.reset();
-          _trashAnimController.forward();
-        }
-      });
-    }
-  }
-
-  void _humanAnimationStatusListener(AnimationStatus status) {
-    if (status == AnimationStatus.completed) {
-      Future.delayed(const Duration(milliseconds: 800), () {
-        if (mounted) {
-          _humanAnimController.reset();
-          _humanAnimController.forward();
-        }
-      });
-    }
   }
 
   Widget proxyDecorator(Widget child, int index, Animation<double> animation) {
@@ -136,18 +96,12 @@ class _BookmarkScreenState extends State<BookmarkScreen>
         },
         background: Container(
           alignment: Alignment.centerRight,
-          child: Lottie.asset(
-            'assets/lottie/trash.json',
-            width: 30,
-            controller: _trashAnimController,
-            delegates: LottieDelegates(
-              values: [
-                ValueDelegate.colorFilter(
-                  ['**'],
-                  value: const ColorFilter.mode(Colors.grey, BlendMode.src),
-                ),
-              ],
-            ),
+          child: const LottieIcon(
+            duration: 800,
+            delay: 400,
+            size: 30,
+            lottiePath: 'assets/lottie/trash.json',
+            color: Colors.grey,
           ),
         ),
         child: Card(
@@ -239,22 +193,12 @@ class _BookmarkScreenState extends State<BookmarkScreen>
                 ),
               ),
             ),
-            Lottie.asset(
-              'assets/lottie/human.json',
-              width: 45,
-              height: 45,
-              controller: _humanAnimController,
-              delegates: LottieDelegates(
-                values: [
-                  ValueDelegate.colorFilter(
-                    ['**'],
-                    value: ColorFilter.mode(
-                      Theme.of(context).scaffoldBackgroundColor,
-                      BlendMode.src,
-                    ),
-                  ),
-                ],
-              ),
+            LottieIcon(
+              duration: 1000,
+              delay: 800,
+              size: 45,
+              lottiePath: 'assets/lottie/human.json',
+              color: Theme.of(context).scaffoldBackgroundColor,
             ),
           ],
         ),
