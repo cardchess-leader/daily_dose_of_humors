@@ -9,6 +9,7 @@ import 'package:daily_dose_of_humors/providers/app_state.dart';
 import 'package:daily_dose_of_humors/models/humor.dart';
 import 'package:daily_dose_of_humors/db/db.dart';
 import 'package:daily_dose_of_humors/widgets/lottie_icon.dart';
+import 'package:daily_dose_of_humors/widgets/manual.dart';
 
 enum BuildHumorScreenFrom {
   daily,
@@ -49,6 +50,7 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
   var viewPunchLine = false;
   // late Humor humorInView;
   late List<Humor?> humorList;
+  bool _isExpanded = false;
 
   @override
   void initState() {
@@ -196,7 +198,7 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
         centerTitle: true,
         actions: [
           IconButton(
-            onPressed: () => {},
+            onPressed: () => {setState(() => _isExpanded = !_isExpanded)},
             icon: Stack(
               children: [
                 Container(
@@ -227,23 +229,40 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
       body: Column(
         children: [
           Expanded(
-            child: PageView.builder(
-              controller: _pageController,
-              itemCount: todayHumorList.length,
-              itemBuilder: (context, index) => HumorView(
-                  humor: todayHumorList[index],
-                  setHumor: (humor) {
-                    humorList[index] = humor;
-                    if (_humorIndex == index) {
-                      initBookmark(humor.uuid);
-                    }
-                  }),
-              onPageChanged: (pageIndex) {
-                // currentHumorIndex = pageIndex;
-                ref.watch(adProvider.notifier).incrementCounter();
-                _humorIndex = pageIndex;
-                initBookmark(humorList[_humorIndex]?.uuid);
-              },
+            child: Stack(
+              children: [
+                PageView.builder(
+                  controller: _pageController,
+                  itemCount: todayHumorList.length,
+                  itemBuilder: (context, index) => HumorView(
+                      humor: todayHumorList[index],
+                      setHumor: (humor) {
+                        humorList[index] = humor;
+                        if (_humorIndex == index) {
+                          initBookmark(humor.uuid);
+                        }
+                      }),
+                  onPageChanged: (pageIndex) {
+                    // currentHumorIndex = pageIndex;
+                    ref.watch(adProvider.notifier).incrementCounter();
+                    _humorIndex = pageIndex;
+                    initBookmark(humorList[_humorIndex]?.uuid);
+                  },
+                ),
+                Align(
+                  alignment: Alignment.topRight,
+                  child: AnimatedScale(
+                    duration: Duration(milliseconds: _isExpanded ? 200 : 0),
+                    curve: Curves.easeInOut,
+                    scale: _isExpanded ? 1.0 : 0.0,
+                    child: ManualWidget(
+                      color: Colors.white,
+                      manualList: widget.selectedCategory.manualList,
+                      onTap: () => setState(() => _isExpanded = false),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
           const BannerAdWidget(),

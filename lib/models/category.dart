@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:daily_dose_of_humors/data/category_data.dart';
+import 'package:daily_dose_of_humors/models/manual.dart';
 
 enum CategoryCode {
   DAD_JOKES,
@@ -24,6 +25,7 @@ class Category {
   final Color themeColor;
   final Color themeColor2;
   final CategoryCode categoryCode;
+  final List<ManualItem> manualList;
 
   // final List<Color> themeColorGradient;
   const Category({
@@ -38,6 +40,14 @@ class Category {
     this.themeColor2 = Colors.white,
     // required this.themeColorGradient,
     required this.categoryCode,
+    this.manualList = const [
+      ManualItem(
+          lottiePath: 'assets/lottie/swipe-right.json',
+          text: 'Swipe to view next jokes.'),
+      ManualItem(
+          lottiePath: 'assets/lottie/double-tap.json',
+          text: 'Double-tap to view the punchline.'),
+    ],
   });
 
   static Category getCategoryByCode(CategoryCode code) {

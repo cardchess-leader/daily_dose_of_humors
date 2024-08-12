@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:daily_dose_of_humors/models/category.dart';
+import 'package:daily_dose_of_humors/models/manual.dart';
 
 const humorCategoryList = [
   Category(
@@ -28,18 +29,23 @@ const humorCategoryList = [
     categoryCode: CategoryCode.KNOCK_KNOCK_JOKES,
   ),
   Category(
-    title: 'One-Liners',
-    imgPath: 'assets/lottie/card-lottie/one-liners.json',
-    imgSize: 200,
-    animDuration: 1500,
-    description:
-        'Brief, witty, and punchy humor, delivering a quick and impactful punchline.',
-    numDailyNew: 7,
-    subscriberOnly: true,
-    themeColor: Color.fromARGB(255, 115, 216, 119),
-    themeColor2: Color.fromARGB(255, 225, 242, 225),
-    categoryCode: CategoryCode.ONE_LINERS,
-  ),
+      title: 'One-Liners',
+      imgPath: 'assets/lottie/card-lottie/one-liners.json',
+      imgSize: 200,
+      animDuration: 1500,
+      description:
+          'Brief, witty, and punchy humor, delivering a quick and impactful punchline.',
+      numDailyNew: 7,
+      subscriberOnly: true,
+      themeColor: Color.fromARGB(255, 115, 216, 119),
+      themeColor2: Color.fromARGB(255, 225, 242, 225),
+      categoryCode: CategoryCode.ONE_LINERS,
+      manualList: [
+        ManualItem(
+          lottiePath: 'assets/lottie/swipe-right.json',
+          text: 'Swipe to view next jokes.',
+        ),
+      ]),
   Category(
     title: 'Dark Humors',
     imgPath: 'assets/lottie/card-lottie/dark-humors.json',
@@ -64,6 +70,14 @@ const humorCategoryList = [
     themeColor: Color.fromARGB(255, 255, 239, 96),
     themeColor2: Color.fromARGB(255, 255, 248, 188),
     categoryCode: CategoryCode.TRICKY_RIDDLES,
+    manualList: [
+      ManualItem(
+          lottiePath: 'assets/lottie/swipe-right.json',
+          text: 'Swipe to view next riddles.'),
+      ManualItem(
+          lottiePath: 'assets/lottie/double-tap.json',
+          text: 'Double-tap to view the answer.'),
+    ],
   ),
   Category(
     title: 'OX Quiz',
@@ -76,6 +90,14 @@ const humorCategoryList = [
     themeColor: Color.fromARGB(255, 57, 199, 218),
     themeColor2: Color.fromARGB(255, 198, 230, 234),
     categoryCode: CategoryCode.OX_QUIZ,
+    manualList: [
+      ManualItem(
+          lottiePath: 'assets/lottie/swipe-right.json',
+          text: 'Swipe to view next quizes.'),
+      ManualItem(
+          lottiePath: 'assets/lottie/double-tap.json',
+          text: 'Double-tap to view the answer.'),
+    ],
   ),
   Category(
     title: 'Funny Quotes',
@@ -88,6 +110,11 @@ const humorCategoryList = [
     themeColor: Color.fromARGB(255, 255, 177, 60),
     themeColor2: Color.fromARGB(255, 255, 230, 192),
     categoryCode: CategoryCode.FUNNY_QUOTES,
+    manualList: [
+      ManualItem(
+          lottiePath: 'assets/lottie/swipe-right.json',
+          text: 'Swipe to view next quotes.'),
+    ],
   ),
   Category(
     title: 'Story Jokes',
@@ -112,5 +139,18 @@ const humorCategoryList = [
     subscriberOnly: true,
     themeColor: Color.fromARGB(255, 123, 137, 218),
     categoryCode: CategoryCode.DETECTIVE_PUZZLES,
+    manualList: [
+      ManualItem(
+          lottiePath: 'assets/lottie/swipe-right.json',
+          text: 'Swipe to view next puzzles.'),
+      ManualItem(
+          lottiePath: 'assets/lottie/tap.json', text: 'Tap to view each clue.'),
+      ManualItem(
+          lottiePath: 'assets/lottie/double-tap.json',
+          text: 'Double-tap to find the answer.'),
+      ManualItem(
+          lottiePath: 'assets/lottie/double-tap.json',
+          text: 'Double-tap to find the answer.'),
+    ],
   ),
 ];
