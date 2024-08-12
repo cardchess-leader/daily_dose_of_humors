@@ -82,9 +82,6 @@ class _ManualWidgetState extends State<ManualWidget>
                 fontSize: 28,
               ),
             ),
-            // const SizedBox(
-            //   height: 50,
-            // ),
             Expanded(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -115,7 +112,6 @@ class _ManualWidgetState extends State<ManualWidget>
                               ),
                             ),
                           ),
-                          // if (i == 3) const SizedBox(width: 40),
                           Text(
                             manualItem.text,
                             style: TextStyle(
@@ -132,9 +128,17 @@ class _ManualWidgetState extends State<ManualWidget>
                 ],
               ),
             ),
-            // const SizedBox(
-            //   height: 50,
-            // ),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 20),
+              child: Text(
+                '- tap anywhere to continue -',
+                style: TextStyle(
+                  color: widget.color,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
           ],
         ),
       ),

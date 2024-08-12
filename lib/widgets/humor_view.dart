@@ -8,6 +8,7 @@ import 'package:daily_dose_of_humors/providers/app_state.dart';
 class HumorView extends ConsumerStatefulWidget {
   final Humor? humor;
   final void Function(Humor humor) setHumor;
+
   const HumorView({
     super.key,
     this.humor,
@@ -15,25 +16,23 @@ class HumorView extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<HumorView> createState() {
-    return _HumorViewState();
-  }
+  ConsumerState<HumorView> createState() => _HumorViewState();
 }
 
-class _HumorViewState extends ConsumerState<HumorView>
-    with TickerProviderStateMixin {
-  final controller = PageController(keepPage: true);
-  var viewPunchLine = false;
-  Color textColor = Colors.black;
+class _HumorViewState extends ConsumerState<HumorView> {
+  final pageController = PageController(keepPage: true);
+  bool viewPunchLine = false;
 
   @override
   void initState() {
     super.initState();
-    // when humor is loaded, invoke setHumor
-    widget.setHumor(widget.humor!);
+    // Invoke setHumor when the humor is loaded
+    if (widget.humor != null) {
+      widget.setHumor(widget.humor!);
+    }
   }
 
-  Widget centerContentWidget(String text) {
+  Widget _centerContentWidget(String text, Color textColor) {
     return Center(
       child: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 20),
@@ -50,34 +49,33 @@ class _HumorViewState extends ConsumerState<HumorView>
     );
   }
 
-  Widget generateHumorContent(Humor humor) {
+  Widget _generateHumorContent(Humor humor, Color textColor) {
     if (viewPunchLine) {
-      return centerContentWidget(humor.punchline ?? '');
+      return _centerContentWidget(humor.punchline ?? '', textColor);
     } else if (humor.contextList?.isNotEmpty ?? false) {
       return Column(
         children: [
           Expanded(
             child: PageView.builder(
               itemCount: humor.contextList!.length,
-              onPageChanged: (pageIndex) {
-                print(pageIndex);
-              },
-              controller: controller,
+              physics: const NeverScrollableScrollPhysics(),
+              controller: pageController,
               itemBuilder: (context, index) {
-                return centerContentWidget(humor.contextList![index]);
+                return _centerContentWidget(
+                    humor.contextList![index], textColor);
               },
             ),
           ),
           SmoothPageIndicator(
-            controller: controller, // PageController
+            controller: pageController,
             count: humor.contextList!.length,
             effect: WormEffect(
               dotWidth: 12,
               dotHeight: 12,
               activeDotColor: humor.getCategoryData().themeColor,
-            ), // your preferred effect
+            ),
             onDotClicked: (index) {
-              controller.animateToPage(
+              pageController.animateToPage(
                 index,
                 duration: const Duration(milliseconds: 300),
                 curve: Curves.easeInOut,
@@ -87,20 +85,31 @@ class _HumorViewState extends ConsumerState<HumorView>
         ],
       );
     } else {
-      return centerContentWidget(humor.context!);
+      return _centerContentWidget(humor.context!, textColor);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    bool isDarkMode = ref.watch(darkModeProvider);
-    textColor = isDarkMode ? Colors.white : Colors.black;
-    // textColor = blackOrWhite;
+    final isDarkMode = ref.watch(darkModeProvider);
+    final textColor = isDarkMode ? Colors.white : Colors.black;
 
-    return GestureDetector(
+    return InkWell(
       onDoubleTap: () {
-        print('double tap!');
-        setState(() => viewPunchLine = !viewPunchLine);
+        setState(() {
+          viewPunchLine = !viewPunchLine;
+        });
+      },
+      onTap: () {
+        if (widget.humor?.contextList?.isNotEmpty ?? false) {
+          final nextPage = (pageController.page!.toInt() + 1) %
+              widget.humor!.contextList!.length;
+          pageController.animateToPage(
+            nextPage,
+            duration: const Duration(milliseconds: 250),
+            curve: Curves.decelerate,
+          );
+        }
       },
       child: Container(
         color: Colors.transparent,
@@ -115,7 +124,6 @@ class _HumorViewState extends ConsumerState<HumorView>
               ),
               clipBehavior: Clip.hardEdge,
               child: Row(
-                mainAxisSize: MainAxisSize.min,
                 children: [
                   Lottie.asset(
                     'assets/lottie/lottie2.json',
@@ -141,7 +149,7 @@ class _HumorViewState extends ConsumerState<HumorView>
                       color: textColor,
                     ),
                   ),
-                  Expanded(child: Container()),
+                  const Spacer(),
                   Text(
                     '2024/07/27 #1',
                     style: TextStyle(
@@ -153,7 +161,9 @@ class _HumorViewState extends ConsumerState<HumorView>
                 ],
               ),
             ),
-            Expanded(child: generateHumorContent(widget.humor!)),
+            Expanded(
+              child: _generateHumorContent(widget.humor!, textColor),
+            ),
             const SizedBox(height: 5),
           ],
         ),

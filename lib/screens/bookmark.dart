@@ -9,9 +9,7 @@ class BookmarkScreen extends StatefulWidget {
   const BookmarkScreen({super.key});
 
   @override
-  State<BookmarkScreen> createState() {
-    return _BookmarkScreenState();
-  }
+  State<BookmarkScreen> createState() => _BookmarkScreenState();
 }
 
 class _BookmarkScreenState extends State<BookmarkScreen>
@@ -29,7 +27,12 @@ class _BookmarkScreenState extends State<BookmarkScreen>
 
   Future<List<Humor>> _loadBookmarks() async {
     final dbHelper = DatabaseHelper();
-    return await dbHelper.getBookmarks();
+    final bookmarks = await dbHelper.getBookmarks();
+    setState(() {
+      this.bookmarks = bookmarks;
+    });
+
+    return bookmarks;
   }
 
   @override
@@ -172,8 +175,8 @@ class _BookmarkScreenState extends State<BookmarkScreen>
 
   @override
   Widget build(BuildContext context) {
-    bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    Color blackOrWhite = isDarkMode ? Colors.white : Colors.black;
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final blackOrWhite = isDarkMode ? Colors.white : Colors.black;
 
     final emptyPlaceHolder = Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -188,7 +191,7 @@ class _BookmarkScreenState extends State<BookmarkScreen>
                 width: 30,
                 height: 30,
                 decoration: BoxDecoration(
-                  color: blackOrWhite, // Set the circle color
+                  color: blackOrWhite,
                   shape: BoxShape.circle,
                 ),
               ),
