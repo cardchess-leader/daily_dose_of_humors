@@ -4,6 +4,7 @@ import 'package:daily_dose_of_humors/widgets/app_bar.dart';
 import 'package:daily_dose_of_humors/models/humor.dart';
 import 'package:daily_dose_of_humors/db/db.dart';
 import 'package:daily_dose_of_humors/widgets/lottie_icon.dart';
+import 'package:daily_dose_of_humors/screens/add_humor.dart';
 
 class BookmarkScreen extends StatefulWidget {
   const BookmarkScreen({super.key});
@@ -271,8 +272,12 @@ class _BookmarkScreenState extends State<BookmarkScreen>
         backgroundColor: Colors.amber.shade400,
         elevation: 2,
         onPressed: () {
-          // Handle the FAB action
-          print('FAB Pressed');
+          showModalBottomSheet(
+            useSafeArea: true,
+            isScrollControlled: true,
+            context: context,
+            builder: (ctx) => AddHumorScreen(),
+          );
         },
         tooltip: 'Add',
         child: const Icon(Icons.add),
