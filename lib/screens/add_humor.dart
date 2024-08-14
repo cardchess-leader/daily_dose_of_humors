@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 import 'package:daily_dose_of_humors/models/humor.dart';
 import 'package:daily_dose_of_humors/models/category.dart';
 import 'package:daily_dose_of_humors/util/global_var.dart';
@@ -18,6 +19,7 @@ class _AddHumorScreenState extends State<AddHumorScreen> {
   final _nicknameController = TextEditingController();
   bool _addToBookmark = true;
   bool _submitToUs = false;
+  bool _isLoading = false;
   String _errMsg = '';
 
   @override
@@ -28,34 +30,76 @@ class _AddHumorScreenState extends State<AddHumorScreen> {
     super.dispose();
   }
 
-  void _handlePress(BuildContext context) async {
+  void _handlePress() async {
+    if (_isLoading) return;
+    setState(() {
+      _isLoading = true;
+    });
     final humor = Humor(
       uuid: uuid.v4(),
-      categoryCode: CategoryCode.DAD_JOKES,
+      categoryCode: CategoryCode.YOUR_HUMORS,
       context: _contextController.text,
       punchline: _punchlineController.text,
-      // author: _nicknameController.text,
+      author: _nicknameController.text,
     );
-    print('humor is: $humor');
     if (_submitToUs) {
-      print('submit to us');
-      // if error occurs, set error message and return out of this //
+      final response = await showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Submit Confirmation'),
+            content: const Text(
+              'We appreciate you sharing your humor with us, and we might feature it in our \'Daily Dose of Humors,\' giving credit to your nickname.\n\nDo you agree to share your humor with us?',
+              style: TextStyle(fontSize: 16),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop(false); // Close the dialog
+                },
+                child: const Text('Nope', style: TextStyle(fontSize: 18)),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop(true); // Close the dialog
+                },
+                child: const Text(
+                  'Sure',
+                  style: TextStyle(fontSize: 18),
+                ),
+              ),
+            ],
+          );
+        },
+      );
+      if (response == true) {
+        print('submit successful!');
+      } else {
+        print('no submit');
+        setState(() {
+          _isLoading = false;
+        });
+        return;
+      }
     }
     if (_addToBookmark) {
-      // final dbHelper = DatabaseHelper();
-      // final success = await dbHelper.addBookmark(humor);
-      // print('success? $success');
-      // if (mounted && success) {
-      //   ScaffoldMessenger.of(context).hideCurrentSnackBar();
-      //   ScaffoldMessenger.of(context).showSnackBar(
-      //     const SnackBar(
-      //       content: Text('Humor added successfully to bookmark.'),
-      //     ),
-      //   );
-      // }
       widget.insertBookmark(humor);
     }
     if (mounted) {
+      String snackbarMsg = '';
+      if (_addToBookmark && !_submitToUs) {
+        snackbarMsg = 'Humor added successfully to bookmark.';
+      } else if (!_addToBookmark && _submitToUs) {
+        snackbarMsg = 'Humor submitted successfully.';
+      } else {
+        snackbarMsg = 'Humor added to bookmark & submitted successfully.';
+      }
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(snackbarMsg),
+        ),
+      );
       Navigator.pop(context);
     }
   }
@@ -64,6 +108,7 @@ class _AddHumorScreenState extends State<AddHumorScreen> {
   Widget build(BuildContext context) {
     final keyboardSpace = MediaQuery.of(context).viewInsets.bottom;
     final height = MediaQuery.of(context).size.height - 150;
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return ClipRRect(
       borderRadius: const BorderRadius.only(
@@ -179,23 +224,37 @@ class _AddHumorScreenState extends State<AddHumorScreen> {
                     ),
                   const SizedBox(height: 16),
                   ElevatedButton(
-                    onPressed: !_addToBookmark && !_submitToUs
-                        ? null
-                        : () => _handlePress(context),
+                    onPressed:
+                        !_addToBookmark && !_submitToUs ? null : _handlePress,
                     style: ElevatedButton.styleFrom(
                       minimumSize: const Size(double.infinity, 50),
                       backgroundColor:
                           Theme.of(context).primaryColor, // Background color
                       foregroundColor: Colors.white, // Text color
                     ),
-                    child: Text(
-                      _addToBookmark && _submitToUs
-                          ? 'Add & Submit'
-                          : _submitToUs
-                              ? 'Submit To Us'
-                              : 'Add To Bookmark',
-                      style: const TextStyle(fontSize: 16),
-                    ),
+                    child: _isLoading
+                        ? Lottie.asset(
+                            'assets/lottie/loading.json',
+                            width: 35,
+                            height: 35,
+                            delegates: LottieDelegates(
+                              values: [
+                                ValueDelegate.colorFilter(
+                                  ['**'],
+                                  value: const ColorFilter.mode(
+                                      Colors.white, BlendMode.src),
+                                ),
+                              ],
+                            ),
+                          )
+                        : Text(
+                            _addToBookmark && _submitToUs
+                                ? 'Add & Submit'
+                                : _submitToUs
+                                    ? 'Submit To Us'
+                                    : 'Add To Bookmark',
+                            style: const TextStyle(fontSize: 16),
+                          ),
                   ),
                 ],
               ),

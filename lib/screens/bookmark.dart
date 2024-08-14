@@ -47,12 +47,6 @@ class _BookmarkScreenState extends State<BookmarkScreen>
   void insertBookmark(Humor humor) {
     setState(() {
       bookmarks.add(humor);
-      ScaffoldMessenger.of(context).hideCurrentSnackBar();
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Humor added successfully to bookmark.'),
-        ),
-      );
     });
   }
 

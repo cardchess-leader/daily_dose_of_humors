@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:scroll_snap_list/scroll_snap_list.dart';
-import 'package:daily_dose_of_humors/data/category_data.dart';
+import 'package:daily_dose_of_humors/models/category.dart';
 import 'package:daily_dose_of_humors/widgets/background.dart';
 import 'package:daily_dose_of_humors/widgets/app_bar.dart';
 import 'package:daily_dose_of_humors/widgets/humor_card.dart';
@@ -53,7 +53,7 @@ class _HomeScreenState extends State<HomeScreen> {
             scrollDirection: Axis.vertical,
             duration: 200,
             itemSize: 500,
-            itemCount: humorCategoryList.length,
+            itemCount: Category.getDailyCategories().length,
             dynamicItemSize: true,
             dynamicSizeEquation: (distance) => 1 - (distance / 2000).abs(),
             onItemFocus: (index) => (setState(() {
@@ -61,10 +61,10 @@ class _HomeScreenState extends State<HomeScreen> {
               _focusCardIndex = index;
             })),
             itemBuilder: (context, index) => InkWell(
-              child: HumorCategoryCard(
-                  humorCategoryList[index], index == _focusCardIndex),
-              onTap: () =>
-                  _openHumorCategory(humorCategoryList[index], context),
+              child: HumorCategoryCard(Category.getDailyCategories()[index],
+                  index == _focusCardIndex),
+              onTap: () => _openHumorCategory(
+                  Category.getDailyCategories()[index], context),
             ),
           ),
         ],

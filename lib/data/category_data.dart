@@ -153,4 +153,12 @@ const humorCategoryList = [
           text: 'Double-tap to find the answer.'),
     ],
   ),
+  Category(
+    title: 'Your Humors',
+    imgPath: 'assets/lottie/card-lottie/detective-puzzles.json',
+    description: 'Awesome humors created by you!',
+    numDailyNew: 0,
+    themeColor: Color.fromARGB(255, 123, 218, 202),
+    categoryCode: CategoryCode.YOUR_HUMORS,
+  ),
 ];

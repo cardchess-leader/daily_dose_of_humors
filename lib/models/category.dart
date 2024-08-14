@@ -12,6 +12,7 @@ enum CategoryCode {
   FUNNY_QUOTES,
   STORY_JOKES,
   DETECTIVE_PUZZLES,
+  YOUR_HUMORS,
 }
 
 class Category {
@@ -22,6 +23,7 @@ class Category {
   final int animDuration;
   final int numDailyNew;
   final bool subscriberOnly;
+  final bool isDaily;
   final Color themeColor;
   final Color themeColor2;
   final CategoryCode categoryCode;
@@ -36,6 +38,7 @@ class Category {
     this.animDuration = 1000,
     required this.numDailyNew,
     this.subscriberOnly = false,
+    this.isDaily = true,
     required this.themeColor,
     this.themeColor2 = Colors.white,
     // required this.themeColorGradient,
@@ -55,5 +58,9 @@ class Category {
       (category) => category.categoryCode == code,
       orElse: () => humorCategoryList[0],
     );
+  }
+
+  static List<Category> getDailyCategories() {
+    return humorCategoryList.where((category) => category.isDaily).toList();
   }
 }
