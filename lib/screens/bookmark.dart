@@ -29,6 +29,7 @@ class _BookmarkScreenState extends State<BookmarkScreen>
   Future<List<Humor>> _loadBookmarks() async {
     final dbHelper = DatabaseHelper();
     final bookmarks = await dbHelper.getBookmarks();
+    print('length is: ${bookmarks.length}');
     setState(() {
       this.bookmarks = bookmarks;
     });
@@ -41,6 +42,18 @@ class _BookmarkScreenState extends State<BookmarkScreen>
     _tabController.dispose();
     _updateBookmarks();
     super.dispose();
+  }
+
+  void insertBookmark(Humor humor) {
+    setState(() {
+      bookmarks.add(humor);
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Humor added successfully to bookmark.'),
+        ),
+      );
+    });
   }
 
   void _updateBookmarks() async {
@@ -276,7 +289,7 @@ class _BookmarkScreenState extends State<BookmarkScreen>
             useSafeArea: true,
             isScrollControlled: true,
             context: context,
-            builder: (ctx) => AddHumorScreen(),
+            builder: (ctx) => AddHumorScreen(insertBookmark),
           );
         },
         tooltip: 'Add',
