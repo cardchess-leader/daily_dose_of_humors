@@ -15,6 +15,7 @@ source: string (under 50 chars)
 
 class Humor {
   final String uuid;
+  final int? order;
   final DateTime? createDate;
   final DateTime? addedDate;
   final CategoryCode categoryCode;
@@ -29,6 +30,7 @@ class Humor {
   // final List<Color> themeColorGradient;
   Humor({
     required this.uuid,
+    this.order,
     this.createDate,
     this.addedDate,
     required this.categoryCode,
@@ -43,6 +45,7 @@ class Humor {
 
   Humor.fromDocument(Map<String, dynamic> document)
       : uuid = document['uuid'],
+        order = document['ord'],
         createDate = document['create_date'] == null
             ? null
             : DateTime.parse(document['create_date']),
@@ -65,6 +68,7 @@ class Humor {
   Map<String, dynamic> humorToMap() {
     final Map<String, dynamic> map = {
       'uuid': uuid,
+      'ord': order, // even if this value is null, use it!
       'category': categoryCode.index,
       'punchline': punchline,
     };

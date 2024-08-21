@@ -17,13 +17,16 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   var _focusCardIndex = 0;
   void _openHumorCategory(selectedCategory, context) {
-    Navigator.of(context).push(MaterialPageRoute(
+    Navigator.of(context).push(
+      MaterialPageRoute(
         builder: (ctx) => HumorScreen(
-              selectedCategory,
-              buildHumorScreenFrom: BuildHumorScreenFrom.bookmark,
-              humorList: todayHumorList,
-              initIndexInBookmark: 0,
-            )));
+          selectedCategory,
+          buildHumorScreenFrom: BuildHumorScreenFrom.bookmark,
+          humorList: todayHumorList,
+          initIndexInBookmark: 0,
+        ),
+      ),
+    );
   }
 
   // This widget is the root of your application.

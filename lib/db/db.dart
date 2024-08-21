@@ -25,6 +25,7 @@ class DatabaseHelper {
           CREATE TABLE bookmarks (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             uuid TEXT UNIQUE NOT NULL,
+            ord INTEGER,
             create_date TEXT,
             added_date TEXT,
             category INTEGER NOT NULL,
@@ -51,6 +52,15 @@ class DatabaseHelper {
             sender TEXT,
             source TEXT
           );
+        ''');
+        await db.execute('''
+          CREATE TRIGGER set_value_to_id 
+          AFTER INSERT ON bookmarks
+          FOR EACH ROW
+          WHEN NEW.ord IS NULL
+          BEGIN
+            UPDATE bookmarks SET ord = NEW.id WHERE id = NEW.id;
+          END;
         ''');
       },
       version: 1,
@@ -101,15 +111,15 @@ class DatabaseHelper {
     }
   }
 
-  // Future<List<Map<String, dynamic>>> getBookmarks() async {
-  //   final db = await database;
-  //   return await db.query('bookmarks');
-  // }
-
   /// Get all bookmarks
   Future<List<Humor>> getBookmarks() async {
     final db = await database;
-    final List<Map<String, dynamic>> maps = await db.query('bookmarks');
+    final List<Map<String, dynamic>> maps = await db.query(
+      'bookmarks',
+      orderBy:
+          'ord ASC', // This orders the results by the "order" column in ascending order
+    );
+
     return List.generate(maps.length, (i) {
       return Humor.fromDocument(maps[i]);
     });

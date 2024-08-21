@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:daily_dose_of_humors/models/category.dart';
-import 'package:daily_dose_of_humors/data/humor_data.dart';
 import 'package:daily_dose_of_humors/widgets/humor_view.dart';
 import 'package:daily_dose_of_humors/widgets/banner_ad.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -43,14 +42,14 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
   late Category _selectedCategory;
   late AnimationController _shareAnimController;
   late AnimationController _bookmarkAnimController;
-  int _humorIndex = 0;
   late PageController _pageController;
+  late List<Humor?> humorList;
   var bookmarkLottieAsset = 'assets/lottie/bookmark-mark.json';
   var bookmarked = false;
+  var _humorIndex = 0;
   var viewPunchLine = false;
-  // late Humor humorInView;
-  late List<Humor?> humorList;
-  bool _isExpanded = false;
+  var _isExpanded = false;
+  var _isBookmarkUpdated = false;
 
   @override
   void initState() {
@@ -64,7 +63,6 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
       vsync: this,
       duration: const Duration(seconds: 1),
     );
-    // humorInView = todayHumorList[0];
     _humorIndex = widget.initIndexInBookmark ?? 0;
     _pageController = PageController(keepPage: true, initialPage: _humorIndex);
     if (widget.humorList != null) {
@@ -132,6 +130,7 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
                     'Bookmark ${bookmarked ? 'added' : 'removed'} successfully.'),
               ),
             );
+          _isBookmarkUpdated = true;
         } else {
           ScaffoldMessenger.of(context)
             ..hideCurrentSnackBar()
@@ -150,7 +149,7 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
   void _onItemTapped(int index) async {
     switch (index) {
       case 0:
-        Navigator.of(context).pop();
+        Navigator.of(context).pop(_isBookmarkUpdated);
         break;
       case 1:
         _shareAnimController.reset();
@@ -233,14 +232,12 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
               children: [
                 PageView.builder(
                   controller: _pageController,
-                  itemCount: todayHumorList.length,
+                  itemCount: humorList.length,
                   itemBuilder: (context, index) => HumorView(
-                      humor: todayHumorList[index],
+                      humor: humorList[index],
                       setHumor: (humor) {
                         humorList[index] = humor;
-                        if (_humorIndex == index) {
-                          initBookmark(humor.uuid);
-                        }
+                        initBookmark(humor.uuid);
                       }),
                   onPageChanged: (pageIndex) {
                     // currentHumorIndex = pageIndex;

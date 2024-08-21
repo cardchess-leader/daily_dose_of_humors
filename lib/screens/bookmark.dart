@@ -1,10 +1,11 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:daily_dose_of_humors/widgets/app_bar.dart';
 import 'package:daily_dose_of_humors/models/humor.dart';
 import 'package:daily_dose_of_humors/db/db.dart';
 import 'package:daily_dose_of_humors/widgets/lottie_icon.dart';
 import 'package:daily_dose_of_humors/screens/add_humor.dart';
+import 'package:daily_dose_of_humors/screens/humor_screen.dart';
+import 'package:daily_dose_of_humors/data/category_data.dart';
 
 class BookmarkScreen extends StatefulWidget {
   const BookmarkScreen({super.key});
@@ -23,56 +24,41 @@ class _BookmarkScreenState extends State<BookmarkScreen>
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    _futureBookmarks = _loadBookmarks();
-  }
-
-  Future<List<Humor>> _loadBookmarks() async {
-    final dbHelper = DatabaseHelper();
-    final bookmarks = await dbHelper.getBookmarks();
-    print('length is: ${bookmarks.length}');
-    setState(() {
-      this.bookmarks = bookmarks;
-    });
-
-    return bookmarks;
+    _loadBookmarks();
   }
 
   @override
   void dispose() {
     _tabController.dispose();
-    _updateBookmarks();
     super.dispose();
   }
 
-  void insertBookmark(Humor humor) {
+  void _loadBookmarks() {
     setState(() {
-      bookmarks.add(humor);
+      _futureBookmarks = DatabaseHelper().getBookmarks().then((bookmarks) {
+        setState(() {
+          this.bookmarks = bookmarks;
+        });
+        return bookmarks;
+      });
     });
   }
 
-  void _updateBookmarks() async {
-    if (bookmarks.isEmpty) {
-      return;
-    }
-    final dbHelper = DatabaseHelper();
-    await dbHelper.clearBookmarks();
-    await dbHelper.addBookmarks(bookmarks);
-  }
-
-  Widget proxyDecorator(Widget child, int index, Animation<double> animation) {
-    return AnimatedBuilder(
-      animation: animation,
-      builder: (BuildContext context, Widget? child) {
-        final double animValue = Curves.easeInOut.transform(animation.value);
-        final double elevation = lerpDouble(1.0, 6.0, animValue)!;
-        final double scale = lerpDouble(1.0, 1.06, animValue)!;
-        return Transform.scale(
-          scale: scale,
-          child: child,
-        );
-      },
-      child: child,
+  void _openBookmarkHumors(int index) async {
+    final isBookmarkUpdated = await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (ctx) => HumorScreen(
+          humorCategoryList[0],
+          buildHumorScreenFrom: BuildHumorScreenFrom.bookmark,
+          humorList: bookmarks,
+          initIndexInBookmark: index,
+        ),
+      ),
     );
+
+    if (isBookmarkUpdated == true) {
+      _loadBookmarks();
+    }
   }
 
   Widget cardBuilder(BuildContext context, int index,
@@ -88,6 +74,8 @@ class _BookmarkScreenState extends State<BookmarkScreen>
           final removedHumor = bookmarks[index];
           setState(() {
             bookmarks.removeAt(index);
+            // db operation
+            DatabaseHelper().removeBookmark(humor.uuid);
           });
           ScaffoldMessenger.of(context).hideCurrentSnackBar();
           ScaffoldMessenger.of(context).showSnackBar(
@@ -99,6 +87,8 @@ class _BookmarkScreenState extends State<BookmarkScreen>
                 onPressed: () {
                   setState(() {
                     bookmarks.insert(index, removedHumor);
+                    // db operation
+                    DatabaseHelper().addBookmark(humor);
                   });
                 },
               ),
@@ -118,67 +108,60 @@ class _BookmarkScreenState extends State<BookmarkScreen>
         child: Card(
           elevation: elevation,
           color: humor.getCategoryData().themeColor,
-          child: Container(
-            padding: const EdgeInsets.all(25),
-            child: Stack(
-              children: [
-                Positioned(
-                  bottom: 0,
-                  right: 0,
-                  child: Image.asset(
-                    'assets/images/fist.png',
-                    width: 80,
-                    height: 80,
-                    color: const Color.fromARGB(21, 0, 0, 0),
+          child: InkWell(
+            onTap: () => _openBookmarkHumors(index),
+            child: Container(
+              padding: const EdgeInsets.all(25),
+              child: Stack(
+                children: [
+                  Positioned(
+                    bottom: 0,
+                    right: 0,
+                    child: Image.asset(
+                      'assets/images/fist.png',
+                      width: 80,
+                      height: 80,
+                      color: const Color.fromARGB(21, 0, 0, 0),
+                    ),
                   ),
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Text(
-                      humor.context ?? humor.contextList?[0] ?? '',
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 2,
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Text(
+                        humor.context ?? humor.contextList?[0] ?? '',
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 2,
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 5),
-                    Text(
-                      '- From ${humor.getCategoryData().title}',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 16,
-                        color: Colors.grey.shade700,
+                      const SizedBox(height: 5),
+                      Text(
+                        '- From ${humor.getCategoryData().title}',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 16,
+                          color: Colors.grey.shade700,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 40),
-                    Text(
-                      'Added on ${humor.addedDate ?? ''}',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        color: Colors.grey.shade700,
+                      const SizedBox(height: 40),
+                      Text(
+                        'Added on ${humor.addedDate ?? ''}',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          color: Colors.grey.shade700,
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              ],
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ),
       ),
     );
-  }
-
-  void _onReorder(int oldIndex, int newIndex) {
-    setState(() {
-      if (newIndex > oldIndex) {
-        newIndex -= 1;
-      }
-      final item = bookmarks.removeAt(oldIndex);
-      bookmarks.insert(newIndex, item);
-    });
   }
 
   @override
@@ -260,12 +243,8 @@ class _BookmarkScreenState extends State<BookmarkScreen>
                 return emptyPlaceHolder;
               } else {
                 bookmarks = snapshot.data!;
-                return ReorderableListView.builder(
-                  proxyDecorator: (child, index, animation) =>
-                      proxyDecorator(child, index, animation),
+                return ListView.builder(
                   itemCount: bookmarks.length,
-                  onReorder: (oldIndex, newIndex) =>
-                      _onReorder(oldIndex, newIndex),
                   padding: const EdgeInsets.symmetric(horizontal: 25),
                   itemBuilder: (context, index) => cardBuilder(context, index),
                 );
@@ -283,7 +262,15 @@ class _BookmarkScreenState extends State<BookmarkScreen>
             useSafeArea: true,
             isScrollControlled: true,
             context: context,
-            builder: (ctx) => AddHumorScreen(insertBookmark),
+            builder: (ctx) => AddHumorScreen(
+              (humor) => setState(
+                () {
+                  bookmarks.add(humor);
+                  // db operation
+                  DatabaseHelper().addBookmark(humor);
+                },
+              ),
+            ),
           );
         },
         tooltip: 'Add',
