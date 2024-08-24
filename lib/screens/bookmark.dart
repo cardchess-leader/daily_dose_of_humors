@@ -17,30 +17,47 @@ class BookmarkScreen extends StatefulWidget {
 class _BookmarkScreenState extends State<BookmarkScreen>
     with TickerProviderStateMixin {
   late TabController _tabController;
-  late Future<List<Humor>> _futureBookmarks;
+  final _searchController = TextEditingController();
+  bool isLoading = true;
   List<Humor> bookmarks = [];
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    _loadBookmarks();
+    _initBookmarks();
   }
 
   @override
   void dispose() {
     _tabController.dispose();
+    _searchController.dispose();
     super.dispose();
   }
 
-  void _loadBookmarks() {
+  Future<void> _initBookmarks() async {
+    final loadedBookmarks = await DatabaseHelper().getAllBookmarks();
     setState(() {
-      _futureBookmarks = DatabaseHelper().getBookmarks().then((bookmarks) {
-        setState(() {
-          this.bookmarks = bookmarks;
-        });
-        return bookmarks;
-      });
+      bookmarks = loadedBookmarks;
+      isLoading = false;
+    });
+  }
+
+  Future<void> _loadBookmarks() async {
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+
+    setState(() {
+      isLoading = true;
+    });
+
+    final searchTerm = _searchController.text.trim();
+    final loadedBookmarks = searchTerm.isEmpty
+        ? await DatabaseHelper().getAllBookmarks()
+        : await DatabaseHelper().getBookmarksByKeyword(searchTerm);
+
+    setState(() {
+      bookmarks = loadedBookmarks;
+      isLoading = false;
     });
   }
 
@@ -61,11 +78,10 @@ class _BookmarkScreenState extends State<BookmarkScreen>
     }
   }
 
-  Widget cardBuilder(BuildContext context, int index,
-      {double elevation = 1.0}) {
+  Widget _buildCard(BuildContext context, int index, {double elevation = 1.0}) {
     final humor = bookmarks[index];
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 0, vertical: 15),
+      margin: const EdgeInsets.symmetric(horizontal: 0, vertical: 10),
       key: ValueKey(humor.uuid),
       child: Dismissible(
         key: ValueKey(humor.uuid),
@@ -74,9 +90,8 @@ class _BookmarkScreenState extends State<BookmarkScreen>
           final removedHumor = bookmarks[index];
           setState(() {
             bookmarks.removeAt(index);
-            // db operation
-            DatabaseHelper().removeBookmark(humor.uuid);
           });
+          DatabaseHelper().removeBookmark(humor.uuid);
           ScaffoldMessenger.of(context).hideCurrentSnackBar();
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -87,9 +102,8 @@ class _BookmarkScreenState extends State<BookmarkScreen>
                 onPressed: () {
                   setState(() {
                     bookmarks.insert(index, removedHumor);
-                    // db operation
-                    DatabaseHelper().addBookmark(humor);
                   });
+                  DatabaseHelper().addBookmark(humor);
                 },
               ),
             ),
@@ -164,12 +178,8 @@ class _BookmarkScreenState extends State<BookmarkScreen>
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    final blackOrWhite = isDarkMode ? Colors.white : Colors.black;
-
-    final emptyPlaceHolder = Column(
+  Widget _emptyPlaceHolder(Color color, String message) {
+    return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Stack(
@@ -182,7 +192,7 @@ class _BookmarkScreenState extends State<BookmarkScreen>
                 width: 30,
                 height: 30,
                 decoration: BoxDecoration(
-                  color: blackOrWhite,
+                  color: color,
                   shape: BoxShape.circle,
                 ),
               ),
@@ -197,15 +207,21 @@ class _BookmarkScreenState extends State<BookmarkScreen>
           ],
         ),
         const SizedBox(height: 10),
-        const Text(
-          'Wow, such empty!',
-          style: TextStyle(
+        Text(
+          message,
+          style: const TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 16,
           ),
         ),
       ],
     );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final blackOrWhite = isDarkMode ? Colors.white : Colors.black;
 
     return Scaffold(
       appBar: CustomAppBar(
@@ -232,26 +248,59 @@ class _BookmarkScreenState extends State<BookmarkScreen>
       body: TabBarView(
         controller: _tabController,
         children: [
-          FutureBuilder<List<Humor>>(
-            future: _futureBookmarks,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
-              } else if (snapshot.hasError) {
-                return Center(child: Text('Error: ${snapshot.error}'));
-              } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                return emptyPlaceHolder;
-              } else {
-                bookmarks = snapshot.data!;
-                return ListView.builder(
-                  itemCount: bookmarks.length,
-                  padding: const EdgeInsets.symmetric(horizontal: 25),
-                  itemBuilder: (context, index) => cardBuilder(context, index),
-                );
-              }
-            },
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 25),
+            child: !isLoading &&
+                    _searchController.text.trim() == '' &&
+                    bookmarks.isEmpty
+                ? _emptyPlaceHolder(blackOrWhite, 'Wow, such empty!')
+                : Column(
+                    children: [
+                      const SizedBox(height: 10),
+                      TextField(
+                        controller: _searchController,
+                        maxLength: 100,
+                        style: const TextStyle(fontSize: 20),
+                        decoration: const InputDecoration(
+                          prefixIcon: Padding(
+                            padding: EdgeInsets.all(10),
+                            child: LottieIcon(
+                              duration: 800,
+                              delay: 1600,
+                              lottiePath: 'assets/lottie/search.json',
+                              color: Colors.grey,
+                            ),
+                          ),
+                          hintText: 'Search for keyword...',
+                          border: InputBorder.none,
+                          counterText: '',
+                        ),
+                        onChanged: (value) => _loadBookmarks(),
+                      ),
+                      Container(
+                        height: 3,
+                        decoration: BoxDecoration(
+                          color: const Color.fromARGB(65, 158, 158, 158),
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                        margin: const EdgeInsets.symmetric(horizontal: 4),
+                      ),
+                      isLoading
+                          ? const Center(child: CircularProgressIndicator())
+                          : Expanded(
+                              child: bookmarks.isEmpty
+                                  ? _emptyPlaceHolder(
+                                      blackOrWhite, 'Wow, no results!')
+                                  : ListView.builder(
+                                      itemCount: bookmarks.length,
+                                      itemBuilder: (context, index) =>
+                                          _buildCard(context, index),
+                                    ),
+                            ),
+                    ],
+                  ),
           ),
-          emptyPlaceHolder,
+          _emptyPlaceHolder(blackOrWhite, 'Wow, such empty!'),
         ],
       ),
       floatingActionButton: FloatingActionButton(

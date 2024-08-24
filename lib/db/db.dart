@@ -112,12 +112,27 @@ class DatabaseHelper {
   }
 
   /// Get all bookmarks
-  Future<List<Humor>> getBookmarks() async {
+  Future<List<Humor>> getAllBookmarks() async {
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.query(
       'bookmarks',
       orderBy:
           'ord ASC', // This orders the results by the "order" column in ascending order
+    );
+
+    return List.generate(maps.length, (i) {
+      return Humor.fromDocument(maps[i]);
+    });
+  }
+
+  /// Get bookmarks by keyword
+  Future<List<Humor>> getBookmarksByKeyword(String keyword) async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      'bookmarks',
+      where: 'context LIKE ?',
+      whereArgs: ['%$keyword%'],
+      orderBy: 'ord ASC',
     );
 
     return List.generate(maps.length, (i) {

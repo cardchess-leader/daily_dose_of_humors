@@ -30,6 +30,11 @@ class _AddHumorScreenState extends State<AddHumorScreen> {
     super.dispose();
   }
 
+  bool _isSubmitButtonEnabled() {
+    return _contextController.text.trim().isNotEmpty &&
+        (_addToBookmark || _submitToUs);
+  }
+
   void _handlePress() async {
     if (_isLoading) return;
     setState(() {
@@ -38,9 +43,9 @@ class _AddHumorScreenState extends State<AddHumorScreen> {
     final humor = Humor(
       uuid: uuid.v4(),
       categoryCode: CategoryCode.YOUR_HUMORS,
-      context: _contextController.text,
-      punchline: _punchlineController.text,
-      author: _nicknameController.text,
+      context: _contextController.text.trim(),
+      punchline: _punchlineController.text.trim(),
+      author: _nicknameController.text.trim(),
     );
     if (_submitToUs) {
       final response = await showDialog(
@@ -151,6 +156,7 @@ class _AddHumorScreenState extends State<AddHumorScreen> {
                         decoration: const InputDecoration(
                           label: Text('Context'),
                         ),
+                        onChanged: (value) => setState(() {}),
                       ),
                       TextField(
                         controller: _punchlineController,
@@ -224,8 +230,7 @@ class _AddHumorScreenState extends State<AddHumorScreen> {
                     ),
                   const SizedBox(height: 16),
                   ElevatedButton(
-                    onPressed:
-                        !_addToBookmark && !_submitToUs ? null : _handlePress,
+                    onPressed: _isSubmitButtonEnabled() ? _handlePress : null,
                     style: ElevatedButton.styleFrom(
                       minimumSize: const Size(double.infinity, 50),
                       backgroundColor:
