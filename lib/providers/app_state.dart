@@ -1,24 +1,54 @@
 import 'dart:io';
-import 'package:riverpod/riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:riverpod/riverpod.dart';
+import 'package:daily_dose_of_humors/util/global_var.dart';
 
-class DarkModeNotifier extends StateNotifier<bool> {
-  DarkModeNotifier() : super(false);
-
-  void toggleDarkMode() {
-    state = !state;
-    // Perform any side effects here if needed
-    print('Dark mode toggled: $state');
+class UserSettingsNotifier extends StateNotifier<Map<String, bool>> {
+  UserSettingsNotifier()
+      : super({
+          'darkMode': false,
+          'vibration': true,
+          'notification': true,
+        }) {
+    _loadPreferences();
   }
 
-  void initDarkMode(bool darkMode) {
-    state = darkMode;
+  Future<void> _loadPreferences() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    // Check if it's the first launch
+    final isFirstLaunch = prefs.getBool('isFirstLaunch') ?? true;
+    if (isFirstLaunch) {
+      // Set default preferences
+      await prefs.setBool('darkMode', state['darkMode']!);
+      await prefs.setBool('vibration', state['vibration']!);
+      await prefs.setBool('notification', state['notification']!);
+      await prefs.setBool('isFirstLaunch', false);
+    } else {
+      // Load existing preferences
+      state = {
+        'darkMode': prefs.getBool('darkMode') ?? false,
+        'vibration': prefs.getBool('vibration') ?? true,
+        'notification': prefs.getBool('notification') ?? true,
+      };
+    }
+  }
+
+  Future<void> toggleSettings(String key) async {
+    final prefs = await SharedPreferences.getInstance();
+    final currentValue = state[key] ?? false;
+    state = {
+      ...state,
+      key: !currentValue,
+    };
+    await prefs.setBool(key, !currentValue);
   }
 }
 
-final darkModeProvider = StateNotifierProvider<DarkModeNotifier, bool>((ref) {
-  // Initially set the dark mode to false, it will be updated in the widget
-  return DarkModeNotifier();
+final userSettingsProvider =
+    StateNotifierProvider<UserSettingsNotifier, Map<String, bool>>((ref) {
+  return UserSettingsNotifier();
 });
 
 class AdNotifier extends StateNotifier<void> {
@@ -74,7 +104,7 @@ class AdNotifier extends StateNotifier<void> {
   void incrementCounter() {
     _counter++;
     print('counter is: $_counter');
-    if (_counter >= 10) {
+    if (_counter >= GLOBAL.SHOW_AD_FREQUENCY) {
       showAd();
       _counter = 0; // Reset counter after showing the ad
     }

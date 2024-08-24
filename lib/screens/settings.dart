@@ -14,20 +14,6 @@ class SettingsScreen extends ConsumerStatefulWidget {
 }
 
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
-  bool themeValue = true;
-  bool vibValue = true;
-  bool notiValue = true;
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
   Widget generateHeader(String headerText) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -76,7 +62,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    bool isDarkMode = ref.watch(darkModeProvider);
+    final isDarkMode = ref.watch(userSettingsProvider)['darkMode'] ?? false;
+    final vibration = ref.watch(userSettingsProvider)['vibration'] ?? false;
+    final notification =
+        ref.watch(userSettingsProvider)['notification'] ?? false;
     return Scaffold(
       appBar: const CustomAppBar(
         heading: 'Settings',
@@ -104,15 +93,18 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           generateHeader('App Preferences'),
           generateSettingTile(
             lottiePath: 'assets/lottie/bulb.json',
-            title: 'Current Theme: Light',
+            title: 'Current Theme: ${isDarkMode ? 'Dark' : 'Light'}',
             isDarkMode: isDarkMode,
             trailingWidget: Transform.scale(
               scale: 0.8,
               alignment: Alignment.centerRight,
               child: Switch(
                 value: isDarkMode,
-                onChanged: (value) =>
-                    {ref.read(darkModeProvider.notifier).toggleDarkMode()},
+                onChanged: (value) => {
+                  ref
+                      .read(userSettingsProvider.notifier)
+                      .toggleSettings('darkMode')
+                },
                 activeColor: Colors.white,
                 activeTrackColor: isDarkMode
                     ? Colors.amberAccent
@@ -125,14 +117,18 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           ),
           generateSettingTile(
             lottiePath: 'assets/lottie/vibration.json',
-            title: 'Vibration: On',
+            title: 'Vibration: ${vibration ? 'On' : 'Off'}',
             isDarkMode: isDarkMode,
             trailingWidget: Transform.scale(
               scale: 0.8,
               alignment: Alignment.centerRight,
               child: Switch(
-                value: vibValue,
-                onChanged: (value) => {setState(() => vibValue = value)},
+                value: vibration,
+                onChanged: (value) => {
+                  ref
+                      .read(userSettingsProvider.notifier)
+                      .toggleSettings('vibration')
+                },
                 activeColor: Colors.white,
                 activeTrackColor: isDarkMode
                     ? Colors.amberAccent
@@ -145,14 +141,18 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           ),
           generateSettingTile(
             lottiePath: 'assets/lottie/notification.json',
-            title: 'Notification: On',
+            title: 'Notification: ${notification ? 'On' : 'Off'}',
             isDarkMode: isDarkMode,
             trailingWidget: Transform.scale(
               scale: 0.8,
               alignment: Alignment.centerRight,
               child: Switch(
-                value: notiValue,
-                onChanged: (value) => {setState(() => notiValue = value)},
+                value: notification,
+                onChanged: (value) => {
+                  ref
+                      .read(userSettingsProvider.notifier)
+                      .toggleSettings('notification')
+                },
                 activeColor: Colors.white,
                 activeTrackColor: isDarkMode
                     ? Colors.amberAccent

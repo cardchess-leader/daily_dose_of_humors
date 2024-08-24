@@ -41,7 +41,7 @@ class _AddHumorScreenState extends State<AddHumorScreen> {
       _isLoading = true;
     });
     final humor = Humor(
-      uuid: uuid.v4(),
+      uuid: GLOBAL.uuid.v4(),
       categoryCode: CategoryCode.YOUR_HUMORS,
       context: _contextController.text.trim(),
       punchline: _punchlineController.text.trim(),
@@ -113,7 +113,6 @@ class _AddHumorScreenState extends State<AddHumorScreen> {
   Widget build(BuildContext context) {
     final keyboardSpace = MediaQuery.of(context).viewInsets.bottom;
     final height = MediaQuery.of(context).size.height - 150;
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return ClipRRect(
       borderRadius: const BorderRadius.only(

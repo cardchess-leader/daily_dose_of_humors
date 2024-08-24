@@ -146,9 +146,9 @@ class _BookmarkScreenState extends State<BookmarkScreen>
                         overflow: TextOverflow.ellipsis,
                         maxLines: 2,
                         style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w600,
-                        ),
+                            fontSize: 20,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black),
                       ),
                       const SizedBox(height: 5),
                       Text(
