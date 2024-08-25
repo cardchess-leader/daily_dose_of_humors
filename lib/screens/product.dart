@@ -165,15 +165,16 @@ class ProductScreen extends StatelessWidget {
                   ),
                 ),
                 Container(
-                    margin: const EdgeInsets.symmetric(vertical: 40),
-                    decoration: const BoxDecoration(
-                      border: Border(
-                        bottom: BorderSide(
-                          color: Colors.grey,
-                          width: 0.5,
-                        ),
+                  margin: const EdgeInsets.symmetric(vertical: 40),
+                  decoration: const BoxDecoration(
+                    border: Border(
+                      bottom: BorderSide(
+                        color: Colors.grey,
+                        width: 0.5,
                       ),
-                    )),
+                    ),
+                  ),
+                ),
                 const SizedBox(
                   // The Product Description Part //
                   width: double.infinity,

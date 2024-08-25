@@ -1,4 +1,5 @@
 import 'package:daily_dose_of_humors/providers/app_state.dart';
+import 'package:daily_dose_of_humors/screens/subscription.dart';
 import 'package:daily_dose_of_humors/widgets/lottie_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -81,7 +82,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             title: 'My Subscription: Free',
             isDarkMode: isDarkMode,
             trailingWidget: const Icon(Icons.keyboard_arrow_right_rounded),
-            onTap: () => {},
+            onTap: () => {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (ctx) => const SubscriptionScreen(),
+                ),
+              )
+            },
           ),
           generateSettingTile(
             lottiePath: 'assets/lottie/history.json',

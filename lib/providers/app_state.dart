@@ -114,3 +114,5 @@ class AdNotifier extends StateNotifier<void> {
 final adProvider = StateNotifierProvider<AdNotifier, void>((ref) {
   return AdNotifier();
 });
+
+// Require another provider for subscription management

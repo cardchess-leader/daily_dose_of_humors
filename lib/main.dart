@@ -26,17 +26,6 @@ class MyApp extends ConsumerStatefulWidget {
 }
 
 class _MyAppState extends ConsumerState<MyApp> {
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   // Initialize dark mode based on platform brightness
-  //   Future.microtask(() async {
-  //     final isDarkMode =
-  //         MediaQuery.of(context).platformBrightness == Brightness.dark;
-  //     ref.read(darkModeProvider.notifier).initDarkMode(isDarkMode);
-  //   });
-  // }
-
   TextTheme _getTextTheme(BuildContext context, Brightness brightness) {
     final textTheme = Theme.of(context).textTheme;
     return GoogleFonts.patrickHandTextTheme(
