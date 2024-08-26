@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+// import 'package:lottie/lottie.dart';
 import 'package:daily_dose_of_humors/widgets/app_bar.dart';
 import 'package:daily_dose_of_humors/models/humor.dart';
 import 'package:daily_dose_of_humors/db/db.dart';
@@ -7,6 +8,9 @@ import 'package:daily_dose_of_humors/widgets/lottie_icon.dart';
 import 'package:daily_dose_of_humors/screens/add_humor.dart';
 import 'package:daily_dose_of_humors/screens/humor_screen.dart';
 import 'package:daily_dose_of_humors/data/category_data.dart';
+import 'package:daily_dose_of_humors/widgets/last_frame_lottie.dart';
+import 'package:daily_dose_of_humors/util/util.dart';
+import 'package:daily_dose_of_humors/models/category.dart';
 
 class BookmarkScreen extends StatefulWidget {
   const BookmarkScreen({super.key});
@@ -131,13 +135,35 @@ class _BookmarkScreenState extends State<BookmarkScreen>
                 children: [
                   Positioned(
                     bottom: 0,
-                    right: 0,
-                    child: Image.asset(
-                      humor.getCategoryData().imgPath,
-                      width: 80,
-                      // height: 100,
-                      color: Color.fromARGB(30, 0, 0, 0),
-                    ),
+                    right: humor.getCategoryData().categoryCode ==
+                            CategoryCode.ONE_LINERS
+                        ? -10
+                        : 0,
+                    // child: Image.asset(
+                    //   humor.getCategoryData().imgPath,
+                    //   width: 64,
+                    //   // height: 100,
+                    //   color: const Color.fromARGB(50, 0, 0, 0),
+                    // ),
+                    child: humor.getCategoryData().lottiePath != null
+                        ? LastFrameLottie(
+                            lottiePath: humor.getCategoryData().lottiePath!,
+                            size: humor.getCategoryData().categoryCode ==
+                                    CategoryCode.ONE_LINERS
+                                ? 110
+                                : 80,
+                            // color: const Color.fromARGB(50, 0, 0, 0),
+                            color:
+                                darken(humor.getCategoryData().themeColor, 0.2),
+                            lottiePointInTime:
+                                humor.getCategoryData().lottiePointInTime ??
+                                    1.0,
+                          )
+                        : Image.asset(
+                            humor.getCategoryData().imgPath!,
+                            width: 80,
+                            color: const Color.fromARGB(50, 0, 0, 0),
+                          ),
                   ),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,

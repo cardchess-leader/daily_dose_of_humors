@@ -6,6 +6,7 @@ const humorCategoryList = [
   Category(
     title: 'Dad Jokes',
     lottiePath: 'assets/lottie/card-lottie/dad-jokes.json',
+    lottiePointInTime: 1.0,
     imgSize: 200,
     animDuration: 2200,
     description: 'Simple, pun-filled, and often groan-inducing humor.',
@@ -18,6 +19,7 @@ const humorCategoryList = [
   Category(
     title: 'Knock-Knock Jokes',
     lottiePath: 'assets/lottie/card-lottie/knock-knock-jokes.json',
+    lottiePointInTime: 0.25,
     imgSize: 200,
     animDuration: 1300,
     description:
@@ -31,6 +33,7 @@ const humorCategoryList = [
   Category(
       title: 'One-Liners',
       lottiePath: 'assets/lottie/card-lottie/one-liners.json',
+      lottiePointInTime: 1.0,
       imgSize: 200,
       animDuration: 1500,
       description:
@@ -49,6 +52,7 @@ const humorCategoryList = [
   Category(
     title: 'Dark Humors',
     lottiePath: 'assets/lottie/card-lottie/dark-humors.json',
+    lottiePointInTime: 1.0,
     imgSize: 200,
     animDuration: 2000,
     description: 'Simple, pun-filled, and often groan-inducing humor.',
@@ -61,6 +65,7 @@ const humorCategoryList = [
   Category(
     title: 'Tricky Riddles',
     lottiePath: 'assets/lottie/card-lottie/tricky-riddles.json',
+    lottiePointInTime: 1.0,
     imgSize: 300,
     animDuration: 1600,
     description:
@@ -82,6 +87,7 @@ const humorCategoryList = [
   Category(
     title: 'OX Quiz',
     lottiePath: 'assets/lottie/card-lottie/ox-quiz.json',
+    lottiePointInTime: 0.6,
     imgSize: 200,
     animDuration: 1100,
     description: 'Quiz of interesting trivia, often surprising and amusing.',
@@ -102,6 +108,7 @@ const humorCategoryList = [
   Category(
     title: 'Funny Quotes',
     lottiePath: 'assets/lottie/card-lottie/funny-quotes.json',
+    lottiePointInTime: 1.0,
     imgSize: 200,
     animDuration: 1100,
     description: 'Witty sayings, often hilarious and clever.',
@@ -119,6 +126,7 @@ const humorCategoryList = [
   Category(
     title: 'Story Jokes',
     lottiePath: 'assets/lottie/card-lottie/story-jokes.json',
+    lottiePointInTime: 1.0,
     imgSize: 200,
     animDuration: 1700,
     description: 'Extended anecdotes with a clever and surprising punchline.',
@@ -131,6 +139,7 @@ const humorCategoryList = [
   Category(
     title: 'Detective Puzzles',
     lottiePath: 'assets/lottie/card-lottie/detective-puzzles.json',
+    lottiePointInTime: 0.7,
     imgSize: 200,
     animDuration: 2000,
     description:
@@ -156,6 +165,7 @@ const humorCategoryList = [
   Category(
     title: 'Your Humors',
     lottiePath: 'assets/lottie/card-lottie/detective-puzzles.json',
+    lottiePointInTime: 0.7,
     description: 'Awesome humors created by you!',
     numDailyNew: 0,
     themeColor: Color.fromARGB(255, 123, 218, 202),
