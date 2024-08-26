@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 
+// No subscription -> null
 class Subscription {
+  /* descriptive info */
+  final String subscriptionName;
   final String text1;
   final String text2;
   final String text3;
@@ -8,8 +11,11 @@ class Subscription {
   final String lottiePath;
   final List<Perk> perks;
   final Color color;
+  /* valuewise info */
+  final int maxBookmarks;
 
   const Subscription({
+    required this.subscriptionName,
     required this.text1,
     required this.text2,
     required this.text3,
@@ -17,6 +23,7 @@ class Subscription {
     required this.lottiePath,
     required this.perks,
     required this.color,
+    required this.maxBookmarks,
   });
 }
 

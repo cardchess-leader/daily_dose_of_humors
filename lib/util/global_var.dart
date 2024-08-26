@@ -7,5 +7,6 @@ class GLOBAL {
   static const uuid = Uuid();
   /* EDIT BELOW VALUES FOR APP CONFIG CHANGE */
   static const SHOW_AD_FREQUENCY =
-      3; // after how many page swipes the ad should show
+      30; // after how many page swipes the ad should show
+  static const SMALL_MAX_INT = 1000000; // max bookmark limit
 }

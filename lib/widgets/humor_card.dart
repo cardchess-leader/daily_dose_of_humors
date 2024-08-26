@@ -121,25 +121,28 @@ class _HumorCategoryCardState extends State<HumorCategoryCard>
                         ),
                       ),
                       Expanded(
-                        child: Transform.scale(
-                          scale: widget.category.title == 'Tricky Riddles'
-                              ? 1.2
-                              : 1,
-                          child: Lottie.asset(
-                            widget.category.imgPath,
-                            fit: BoxFit.contain,
-                            controller: _controller,
-                            delegates: LottieDelegates(
-                              values: [
-                                ValueDelegate.colorFilter(
-                                  ['**'],
-                                  value: ColorFilter.mode(
-                                      darkenThemeColor, BlendMode.srcATop),
+                        child: widget.category.lottiePath != null
+                            ? Transform.scale(
+                                scale: widget.category.title == 'Tricky Riddles'
+                                    ? 1.2
+                                    : 1,
+                                child: Lottie.asset(
+                                  widget.category.lottiePath!,
+                                  fit: BoxFit.contain,
+                                  controller: _controller,
+                                  delegates: LottieDelegates(
+                                    values: [
+                                      ValueDelegate.colorFilter(
+                                        ['**'],
+                                        value: ColorFilter.mode(
+                                            darkenThemeColor,
+                                            BlendMode.srcATop),
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                              ],
-                            ),
-                          ),
-                        ),
+                              )
+                            : Image.asset(widget.category.imgPath!),
                       ),
                     ],
                   ),
@@ -155,11 +158,14 @@ class _HumorCategoryCardState extends State<HumorCategoryCard>
                     Text(
                       widget.category.description,
                       textAlign: TextAlign.left,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 2,
                       style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 18,
-                          fontStyle: FontStyle.italic,
-                          color: adaptiveTextColor),
+                        fontWeight: FontWeight.w600,
+                        fontSize: 18,
+                        fontStyle: FontStyle.italic,
+                        color: adaptiveTextColor,
+                      ),
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,

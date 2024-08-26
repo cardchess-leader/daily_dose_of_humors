@@ -27,7 +27,7 @@ class DatabaseHelper {
             uuid TEXT UNIQUE NOT NULL,
             ord INTEGER,
             create_date TEXT,
-            added_date TEXT,
+            added_date TEXT NOT NULL,
             category INTEGER NOT NULL,
             title TEXT,
             context TEXT,

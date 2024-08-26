@@ -18,7 +18,8 @@ enum CategoryCode {
 class Category {
   final String title;
   final String description;
-  final String imgPath;
+  final String imgPath; // either imgPath or lottiePath should be not null
+  final String? lottiePath; // either imgPath or lottiePath should be not null
   final double imgSize;
   final int animDuration;
   final int numDailyNew;
@@ -33,7 +34,8 @@ class Category {
   const Category({
     required this.title,
     required this.description,
-    required this.imgPath,
+    this.imgPath = 'assets/images/detective+B.png',
+    this.lottiePath,
     this.imgSize = 200,
     this.animDuration = 1000,
     required this.numDailyNew,

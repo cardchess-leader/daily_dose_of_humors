@@ -19,13 +19,15 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
   final controller = PageController(initialPage: 1, viewportFraction: 0.5);
   int focusedIndex = 1;
 
-  Widget generateListTile(Perk perk) {
+  Widget generateListTile(Perk perk, bool isDarkMode) {
     return Container(
       alignment: Alignment.center,
       margin: const EdgeInsets.only(bottom: 10),
-      constraints: const BoxConstraints(
-        minHeight: 95.0, // Set minimum height here
-      ),
+      constraints: isDarkMode
+          ? null
+          : const BoxConstraints(
+              minHeight: 95.0, // Set minimum height here
+            ),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(50),
@@ -68,7 +70,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
             // overflow: TextOverflow.ellipsis,
             fontWeight: FontWeight.bold,
             fontSize: 16,
-            color: Colors.grey.shade900,
+            color: isDarkMode ? Colors.white : Colors.grey.shade900,
           ),
         ),
       ),
@@ -280,7 +282,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                     ),
                     const SizedBox(height: 20),
                     ...(subscriptionTypes[focusedIndex].perks.map(
-                          (perk) => generateListTile(perk),
+                          (perk) => generateListTile(perk, isDarkMode),
                         )),
                     const SizedBox(height: 100),
                   ],

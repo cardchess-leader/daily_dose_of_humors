@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:daily_dose_of_humors/widgets/app_bar.dart';
 import 'package:daily_dose_of_humors/models/humor.dart';
 import 'package:daily_dose_of_humors/db/db.dart';
@@ -132,10 +133,10 @@ class _BookmarkScreenState extends State<BookmarkScreen>
                     bottom: 0,
                     right: 0,
                     child: Image.asset(
-                      'assets/images/fist.png',
+                      humor.getCategoryData().imgPath,
                       width: 80,
-                      height: 80,
-                      color: const Color.fromARGB(21, 0, 0, 0),
+                      // height: 100,
+                      color: Color.fromARGB(30, 0, 0, 0),
                     ),
                   ),
                   Column(
@@ -161,7 +162,7 @@ class _BookmarkScreenState extends State<BookmarkScreen>
                       ),
                       const SizedBox(height: 40),
                       Text(
-                        'Added on ${humor.addedDate ?? ''}',
+                        'Added on ${DateFormat('yyyy-MM-dd').format(humor.addedDate)}',
                         style: TextStyle(
                           fontWeight: FontWeight.w600,
                           color: Colors.grey.shade700,
@@ -286,7 +287,8 @@ class _BookmarkScreenState extends State<BookmarkScreen>
                         margin: const EdgeInsets.symmetric(horizontal: 4),
                       ),
                       isLoading
-                          ? const Center(child: CircularProgressIndicator())
+                          ? const Expanded(
+                              child: Center(child: CircularProgressIndicator()))
                           : Expanded(
                               child: bookmarks.isEmpty
                                   ? _emptyPlaceHolder(

@@ -17,7 +17,7 @@ class Humor {
   final String uuid;
   final int? order;
   final DateTime? createDate;
-  final DateTime? addedDate;
+  final DateTime addedDate;
   final CategoryCode categoryCode;
   final String? title;
   final String? context;
@@ -32,7 +32,7 @@ class Humor {
     required this.uuid,
     this.order,
     this.createDate,
-    this.addedDate,
+    DateTime? addedDate,
     required this.categoryCode,
     this.title,
     this.context,
@@ -41,7 +41,7 @@ class Humor {
     this.author,
     this.sender,
     this.source,
-  });
+  }) : addedDate = addedDate ?? DateTime.now();
 
   Humor.fromDocument(Map<String, dynamic> document)
       : uuid = document['uuid'],
@@ -49,9 +49,7 @@ class Humor {
         createDate = document['create_date'] == null
             ? null
             : DateTime.parse(document['create_date']),
-        addedDate = document['added_date'] == null
-            ? null
-            : DateTime.parse(document['added_date']),
+        addedDate = DateTime.parse(document['added_date']),
         categoryCode = CategoryCode.values[document['category']],
         title = document['title'],
         context = document['context'],
@@ -69,15 +67,13 @@ class Humor {
     final Map<String, dynamic> map = {
       'uuid': uuid,
       'ord': order, // even if this value is null, use it!
+      'added_date': addedDate.toIso8601String(),
       'category': categoryCode.index,
       'punchline': punchline,
     };
 
     if (createDate != null) {
       map['create_date'] = createDate!.toIso8601String();
-    }
-    if (addedDate != null) {
-      map['added_date'] = addedDate!.toIso8601String();
     }
     if (title != null) {
       map['title'] = title;
