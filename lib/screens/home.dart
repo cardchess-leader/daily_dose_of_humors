@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:scroll_snap_list/scroll_snap_list.dart';
 import 'package:daily_dose_of_humors/models/category.dart';
 import 'package:daily_dose_of_humors/widgets/background.dart';
 import 'package:daily_dose_of_humors/widgets/app_bar.dart';
 import 'package:daily_dose_of_humors/widgets/humor_card.dart';
 import 'package:daily_dose_of_humors/screens/humor_screen.dart';
 import 'package:daily_dose_of_humors/data/humor_data.dart';
+import 'package:daily_dose_of_humors/util/physics.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -52,23 +52,27 @@ class _HomeScreenState extends State<HomeScreen> {
             scrollTime: 10000,
             patternLength: 2,
           ),
-          ScrollSnapList(
-            scrollDirection: Axis.vertical,
-            duration: 200,
-            itemSize: 500,
-            itemCount: Category.getDailyCategories().length,
-            dynamicItemSize: true,
-            dynamicSizeEquation: (distance) => 1 - (distance / 2000).abs(),
-            onItemFocus: (index) => (setState(() {
-              print(index);
-              _focusCardIndex = index;
-            })),
-            itemBuilder: (context, index) => InkWell(
-              child: HumorCategoryCard(Category.getDailyCategories()[index],
-                  index == _focusCardIndex),
-              onTap: () => _openHumorCategory(
-                  Category.getDailyCategories()[index], context),
+          ListWheelScrollView(
+            itemExtent: 500,
+            diameterRatio: 10,
+            physics: const FastSnapScrollPhysics(
+              speedFactor: 5.0,
+              frictionFactor: 0.2,
             ),
+            onSelectedItemChanged: (index) {
+              setState(() {
+                _focusCardIndex = index;
+              });
+            },
+            children:
+                List.generate(Category.getDailyCategories().length, (index) {
+              return InkWell(
+                child: HumorCategoryCard(Category.getDailyCategories()[index],
+                    index == _focusCardIndex),
+                onTap: () => _openHumorCategory(
+                    Category.getDailyCategories()[index], context),
+              );
+            }),
           ),
         ],
       ),
