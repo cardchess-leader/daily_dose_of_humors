@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
-import 'package:daily_dose_of_humors/models/category.dart';
+// import 'package:daily_dose_of_humors/models/category.dart';
 import 'package:daily_dose_of_humors/widgets/humor_view.dart';
 import 'package:daily_dose_of_humors/widgets/banner_ad.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -17,13 +17,14 @@ enum BuildHumorScreenFrom {
 }
 
 class HumorScreen extends ConsumerStatefulWidget {
-  final Category selectedCategory;
+  // final Category selectedCategory;
   final BuildHumorScreenFrom buildHumorScreenFrom;
   final List<Humor>? humorList;
   final List<String>? humorUuidList;
   final int? initIndexInBookmark;
   const HumorScreen(
-    this.selectedCategory, {
+      // this.selectedCategory,
+      {
     super.key,
     required this.buildHumorScreenFrom,
     this.humorList,
@@ -39,7 +40,7 @@ class HumorScreen extends ConsumerStatefulWidget {
 
 class _HumorScreenState extends ConsumerState<HumorScreen>
     with TickerProviderStateMixin {
-  late Category _selectedCategory;
+  // late Category _selectedCategory;
   late AnimationController _shareAnimController;
   late AnimationController _bookmarkAnimController;
   late PageController _pageController;
@@ -54,7 +55,7 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
   @override
   void initState() {
     super.initState();
-    _selectedCategory = widget.selectedCategory;
+    // _selectedCategory = widget.selectedCategory;
     _shareAnimController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 1),
@@ -182,18 +183,20 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
   Widget build(BuildContext context) {
     bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
     Color blackOrWhite = isDarkMode ? Colors.white : Colors.black;
+    Color themeColor =
+        humorList[_humorIndex]?.getCategoryData().themeColor ?? Colors.amber;
 
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
         title: Text(
-          _selectedCategory.title,
+          humorList[_humorIndex]?.getCategoryData().title ?? 'Loading...',
           style: const TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 25,
           ),
         ),
-        backgroundColor: _selectedCategory.themeColor,
+        backgroundColor: themeColor,
         centerTitle: true,
         actions: [
           IconButton(
@@ -218,7 +221,7 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
                   delay: 1000,
                   size: 45,
                   lottiePath: 'assets/lottie/help.json',
-                  color: _selectedCategory.themeColor,
+                  color: themeColor,
                 ),
               ],
             ),
@@ -234,11 +237,12 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
                   controller: _pageController,
                   itemCount: humorList.length,
                   itemBuilder: (context, index) => HumorView(
-                      humor: humorList[index],
-                      setHumor: (humor) {
-                        humorList[index] = humor;
-                        initBookmark(humor.uuid);
-                      }),
+                    humor: humorList[index],
+                    setHumor: (humor) {
+                      humorList[index] = humor;
+                      initBookmark(humor.uuid);
+                    },
+                  ),
                   onPageChanged: (pageIndex) {
                     // currentHumorIndex = pageIndex;
                     ref.watch(adProvider.notifier).incrementCounter();
@@ -254,7 +258,10 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
                     scale: _isExpanded ? 1.0 : 0.0,
                     child: ManualWidget(
                       color: Colors.white,
-                      manualList: widget.selectedCategory.manualList,
+                      manualList: humorList[_humorIndex]
+                              ?.getCategoryData()
+                              .manualList ??
+                          [],
                       onTap: () => setState(() => _isExpanded = false),
                     ),
                   ),
@@ -266,7 +273,7 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
         ],
       ),
       bottomNavigationBar: BottomAppBar(
-        color: _selectedCategory.themeColor,
+        color: themeColor,
         notchMargin: 6.0,
         child: Row(
           children: [

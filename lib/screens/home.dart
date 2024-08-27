@@ -20,7 +20,7 @@ class _HomeScreenState extends State<HomeScreen> {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (ctx) => HumorScreen(
-          selectedCategory,
+          // selectedCategory,
           buildHumorScreenFrom: BuildHumorScreenFrom.bookmark,
           humorList: todayHumorList,
           initIndexInBookmark: 0,

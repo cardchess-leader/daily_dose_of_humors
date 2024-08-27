@@ -1,9 +1,10 @@
+import 'dart:math'; // For using pi
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lottie/lottie.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:daily_dose_of_humors/models/humor.dart';
 import 'package:daily_dose_of_humors/providers/app_state.dart';
+import 'package:daily_dose_of_humors/models/category.dart';
 
 class HumorView extends ConsumerStatefulWidget {
   final Humor? humor;
@@ -111,56 +112,67 @@ class _HumorViewState extends ConsumerState<HumorView> {
           );
         }
       },
-      child: Container(
-        color: Colors.transparent,
+      child: Padding(
+        // color: Colors.transparent,
         padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
         child: Column(
           children: [
             Container(
-              padding: const EdgeInsets.only(right: 10),
+              height: 50,
               decoration: BoxDecoration(
                 color: Colors.amber,
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(50),
               ),
               clipBehavior: Clip.hardEdge,
-              child: Row(
+              child: Stack(
                 children: [
-                  Lottie.asset(
-                    'assets/lottie/lottie2.json',
-                    width: 45,
-                    height: 45,
-                    delegates: LottieDelegates(
-                      values: [
-                        ValueDelegate.colorFilter(
-                          ['**'],
-                          value: ColorFilter.mode(
-                            textColor,
-                            BlendMode.src,
+                  Align(
+                    alignment: Alignment.center,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 70),
+                      child: Text(
+                        (() {
+                          if (widget.humor == null) {
+                            return 'Loading Humors...';
+                          }
+                          if (widget.humor!.categoryCode ==
+                              CategoryCode.YOUR_HUMORS) {
+                            return 'Your Own Humor';
+                          }
+                          return 'Sent by: Board Collie';
+                        })(),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: textColor,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 20,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Align(
+                    alignment: const Alignment(1.1, 0),
+                    child: Transform(
+                      transform: Matrix4.rotationZ(pi / 4),
+                      alignment: Alignment.center,
+                      child: Container(
+                        color: Colors.redAccent,
+                        padding: const EdgeInsets.symmetric(horizontal: 50),
+                        child: const Text(
+                          'NEW',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
-                      ],
-                    ),
-                  ),
-                  Text(
-                    'x  123',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: textColor,
-                    ),
-                  ),
-                  const Spacer(),
-                  Text(
-                    '2024/07/27 #1',
-                    style: TextStyle(
-                      color: textColor,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 16,
+                      ),
                     ),
                   ),
                 ],
               ),
             ),
+            const SizedBox(height: 10),
             Expanded(
               child: _generateHumorContent(widget.humor!, textColor),
             ),

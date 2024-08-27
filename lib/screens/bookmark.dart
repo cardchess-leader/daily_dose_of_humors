@@ -70,7 +70,7 @@ class _BookmarkScreenState extends State<BookmarkScreen>
     final isBookmarkUpdated = await Navigator.of(context).push(
       MaterialPageRoute(
         builder: (ctx) => HumorScreen(
-          humorCategoryList[0],
+          // humorCategoryList[0],
           buildHumorScreenFrom: BuildHumorScreenFrom.bookmark,
           humorList: bookmarks,
           initIndexInBookmark: index,
@@ -83,7 +83,7 @@ class _BookmarkScreenState extends State<BookmarkScreen>
     }
   }
 
-  Widget _buildCard(BuildContext context, int index, {double elevation = 1.0}) {
+  Widget _buildCard(BuildContext context, int index) {
     final humor = bookmarks[index];
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 0, vertical: 10),
@@ -125,7 +125,7 @@ class _BookmarkScreenState extends State<BookmarkScreen>
           ),
         ),
         child: Card(
-          elevation: elevation,
+          elevation: 5,
           color: humor.getCategoryData().themeColor,
           child: InkWell(
             onTap: () => _openBookmarkHumors(index),
