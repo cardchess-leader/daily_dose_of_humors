@@ -1,21 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:scroll_snap_list/scroll_snap_list.dart';
 import 'package:lottie/lottie.dart';
 import 'package:daily_dose_of_humors/models/subscription.dart';
 import 'package:daily_dose_of_humors/data/subscription_data.dart';
 import 'package:daily_dose_of_humors/widgets/lottie_icon.dart';
 import 'package:daily_dose_of_humors/util/util.dart';
+import 'package:daily_dose_of_humors/providers/app_state.dart';
 
-class SubscriptionScreen extends StatefulWidget {
+class SubscriptionScreen extends ConsumerStatefulWidget {
   const SubscriptionScreen({
     super.key,
   });
 
   @override
-  State<SubscriptionScreen> createState() => _SubscriptionScreenState();
+  ConsumerState<SubscriptionScreen> createState() => _SubscriptionScreenState();
 }
 
-class _SubscriptionScreenState extends State<SubscriptionScreen> {
+class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
   final controller = PageController(initialPage: 1, viewportFraction: 0.5);
   int focusedIndex = 1;
 
@@ -330,7 +332,12 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                         .color, // Background color
                     foregroundColor: Colors.white, // Text color
                   ),
-                  onPressed: () => {},
+                  onPressed: () => {
+                    ref
+                        .read(subscriptionStatusProvider.notifier)
+                        .updateSubscription(
+                            subscriptionTypes[focusedIndex].subscriptionCode)
+                  },
                   child: const Text(
                     'Start My Subscription',
                     style: TextStyle(

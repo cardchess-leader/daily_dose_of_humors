@@ -1,25 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-// import 'package:lottie/lottie.dart';
 import 'package:daily_dose_of_humors/widgets/app_bar.dart';
 import 'package:daily_dose_of_humors/models/humor.dart';
 import 'package:daily_dose_of_humors/db/db.dart';
 import 'package:daily_dose_of_humors/widgets/lottie_icon.dart';
 import 'package:daily_dose_of_humors/screens/add_humor.dart';
 import 'package:daily_dose_of_humors/screens/humor_screen.dart';
-import 'package:daily_dose_of_humors/data/category_data.dart';
 import 'package:daily_dose_of_humors/widgets/last_frame_lottie.dart';
 import 'package:daily_dose_of_humors/util/util.dart';
 import 'package:daily_dose_of_humors/models/category.dart';
+import 'package:daily_dose_of_humors/providers/app_state.dart';
+import 'package:daily_dose_of_humors/util/global_var.dart';
 
-class BookmarkScreen extends StatefulWidget {
+class BookmarkScreen extends ConsumerStatefulWidget {
   const BookmarkScreen({super.key});
 
   @override
-  State<BookmarkScreen> createState() => _BookmarkScreenState();
+  ConsumerState<BookmarkScreen> createState() => _BookmarkScreenState();
 }
 
-class _BookmarkScreenState extends State<BookmarkScreen>
+class _BookmarkScreenState extends ConsumerState<BookmarkScreen>
     with TickerProviderStateMixin {
   late TabController _tabController;
   final _searchController = TextEditingController();
@@ -96,7 +97,7 @@ class _BookmarkScreenState extends State<BookmarkScreen>
           setState(() {
             bookmarks.removeAt(index);
           });
-          DatabaseHelper().removeBookmark(humor.uuid);
+          DatabaseHelper().removeBookmark(humor);
           ScaffoldMessenger.of(context).hideCurrentSnackBar();
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -247,6 +248,7 @@ class _BookmarkScreenState extends State<BookmarkScreen>
 
   @override
   Widget build(BuildContext context) {
+    final maxBookmarkCount = ref.watch(subscriptionStatusProvider).maxBookmarks;
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final blackOrWhite = isDarkMode ? Colors.white : Colors.black;
 
@@ -267,7 +269,11 @@ class _BookmarkScreenState extends State<BookmarkScreen>
           unselectedLabelColor: Colors.grey.shade500,
           controller: _tabController,
           tabs: [
-            Tab(text: 'Bookmarks (${bookmarks.length}/500)'),
+            Tab(
+                text: 'Bookmarks (${bookmarks.length}${(() {
+              if (maxBookmarkCount == GLOBAL.SMALL_MAX_INT) return '';
+              return '/$maxBookmarkCount';
+            })()})'),
             const Tab(text: 'Library (0)'),
           ],
         ),

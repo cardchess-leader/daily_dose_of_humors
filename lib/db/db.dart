@@ -96,13 +96,13 @@ class DatabaseHelper {
     });
   }
 
-  Future<bool> removeBookmark(String uuid) async {
+  Future<bool> removeBookmark(Humor humor) async {
     final db = await database;
     try {
       int result = await db.delete(
         'bookmarks',
         where: 'uuid = ?',
-        whereArgs: [uuid],
+        whereArgs: [humor.uuid],
       );
       return result > 0;
     } catch (e) {
@@ -125,6 +125,11 @@ class DatabaseHelper {
     });
   }
 
+  Future<int> getBookmarkCount() async {
+    final db = await database;
+    return (await db.query('bookmarks')).length;
+  }
+
   /// Get bookmarks by keyword
   Future<List<Humor>> getBookmarksByKeyword(String keyword) async {
     final db = await database;
@@ -140,10 +145,10 @@ class DatabaseHelper {
     });
   }
 
-  Future<bool> isBookmarked(String uuid) async {
+  Future<bool> isBookmarked(Humor humor) async {
     final db = await database;
     final List<Map<String, dynamic>> result =
-        await db.query('bookmarks', where: 'uuid = ?', whereArgs: [uuid]);
+        await db.query('bookmarks', where: 'uuid = ?', whereArgs: [humor.uuid]);
     print('query result: $result');
     if (result.isEmpty) {
       return false;

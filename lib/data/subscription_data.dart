@@ -16,14 +16,28 @@ const _unlockContentsPerk = Perk(
   color: Colors.green,
 );
 
+const freeSubscription = Subscription(
+  subscriptionCode: SubscriptionCode.FREE,
+  subscriptionName: 'Free',
+  text1: '',
+  text2: '',
+  text3: '',
+  text4: '',
+  lottiePath: 'assets/lottie/monthly-face.json',
+  maxBookmarks: 0,
+  perks: [],
+  color: Colors.amberAccent,
+);
+
 const monthlySubscription = Subscription(
+  subscriptionCode: SubscriptionCode.MONTHLY,
   subscriptionName: 'Monthly',
   text1: 'MOST AFFORDABLE',
   text2: '1 Month',
   text3: 'KRW 1,900 per month',
   text4: '≈ KRW 475.00 / week only',
   lottiePath: 'assets/lottie/monthly-face.json',
-  maxBookmarks: 200,
+  maxBookmarks: 0,
   perks: [
     _removeAdsPerk,
     _unlockContentsPerk,
@@ -45,7 +59,8 @@ const monthlySubscription = Subscription(
 );
 
 const yearlySubscription = Subscription(
-  subscriptionName: 'Yearly Subscription',
+  subscriptionCode: SubscriptionCode.YEARLY,
+  subscriptionName: 'Yearly',
   text1: 'MOST POPULAR',
   text2: '1 Year',
   text3: 'KRW 9,900 per year',
@@ -73,7 +88,8 @@ const yearlySubscription = Subscription(
 );
 
 const lifetimeSubscription = Subscription(
-  subscriptionName: 'Lifetime Subscription',
+  subscriptionCode: SubscriptionCode.LIFETIME,
+  subscriptionName: 'Lifetime',
   text1: 'BEST VALUE',
   text2: 'Lifetime',
   text3: 'KRW 39,900 only',

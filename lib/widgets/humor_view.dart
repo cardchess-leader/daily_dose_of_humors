@@ -92,7 +92,7 @@ class _HumorViewState extends ConsumerState<HumorView> {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = ref.watch(userSettingsProvider)['darkMode'] ?? false;
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final textColor = isDarkMode ? Colors.white : Colors.black;
 
     return InkWell(

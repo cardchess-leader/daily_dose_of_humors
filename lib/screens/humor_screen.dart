@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
-// import 'package:daily_dose_of_humors/models/category.dart';
 import 'package:daily_dose_of_humors/widgets/humor_view.dart';
 import 'package:daily_dose_of_humors/widgets/banner_ad.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:daily_dose_of_humors/providers/app_state.dart';
 import 'package:daily_dose_of_humors/models/humor.dart';
-import 'package:daily_dose_of_humors/db/db.dart';
 import 'package:daily_dose_of_humors/widgets/lottie_icon.dart';
 import 'package:daily_dose_of_humors/widgets/manual.dart';
+import 'package:daily_dose_of_humors/screens/subscription.dart';
 
 enum BuildHumorScreenFrom {
   daily,
@@ -46,7 +45,6 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
   late PageController _pageController;
   late List<Humor?> humorList;
   var bookmarkLottieAsset = 'assets/lottie/bookmark-mark.json';
-  var bookmarked = false;
   var _humorIndex = 0;
   var viewPunchLine = false;
   var _isExpanded = false;
@@ -81,15 +79,11 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
     super.dispose();
   }
 
-  void initBookmark(String? uuid) async {
-    if (uuid == null) {
-      return;
-    }
-    final dbHelper = DatabaseHelper();
-    final isBookmarked = await dbHelper.isBookmarked(uuid);
-    print('initBookmark: $isBookmarked');
+  void initBookmark(Humor humor) async {
+    final isBookmarked =
+        await ref.read(bookmarkProvider.notifier).isHumorBookmarked(humor);
+    // print('initBookmark: $isBookmarked');
     setState(() {
-      bookmarked = isBookmarked;
       bookmarkLottieAsset = isBookmarked
           ? 'assets/lottie/bookmark-mark.json'
           : 'assets/lottie/bookmark-unmark.json';
@@ -97,54 +91,61 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
     });
   }
 
-  void updateBookmark(Humor? humor) async {
-    if (humor == null) return;
-
-    final dbHelper = DatabaseHelper();
-    bool isUpdateSuccessful;
-
-    if (bookmarked) {
-      // Remove the bookmark
-      isUpdateSuccessful = await dbHelper.removeBookmark(humor.uuid);
-    } else {
-      // Add the bookmark
-      isUpdateSuccessful = await dbHelper.addBookmark(humor);
-    }
-
-    if (mounted) {
-      setState(() {
-        if (isUpdateSuccessful) {
-          bookmarked = !bookmarked;
-          bookmarkLottieAsset = bookmarked
-              ? 'assets/lottie/bookmark-mark.json'
-              : 'assets/lottie/bookmark-unmark.json';
-
-          _bookmarkAnimController.reset();
-          _bookmarkAnimController.forward();
-
-          ScaffoldMessenger.of(context)
-            ..hideCurrentSnackBar()
-            ..showSnackBar(
-              SnackBar(
-                duration: const Duration(milliseconds: 3000),
-                content: Text(
-                    'Bookmark ${bookmarked ? 'added' : 'removed'} successfully.'),
-              ),
-            );
-          _isBookmarkUpdated = true;
-        } else {
-          ScaffoldMessenger.of(context)
-            ..hideCurrentSnackBar()
-            ..showSnackBar(
-              SnackBar(
-                duration: const Duration(milliseconds: 3000),
-                content: Text(
-                    'Could not ${bookmarked ? 'remove' : 'add'} bookmark.\nPlease try again later.'),
-              ),
-            );
-        }
-      });
-    }
+  void updateBookmark(Humor humor) async {
+    int resultCode =
+        await ref.read(bookmarkProvider.notifier).toggleBookmark(humor);
+    print('resultCode is: $resultCode');
+    // if (mounted) {
+    setState(() {
+      if (resultCode == 1 || resultCode == 3) {
+        _isBookmarkUpdated = true;
+        bookmarkLottieAsset = resultCode == 1
+            ? 'assets/lottie/bookmark-unmark.json'
+            : 'assets/lottie/bookmark-mark.json';
+        _bookmarkAnimController.reset();
+        _bookmarkAnimController.forward();
+      }
+      String snackBarMsg = '';
+      SnackBarAction? snackBarAction;
+      switch (resultCode) {
+        case 1:
+          snackBarMsg = 'Bookmark removed successfully.';
+          break;
+        case 2:
+          snackBarMsg = 'Could not remove bookmark.\nPlease try again later.';
+          break;
+        case 3:
+          snackBarMsg = 'Bookmark added successfully.';
+          break;
+        case 4:
+          snackBarMsg =
+              'Bookmark feature is exclusive to subscribers.\nWould you like to find out subscription benefits?';
+          snackBarAction = SnackBarAction(
+            label: 'Sure',
+            textColor: Colors.amber,
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (ctx) => const SubscriptionScreen(),
+                ),
+              );
+            },
+          );
+          break;
+        case 5:
+          snackBarMsg = 'Could not add bookmark.\nPlease try again later.';
+          break;
+      }
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            duration: const Duration(milliseconds: 3000),
+            content: Text(snackBarMsg),
+            action: snackBarAction,
+          ),
+        );
+    });
   }
 
   void _onItemTapped(int index) async {
@@ -157,7 +158,9 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
         _shareAnimController.forward();
         break;
       case 2:
-        updateBookmark(humorList[_humorIndex]);
+        if (humorList[_humorIndex] != null) {
+          updateBookmark(humorList[_humorIndex]!);
+        }
         break;
     }
   }
@@ -240,14 +243,16 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
                     humor: humorList[index],
                     setHumor: (humor) {
                       humorList[index] = humor;
-                      initBookmark(humor.uuid);
+                      initBookmark(humor);
                     },
                   ),
                   onPageChanged: (pageIndex) {
                     // currentHumorIndex = pageIndex;
                     ref.watch(adProvider.notifier).incrementCounter();
                     _humorIndex = pageIndex;
-                    initBookmark(humorList[_humorIndex]?.uuid);
+                    if (humorList[_humorIndex] != null) {
+                      initBookmark(humorList[_humorIndex]!);
+                    }
                   },
                 ),
                 Align(

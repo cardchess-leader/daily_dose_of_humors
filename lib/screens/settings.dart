@@ -65,6 +65,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   Widget build(BuildContext context) {
     final isDarkMode = ref.watch(userSettingsProvider)['darkMode'] ?? false;
     final vibration = ref.watch(userSettingsProvider)['vibration'] ?? false;
+    final subscriptionName =
+        ref.watch(subscriptionStatusProvider).subscriptionName;
+
     final notification =
         ref.watch(userSettingsProvider)['notification'] ?? false;
     return Scaffold(
@@ -79,7 +82,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           generateHeader('Subscription'),
           generateSettingTile(
             lottiePath: 'assets/lottie/takeoff.json',
-            title: 'My Subscription: Free',
+            title: 'My Subscription: $subscriptionName',
             isDarkMode: isDarkMode,
             trailingWidget: const Icon(Icons.keyboard_arrow_right_rounded),
             onTap: () => {

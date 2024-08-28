@@ -1,7 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:daily_dose_of_humors/data/subscription_data.dart';
+
+enum SubscriptionCode {
+  FREE,
+  MONTHLY,
+  YEARLY,
+  LIFETIME,
+}
 
 // No subscription -> null
 class Subscription {
+  final SubscriptionCode subscriptionCode;
   /* descriptive info */
   final String subscriptionName;
   final String text1;
@@ -15,6 +24,7 @@ class Subscription {
   final int maxBookmarks;
 
   const Subscription({
+    required this.subscriptionCode,
     required this.subscriptionName,
     required this.text1,
     required this.text2,
@@ -25,6 +35,14 @@ class Subscription {
     required this.color,
     required this.maxBookmarks,
   });
+
+  static Subscription getSubscriptionByCode(SubscriptionCode code) {
+    return subscriptionTypes.firstWhere(
+      (subscription) => subscription.subscriptionCode == code,
+      orElse: () =>
+          freeSubscription, // Return -1 if no element meets the condition
+    );
+  }
 }
 
 class Perk {
