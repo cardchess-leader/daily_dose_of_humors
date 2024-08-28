@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:daily_dose_of_humors/models/humor.dart';
-import 'package:daily_dose_of_humors/providers/app_state.dart';
 import 'package:daily_dose_of_humors/models/category.dart';
 
 class HumorView extends ConsumerStatefulWidget {

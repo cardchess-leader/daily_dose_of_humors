@@ -40,6 +40,7 @@ class HumorScreen extends ConsumerStatefulWidget {
 class _HumorScreenState extends ConsumerState<HumorScreen>
     with TickerProviderStateMixin {
   // late Category _selectedCategory;
+  ScaffoldMessengerState? _scaffoldMessengerState;
   late AnimationController _shareAnimController;
   late AnimationController _bookmarkAnimController;
   late PageController _pageController;
@@ -49,6 +50,7 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
   var viewPunchLine = false;
   var _isExpanded = false;
   var _isBookmarkUpdated = false;
+  double _bannerHeight = 0;
 
   @override
   void initState() {
@@ -73,9 +75,17 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Save a reference to ScaffoldMessengerState in didChangeDependencies
+    _scaffoldMessengerState = ScaffoldMessenger.of(context);
+  }
+
+  @override
   void dispose() {
     _shareAnimController.dispose();
     _bookmarkAnimController.dispose();
+    _scaffoldMessengerState?.clearSnackBars();
     super.dispose();
   }
 
@@ -143,6 +153,13 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
             duration: const Duration(milliseconds: 3000),
             content: Text(snackBarMsg),
             action: snackBarAction,
+            behavior: SnackBarBehavior.floating, // Makes the Snackbar float
+            shape:
+                const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+            margin: EdgeInsets.only(
+              bottom:
+                  _bannerHeight, // Adjust this value as needed to control position
+            ),
           ),
         );
     });
@@ -233,6 +250,7 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
       ),
       body: Column(
         children: [
+          // const BannerAdWidget(),
           Expanded(
             child: Stack(
               children: [
@@ -274,7 +292,8 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
               ],
             ),
           ),
-          const BannerAdWidget(),
+          BannerAdWidget(
+              setBannerHeight: (bannerHeight) => _bannerHeight = bannerHeight),
         ],
       ),
       bottomNavigationBar: BottomAppBar(

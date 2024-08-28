@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class BannerAdWidget extends StatefulWidget {
-  const BannerAdWidget({super.key});
+  final void Function(double bannerHeight)? setBannerHeight;
+
+  const BannerAdWidget({super.key, this.setBannerHeight});
 
   @override
-  _BannerAdWidgetState createState() => _BannerAdWidgetState();
+  State<BannerAdWidget> createState() => _BannerAdWidgetState();
 }
 
 class _BannerAdWidgetState extends State<BannerAdWidget> {
@@ -28,6 +30,8 @@ class _BannerAdWidgetState extends State<BannerAdWidget> {
     if (size == null) {
       print('Unable to get height of anchored banner.');
       return;
+    } else if (widget.setBannerHeight != null) {
+      widget.setBannerHeight!(size.height.toDouble());
     }
 
     _anchoredAdaptiveAd = BannerAd(
