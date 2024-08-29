@@ -57,18 +57,18 @@ class _HumorViewState extends ConsumerState<HumorView> {
         children: [
           Expanded(
             child: PageView.builder(
-              itemCount: humor.contextList!.length,
+              itemCount: humor.contextList!.length + 1,
               physics: const NeverScrollableScrollPhysics(),
               controller: pageController,
               itemBuilder: (context, index) {
                 return _centerContentWidget(
-                    humor.contextList![index], textColor);
+                    [humor.context!, ...humor.contextList!][index], textColor);
               },
             ),
           ),
           SmoothPageIndicator(
             controller: pageController,
-            count: humor.contextList!.length,
+            count: humor.contextList!.length + 1,
             effect: WormEffect(
               dotWidth: 12,
               dotHeight: 12,
@@ -95,15 +95,17 @@ class _HumorViewState extends ConsumerState<HumorView> {
     final textColor = isDarkMode ? Colors.white : Colors.black;
 
     return InkWell(
-      onDoubleTap: () {
-        setState(() {
-          viewPunchLine = !viewPunchLine;
-        });
-      },
+      onDoubleTap: widget.humor?.punchline != null
+          ? () {
+              setState(() {
+                viewPunchLine = !viewPunchLine;
+              });
+            }
+          : null,
       onTap: () {
         if (widget.humor?.contextList?.isNotEmpty ?? false) {
           final nextPage = (pageController.page!.toInt() + 1) %
-              widget.humor!.contextList!.length;
+              (widget.humor!.contextList!.length + 1);
           pageController.animateToPage(
             nextPage,
             duration: const Duration(milliseconds: 250),
