@@ -136,7 +136,7 @@ class _HumorViewState extends ConsumerState<HumorView> {
                           }
                           if (widget.humor!.categoryCode ==
                               CategoryCode.YOUR_HUMORS) {
-                            return 'Your Own Humor';
+                            return 'Your Own Humors';
                           }
                           return 'Sent by: Board Collie';
                         })(),

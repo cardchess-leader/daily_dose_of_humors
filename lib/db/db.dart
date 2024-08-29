@@ -35,7 +35,7 @@ class DatabaseHelper {
             punchline TEXT,
             author TEXT,
             sender TEXT,
-            source TEXT
+            source TEXT NOT NULL
           );
         ''');
         await db.execute('''
@@ -50,7 +50,7 @@ class DatabaseHelper {
             punchline TEXT,
             author TEXT,
             sender TEXT,
-            source TEXT
+            source TEXT NOT NULL
           );
         ''');
         await db.execute('''
@@ -135,10 +135,12 @@ class DatabaseHelper {
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.query(
       'bookmarks',
-      where: 'context LIKE ?',
-      whereArgs: ['%$keyword%'],
+      where: 'context LIKE ? OR source LIKE ?',
+      whereArgs: ['%$keyword%', '%$keyword%'],
       orderBy: 'ord ASC',
     );
+
+    print(maps);
 
     return List.generate(maps.length, (i) {
       return Humor.fromDocument(maps[i]);

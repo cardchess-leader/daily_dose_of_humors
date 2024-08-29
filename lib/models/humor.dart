@@ -25,7 +25,7 @@ class Humor {
   final String? punchline;
   final String? author;
   final String? sender;
-  final String? source;
+  final String source;
 
   // final List<Color> themeColorGradient;
   Humor({
@@ -40,7 +40,7 @@ class Humor {
     this.punchline,
     this.author,
     this.sender,
-    this.source,
+    required this.source,
   }) : addedDate = addedDate ?? DateTime.now();
 
   Humor.fromDocument(Map<String, dynamic> document)
@@ -70,6 +70,7 @@ class Humor {
       'added_date': addedDate.toIso8601String(),
       'category': categoryCode.index,
       'punchline': punchline,
+      'source': source,
     };
 
     if (createDate != null) {
@@ -89,9 +90,6 @@ class Humor {
     }
     if (sender != null) {
       map['sender'] = sender;
-    }
-    if (source != null) {
-      map['source'] = source;
     }
     return map;
   }

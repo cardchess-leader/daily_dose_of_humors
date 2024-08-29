@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:daily_dose_of_humors/widgets/app_bar.dart';
 import 'package:daily_dose_of_humors/models/humor.dart';
-import 'package:daily_dose_of_humors/db/db.dart';
 import 'package:daily_dose_of_humors/widgets/lottie_icon.dart';
 import 'package:daily_dose_of_humors/screens/add_humor.dart';
 import 'package:daily_dose_of_humors/screens/humor_screen.dart';
@@ -42,7 +41,8 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen>
   }
 
   Future<void> _initBookmarks() async {
-    final loadedBookmarks = await DatabaseHelper().getAllBookmarks();
+    final loadedBookmarks =
+        await ref.read(bookmarkProvider.notifier).getAllBookmarks();
     setState(() {
       bookmarks = loadedBookmarks;
       isLoading = false;
@@ -58,8 +58,10 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen>
 
     final searchTerm = _searchController.text.trim();
     final loadedBookmarks = searchTerm.isEmpty
-        ? await DatabaseHelper().getAllBookmarks()
-        : await DatabaseHelper().getBookmarksByKeyword(searchTerm);
+        ? await ref.read(bookmarkProvider.notifier).getAllBookmarks()
+        : await ref
+            .read(bookmarkProvider.notifier)
+            .getBookmarksByKeyword(searchTerm);
 
     setState(() {
       bookmarks = loadedBookmarks;
@@ -97,7 +99,7 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen>
           setState(() {
             bookmarks.removeAt(index);
           });
-          DatabaseHelper().removeBookmark(humor);
+          ref.read(bookmarkProvider.notifier).removeBookmark(humor);
           ScaffoldMessenger.of(context).hideCurrentSnackBar();
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -109,7 +111,7 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen>
                   setState(() {
                     bookmarks.insert(index, removedHumor);
                   });
-                  DatabaseHelper().addBookmark(humor);
+                  ref.read(bookmarkProvider.notifier).addBookmark(humor);
                 },
               ),
             ),
@@ -140,12 +142,6 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen>
                             CategoryCode.ONE_LINERS
                         ? -10
                         : 0,
-                    // child: Image.asset(
-                    //   humor.getCategoryData().imgPath,
-                    //   width: 64,
-                    //   // height: 100,
-                    //   color: const Color.fromARGB(50, 0, 0, 0),
-                    // ),
                     child: humor.getCategoryData().lottiePath != null
                         ? LastFrameLottie(
                             lottiePath: humor.getCategoryData().lottiePath!,
@@ -180,7 +176,7 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen>
                       ),
                       const SizedBox(height: 5),
                       Text(
-                        '- From ${humor.getCategoryData().title}',
+                        '- From "${humor.source}"',
                         style: TextStyle(
                           fontWeight: FontWeight.w600,
                           fontSize: 16,
@@ -349,8 +345,7 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen>
               (humor) => setState(
                 () {
                   bookmarks.add(humor);
-                  // db operation
-                  DatabaseHelper().addBookmark(humor);
+                  ref.read(bookmarkProvider.notifier).addBookmark(humor);
                 },
               ),
             ),

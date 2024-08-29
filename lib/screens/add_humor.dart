@@ -46,6 +46,7 @@ class _AddHumorScreenState extends State<AddHumorScreen> {
       context: _contextController.text.trim(),
       punchline: _punchlineController.text.trim(),
       author: _nicknameController.text.trim(),
+      source: 'Your Own Humors',
     );
     if (_submitToUs) {
       final response = await showDialog(

@@ -10,8 +10,9 @@ const _removeAdsPerk = Perk(
 );
 
 const _unlockContentsPerk = Perk(
-  title: 'Unlock All Contents',
-  subtitle: 'Unlock all humor contents, including detective puzzles and more!',
+  title: 'Unlock All Daily Contents',
+  subtitle:
+      'Unlock all subscriber-only daily contents, including detective puzzles!',
   imgPath: 'assets/images/unlock-color.png',
   color: Colors.green,
 );

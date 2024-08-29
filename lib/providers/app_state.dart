@@ -94,6 +94,10 @@ class BookmarkNotifier extends StateNotifier<void> {
     return await DatabaseHelper().getAllBookmarks();
   }
 
+  Future<List<Humor>> getBookmarksByKeyword(String keyword) async {
+    return await DatabaseHelper().getBookmarksByKeyword(keyword);
+  }
+
   Future<bool> isHumorBookmarked(Humor humor) async {
     return await DatabaseHelper().isBookmarked(humor);
   }
