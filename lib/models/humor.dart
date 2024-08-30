@@ -26,6 +26,7 @@ class Humor {
   final String? author;
   final String? sender;
   final String source;
+  int thumbsUpCounter;
 
   // final List<Color> themeColorGradient;
   Humor({
@@ -41,6 +42,7 @@ class Humor {
     this.author,
     this.sender,
     required this.source,
+    this.thumbsUpCounter = 0,
   }) : addedDate = addedDate ?? DateTime.now();
 
   Humor.fromDocument(Map<String, dynamic> document)
@@ -57,7 +59,8 @@ class Humor {
         punchline = document['punchline'],
         author = document['author'],
         sender = document['sender'],
-        source = document['source'];
+        source = document['source'],
+        thumbsUpCounter = 0;
 
   Category getCategoryData() {
     return Category.getCategoryByCode(categoryCode);

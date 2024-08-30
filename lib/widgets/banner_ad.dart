@@ -68,7 +68,8 @@ class _BannerAdWidgetState extends State<BannerAdWidget> {
 
   @override
   void dispose() {
-    super.dispose();
+    widget.setBannerHeight!(0);
     _anchoredAdaptiveAd?.dispose();
+    super.dispose();
   }
 }

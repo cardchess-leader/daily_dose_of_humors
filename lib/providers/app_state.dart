@@ -28,6 +28,11 @@ class SubscriptionStatusNotifier extends StateNotifier<Subscription> {
     await prefs.setInt(
         'subscriptionStatus', newSubscription.subscriptionCode.index);
   }
+
+  bool isSubscriptionAdFree() {
+    return state.subscriptionCode != SubscriptionCode.FREE &&
+        state.subscriptionCode != SubscriptionCode.MONTHLY;
+  }
 }
 
 final subscriptionStatusProvider =

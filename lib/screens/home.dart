@@ -21,7 +21,7 @@ class _HomeScreenState extends State<HomeScreen> {
       MaterialPageRoute(
         builder: (ctx) => HumorScreen(
           // selectedCategory,
-          buildHumorScreenFrom: BuildHumorScreenFrom.bookmark,
+          buildHumorScreenFrom: BuildHumorScreenFrom.daily,
           humorList: todayHumorList,
           initIndexInBookmark: 0,
         ),

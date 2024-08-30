@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'dart:math';
+import 'package:daily_dose_of_humors/util/global_var.dart';
 
 // Function to lighten a color
 Color lighten(Color color, [double amount = 0.1]) {
@@ -18,13 +18,12 @@ Color darken(Color color, [double amount = 0.1]) {
 }
 
 List<Color> generateRandomColors(int count) {
-  Random random = Random();
   return List<Color>.generate(count, (index) {
     return Color.fromARGB(
       255,
-      random.nextInt(256), // Red
-      random.nextInt(256), // Green
-      random.nextInt(256), // Blue
+      GLOBAL.random.nextInt(256), // Red
+      GLOBAL.random.nextInt(256), // Green
+      GLOBAL.random.nextInt(256), // Blue
     );
   });
 }

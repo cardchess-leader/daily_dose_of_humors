@@ -2,17 +2,20 @@ import 'dart:math'; // For using pi
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+import 'package:animated_flip_counter/animated_flip_counter.dart';
 import 'package:daily_dose_of_humors/models/humor.dart';
 import 'package:daily_dose_of_humors/models/category.dart';
 
 class HumorView extends ConsumerStatefulWidget {
   final Humor? humor;
   final void Function(Humor humor) setHumor;
+  final bool showThumbsUpCount;
 
   const HumorView({
     super.key,
     this.humor,
     required this.setHumor,
+    this.showThumbsUpCount = true,
   });
 
   @override
@@ -173,10 +176,50 @@ class _HumorViewState extends ConsumerState<HumorView> {
                 ],
               ),
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 5),
+            if (widget.showThumbsUpCount)
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                child: Row(
+                  children: [
+                    Image.asset(
+                      'assets/icons/thumb-up.png',
+                      color: Colors.black,
+                      width: 20,
+                    ),
+                    const SizedBox(width: 5),
+                    AnimatedFlipCounter(
+                      value: widget.humor?.thumbsUpCounter ?? 0,
+                      textStyle: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    // const Text(
+                    //   ' 24',
+                    //   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    // ),
+                    const Spacer(),
+                  ],
+                ),
+              ),
             Expanded(
               child: _generateHumorContent(widget.humor!, textColor),
             ),
+            const SizedBox(height: 5),
+            // Container(
+            //   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+            //   child: Row(
+            //     children: [
+            //       const Spacer(),
+            //       const Text(
+            //         '2024.7.12 #3',
+            //         style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            //       ),
+            //     ],
+            //   ),
+            // ),
             const SizedBox(height: 5),
           ],
         ),

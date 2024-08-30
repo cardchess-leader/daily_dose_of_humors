@@ -1,3 +1,4 @@
+import 'package:daily_dose_of_humors/util/global_var.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:daily_dose_of_humors/widgets/humor_view.dart';
@@ -8,6 +9,7 @@ import 'package:daily_dose_of_humors/models/humor.dart';
 import 'package:daily_dose_of_humors/widgets/lottie_icon.dart';
 import 'package:daily_dose_of_humors/widgets/manual.dart';
 import 'package:daily_dose_of_humors/screens/subscription.dart';
+import 'package:daily_dose_of_humors/data/emoji_data.dart';
 
 enum BuildHumorScreenFrom {
   daily,
@@ -43,6 +45,7 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
   ScaffoldMessengerState? _scaffoldMessengerState;
   late AnimationController _shareAnimController;
   late AnimationController _bookmarkAnimController;
+  late AnimationController _fabLottieAnimController;
   late PageController _pageController;
   late List<Humor?> humorList;
   var bookmarkLottieAsset = 'assets/lottie/bookmark-mark.json';
@@ -51,6 +54,8 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
   var _isExpanded = false;
   var _isBookmarkUpdated = false;
   double _bannerHeight = 0;
+  bool _isFabAnimating = false;
+  var _emojiLottieIndex = 0;
 
   @override
   void initState() {
@@ -58,13 +63,16 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
     // _selectedCategory = widget.selectedCategory;
     _shareAnimController = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 1),
+      // duration: const Duration(seconds: 1),
     );
     _bookmarkAnimController = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 1),
+      // duration: const Duration(seconds: 1),
     );
-    _humorIndex = widget.initIndexInBookmark ?? 0;
+    _fabLottieAnimController = AnimationController(
+      vsync: this,
+    )..addStatusListener(_fabLottieAnimListener);
+    _humorIndex = widget.initIndexInBookmark ?? 1;
     _pageController = PageController(keepPage: true, initialPage: _humorIndex);
     if (widget.humorList != null) {
       humorList = widget.humorList!;
@@ -83,10 +91,20 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
 
   @override
   void dispose() {
+    _fabLottieAnimController.removeStatusListener(_fabLottieAnimListener);
     _shareAnimController.dispose();
     _bookmarkAnimController.dispose();
+    _fabLottieAnimController.dispose();
     _scaffoldMessengerState?.clearSnackBars();
     super.dispose();
+  }
+
+  void _fabLottieAnimListener(AnimationStatus status) {
+    if (status == AnimationStatus.completed) {
+      setState(() {
+        _isFabAnimating = false;
+      });
+    }
   }
 
   void initBookmark(Humor humor) async {
@@ -184,19 +202,48 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
 
   Widget getBottomNavLottie(
       String assetPath, Color color, AnimationController controller) {
-    return Lottie.asset(
-      assetPath,
-      width: 24,
-      controller: controller,
-      delegates: LottieDelegates(
-        values: [
-          ValueDelegate.colorFilter(
-            ['**'],
-            value: ColorFilter.mode(color, BlendMode.src),
-          ),
-        ],
-      ),
-    );
+    return Lottie.asset(assetPath,
+        width: 24,
+        controller: controller,
+        delegates: LottieDelegates(
+          values: [
+            ValueDelegate.colorFilter(
+              ['**'],
+              value: ColorFilter.mode(color, BlendMode.src),
+            ),
+          ],
+        ), onLoaded: (composition) {
+      controller.duration = composition.duration;
+    });
+  }
+
+  void _handleThumbUp() {
+    setState(() {
+      _isFabAnimating = true;
+      _fabLottieAnimController.reset();
+      _fabLottieAnimController.forward();
+      if (widget.buildHumorScreenFrom == BuildHumorScreenFrom.daily) {
+        humorList[_humorIndex]!.thumbsUpCounter++;
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(
+            SnackBar(
+              duration: const Duration(milliseconds: 3000),
+              content:
+                  const Text('Awesome! Thumbs up for this humor!  (10 left!)'),
+              behavior: SnackBarBehavior.floating, // Makes the Snackbar float
+              shape:
+                  const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+              margin: EdgeInsets.only(
+                bottom:
+                    _bannerHeight, // Adjust this value as needed to control position
+              ),
+            ),
+          );
+      } else {
+        _emojiLottieIndex = GLOBAL.random.nextInt(emojiLottieList.length);
+      }
+    });
   }
 
   @override
@@ -205,6 +252,7 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
     Color blackOrWhite = isDarkMode ? Colors.white : Colors.black;
     Color themeColor =
         humorList[_humorIndex]?.getCategoryData().themeColor ?? Colors.amber;
+    bool isDaily = widget.buildHumorScreenFrom == BuildHumorScreenFrom.daily;
 
     return Scaffold(
       appBar: AppBar(
@@ -220,6 +268,7 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
         centerTitle: true,
         actions: [
           IconButton(
+            tooltip: 'help',
             onPressed: () => {setState(() => _isExpanded = !_isExpanded)},
             icon: Stack(
               children: [
@@ -263,6 +312,8 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
                       humorList[index] = humor;
                       initBookmark(humor);
                     },
+                    showThumbsUpCount: widget.buildHumorScreenFrom ==
+                        BuildHumorScreenFrom.daily,
                   ),
                   onPageChanged: (pageIndex) {
                     // currentHumorIndex = pageIndex;
@@ -292,8 +343,12 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
               ],
             ),
           ),
-          BannerAdWidget(
-              setBannerHeight: (bannerHeight) => _bannerHeight = bannerHeight),
+          if (!ref
+              .read(subscriptionStatusProvider.notifier)
+              .isSubscriptionAdFree())
+            BannerAdWidget(
+                setBannerHeight: (bannerHeight) =>
+                    _bannerHeight = bannerHeight),
         ],
       ),
       bottomNavigationBar: BottomAppBar(
@@ -302,6 +357,7 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
         child: Row(
           children: [
             IconButton(
+              tooltip: 'go back',
               icon: Transform(
                 alignment: Alignment.center,
                 transform: Matrix4.identity()..scale(-1.0, 1.0, 1.0),
@@ -314,11 +370,13 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
               onPressed: () => _onItemTapped(0),
             ),
             IconButton(
+              tooltip: 'share this humor',
               icon: getBottomNavLottie('assets/lottie/share.json', blackOrWhite,
                   _shareAnimController),
               onPressed: () => _onItemTapped(1),
             ),
             IconButton(
+              tooltip: 'bookmark this humor',
               icon: getBottomNavLottie(
                   bookmarkLottieAsset, blackOrWhite, _bookmarkAnimController),
               onPressed: () => _onItemTapped(2),
@@ -328,25 +386,21 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endContained,
       floatingActionButton: FloatingActionButton(
+        elevation: _isFabAnimating ? 1 : 5,
+        highlightElevation: 1,
+        disabledElevation: 1,
         backgroundColor: Colors.amber.shade400,
-        onPressed: () {
-          // Handle the FAB action
-          print('FAB Pressed');
-        },
-        tooltip: 'Add',
+        onPressed: _isFabAnimating ? null : _handleThumbUp,
+        tooltip: isDaily ? 'thumbs up!' : 'rate this humor!',
         child: Lottie.asset(
-          'assets/lottie/lottie-test.json',
-          fit: BoxFit.contain,
-          // width: 10,
-          // height: 10,
-          delegates: LottieDelegates(
-            values: [
-              ValueDelegate.colorFilter(
-                ['**'],
-                value: const ColorFilter.mode(Colors.black, BlendMode.src),
-              ),
-            ],
-          ),
+          isDaily
+              ? 'assets/lottie/thumb-up.json'
+              : 'assets/lottie/emoji-lottie/${emojiLottieList[_emojiLottieIndex]}.json',
+          width: isDaily ? 32 : 40,
+          controller: _fabLottieAnimController, // For bookmark, set to disabled
+          onLoaded: (composition) {
+            _fabLottieAnimController.duration = composition.duration;
+          },
         ),
       ),
     );
