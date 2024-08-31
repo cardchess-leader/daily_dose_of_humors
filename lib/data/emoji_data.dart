@@ -31,7 +31,7 @@ const emojiLottieList = [
   'sad',
   'sleeping',
   'sleepy',
-  'smiling',
+  'smilling',
   'smirking',
   'squit',
   'tired',

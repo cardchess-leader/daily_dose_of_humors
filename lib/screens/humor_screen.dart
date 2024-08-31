@@ -1,4 +1,4 @@
-import 'package:daily_dose_of_humors/util/global_var.dart';
+// import 'package:daily_dose_of_humors/util/global_var.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:daily_dose_of_humors/widgets/humor_view.dart';
@@ -10,6 +10,7 @@ import 'package:daily_dose_of_humors/widgets/lottie_icon.dart';
 import 'package:daily_dose_of_humors/widgets/manual.dart';
 import 'package:daily_dose_of_humors/screens/subscription.dart';
 import 'package:daily_dose_of_humors/data/emoji_data.dart';
+import 'package:daily_dose_of_humors/util/util.dart';
 
 enum BuildHumorScreenFrom {
   daily,
@@ -60,14 +61,11 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
   @override
   void initState() {
     super.initState();
-    // _selectedCategory = widget.selectedCategory;
     _shareAnimController = AnimationController(
       vsync: this,
-      // duration: const Duration(seconds: 1),
     );
     _bookmarkAnimController = AnimationController(
       vsync: this,
-      // duration: const Duration(seconds: 1),
     );
     _fabLottieAnimController = AnimationController(
       vsync: this,
@@ -103,6 +101,11 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
     if (status == AnimationStatus.completed) {
       setState(() {
         _isFabAnimating = false;
+        if (widget.buildHumorScreenFrom != BuildHumorScreenFrom.daily) {
+          print('why is this running?');
+          _fabLottieAnimController.reset();
+          _fabLottieAnimController.forward();
+        }
       });
     }
   }
@@ -217,7 +220,7 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
     });
   }
 
-  void _handleThumbUp() {
+  void _handleFabPress() {
     setState(() {
       _isFabAnimating = true;
       _fabLottieAnimController.reset();
@@ -241,7 +244,24 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
             ),
           );
       } else {
-        _emojiLottieIndex = GLOBAL.random.nextInt(emojiLottieList.length);
+        _emojiLottieIndex =
+            getDifferentRandInt(emojiLottieList.length, _emojiLottieIndex);
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(
+            SnackBar(
+              duration: const Duration(milliseconds: 3000),
+              content: Text(
+                  'You rate this humor as: "${emojiLottieList[_emojiLottieIndex]}".'),
+              behavior: SnackBarBehavior.floating, // Makes the Snackbar float
+              shape:
+                  const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+              margin: EdgeInsets.only(
+                bottom:
+                    _bannerHeight, // Adjust this value as needed to control position
+              ),
+            ),
+          );
       }
     });
   }
@@ -390,7 +410,7 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
         highlightElevation: 1,
         disabledElevation: 1,
         backgroundColor: Colors.amber.shade400,
-        onPressed: _isFabAnimating ? null : _handleThumbUp,
+        onPressed: _isFabAnimating ? null : _handleFabPress,
         tooltip: isDaily ? 'thumbs up!' : 'rate this humor!',
         child: Lottie.asset(
           isDaily
@@ -400,6 +420,9 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
           controller: _fabLottieAnimController, // For bookmark, set to disabled
           onLoaded: (composition) {
             _fabLottieAnimController.duration = composition.duration;
+            if (!isDaily) {
+              _fabLottieAnimController.forward();
+            }
           },
         ),
       ),

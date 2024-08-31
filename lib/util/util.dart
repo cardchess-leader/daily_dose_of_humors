@@ -27,3 +27,10 @@ List<Color> generateRandomColors(int count) {
     );
   });
 }
+
+int getDifferentRandInt(int maxVal, int prevVal) {
+  while (true) {
+    int newVal = GLOBAL.random.nextInt(maxVal);
+    if (newVal != prevVal) return newVal;
+  }
+}
