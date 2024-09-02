@@ -1,0 +1,30 @@
+{
+    "flutter": {
+        "platforms": {
+            "android": {
+                "default": {
+                    "projectId": "daily-dose-of-humors",
+                    "appId": "1:710204387067:android:9bfd35be80ddcbb5b44a5e",
+                    "fileOutput": "android/app/google-services.json"
+                }
+            },
+            "ios": {
+                "default": {
+                    "projectId": "daily-dose-of-humors",
+                    "appId": "1:710204387067:ios:0884ee5b650d9bc6b44a5e",
+                    "uploadDebugSymbols": false,
+                    "fileOutput": "ios/Runner/GoogleService-Info.plist"
+                }
+            },
+            "dart": {
+                "lib/firebase_options.dart": {
+                    "projectId": "daily-dose-of-humors",
+                    "configurations": {
+                        "android": "1:710204387067:android:9bfd35be80ddcbb5b44a5e",
+                        "ios": "1:710204387067:ios:0884ee5b650d9bc6b44a5e"
+                    }
+                }
+            }
+        }
+    }
+}

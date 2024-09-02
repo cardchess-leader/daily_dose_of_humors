@@ -7,15 +7,13 @@ import 'package:daily_dose_of_humors/models/humor.dart';
 import 'package:daily_dose_of_humors/models/category.dart';
 
 class HumorView extends ConsumerStatefulWidget {
-  final Humor? humor;
+  final Humor humor;
   final void Function(Humor humor) setHumor;
-  final bool showThumbsUpCount;
 
   const HumorView({
     super.key,
-    this.humor,
+    required this.humor,
     required this.setHumor,
-    this.showThumbsUpCount = true,
   });
 
   @override
@@ -177,7 +175,7 @@ class _HumorViewState extends ConsumerState<HumorView> {
               ),
             ),
             const SizedBox(height: 5),
-            if (widget.showThumbsUpCount)
+            if (widget.humor is DailyHumor)
               Container(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
@@ -185,21 +183,17 @@ class _HumorViewState extends ConsumerState<HumorView> {
                   children: [
                     Image.asset(
                       'assets/icons/thumb-up.png',
-                      color: Colors.black,
-                      width: 20,
+                      color: textColor,
+                      width: 18,
                     ),
                     const SizedBox(width: 5),
                     AnimatedFlipCounter(
-                      value: widget.humor?.thumbsUpCounter ?? 0,
+                      value: (widget.humor as DailyHumor).thumbsUpCount,
                       textStyle: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    // const Text(
-                    //   ' 24',
-                    //   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                    // ),
                     const Spacer(),
                   ],
                 ),

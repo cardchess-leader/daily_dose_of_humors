@@ -73,7 +73,6 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen>
     final isBookmarkUpdated = await Navigator.of(context).push(
       MaterialPageRoute(
         builder: (ctx) => HumorScreen(
-          // humorCategoryList[0],
           buildHumorScreenFrom: BuildHumorScreenFrom.bookmark,
           humorList: bookmarks,
           initIndexInBookmark: index,
@@ -185,7 +184,7 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen>
                       ),
                       const SizedBox(height: 40),
                       Text(
-                        'Added on ${DateFormat('yyyy-MM-dd').format(humor.addedDate)}',
+                        'Added on ${DateFormat('yyyy-MM-dd').format((humor as BookmarkHumor).bookmarkAddedDate)}',
                         style: TextStyle(
                           fontWeight: FontWeight.w600,
                           color: Colors.grey.shade700,

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "710204387067",
+    "project_id": "daily-dose-of-humors",
+    "storage_bucket": "daily-dose-of-humors.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:710204387067:android:9bfd35be80ddcbb5b44a5e",
+        "android_client_info": {
+          "package_name": "com.boardcollie.daily_dose_of_humors"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDBxwwc3kamfCJD_8a_6ltOdbqusEJHFok"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

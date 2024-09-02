@@ -1,66 +1,40 @@
 import 'package:daily_dose_of_humors/models/category.dart';
 
-/*
-create_date: date
-added_date: date
-category: integer between 0 and 10
-title TEXT,
-context: string
-context_list: string
-punchline: string
-author: string (under 50 chars)
-sender: string (under 50 chars)
-source: string (under 50 chars)
-*/
-
 class Humor {
   final String uuid;
-  final int? order;
-  final DateTime? createDate;
-  final DateTime addedDate;
   final CategoryCode categoryCode;
-  final String? title;
-  final String? context;
+  final String context;
   final List<String>? contextList;
   final String? punchline;
   final String? author;
-  final String? sender;
+  final String sender;
   final String source;
-  int thumbsUpCounter;
 
-  // final List<Color> themeColorGradient;
   Humor({
     required this.uuid,
-    this.order,
-    this.createDate,
     DateTime? addedDate,
     required this.categoryCode,
-    this.title,
-    this.context,
+    required this.context,
     this.contextList,
     this.punchline,
     this.author,
-    this.sender,
+    required this.sender,
     required this.source,
-    this.thumbsUpCounter = 0,
-  }) : addedDate = addedDate ?? DateTime.now();
+  });
 
   Humor.fromDocument(Map<String, dynamic> document)
       : uuid = document['uuid'],
-        order = document['ord'],
-        createDate = document['create_date'] == null
-            ? null
-            : DateTime.parse(document['create_date']),
-        addedDate = DateTime.parse(document['added_date']),
-        categoryCode = CategoryCode.values[document['category']],
-        title = document['title'],
+        categoryCode = CategoryCode.values.firstWhere(
+          (e) => e.name == document['category'],
+          orElse: () =>
+              CategoryCode.YOUR_HUMORS, // Return null if no match is found
+        ),
         context = document['context'],
         contextList = document['context_list']?.split('@@@'),
         punchline = document['punchline'],
         author = document['author'],
         sender = document['sender'],
-        source = document['source'],
-        thumbsUpCounter = 0;
+        source = document['source'];
 
   Category getCategoryData() {
     return Category.getCategoryByCode(categoryCode);
@@ -69,31 +43,104 @@ class Humor {
   Map<String, dynamic> humorToMap() {
     final Map<String, dynamic> map = {
       'uuid': uuid,
-      'ord': order, // even if this value is null, use it!
-      'added_date': addedDate.toIso8601String(),
       'category': categoryCode.index,
+      'context': context,
+      'context_list': contextList?.join('@@@'),
       'punchline': punchline,
       'source': source,
+      'author': author,
+      'sender': sender,
     };
+    return map;
+  }
+}
 
-    if (createDate != null) {
-      map['create_date'] = createDate!.toIso8601String();
-    }
-    if (title != null) {
-      map['title'] = title;
-    }
-    if (context != null) {
-      map['context'] = context;
-    }
-    if (contextList != null) {
-      map['context_list'] = contextList!.join('@@@');
-    }
-    if (author != null) {
-      map['author'] = author;
-    }
-    if (sender != null) {
-      map['sender'] = sender;
-    }
+class DailyHumor extends Humor {
+  final DateTime createdDate;
+  int thumbsUpCount;
+
+  DailyHumor({
+    required super.uuid,
+    required this.createdDate, // exclusive to daily humor
+    required super.categoryCode,
+    required super.context,
+    super.contextList,
+    super.punchline,
+    super.author,
+    required super.sender,
+    required super.source,
+    this.thumbsUpCount = 0, // exclusive to daily humor
+  });
+
+  DailyHumor.fromDocument(
+      Map<String, dynamic> document) // Construct from Firebase server
+      : createdDate = DateTime.parse(document['created_date']),
+        thumbsUpCount = document['thumbs_up_count'] ?? 0,
+        super(
+          uuid: document['uuid'],
+          categoryCode: CategoryCode.values.firstWhere(
+            (e) => e.name == document['category'],
+            orElse: () =>
+                CategoryCode.YOUR_HUMORS, // Return null if no match is found
+          ),
+          context: document['context'],
+          contextList: document['context_list']?.split('@@@'),
+          punchline: document['punchline'],
+          author: document['author'],
+          sender: document['sender'],
+          source: document['source'],
+        );
+}
+
+class BookmarkHumor extends Humor {
+  final int? bookmarkOrd;
+  final DateTime bookmarkAddedDate;
+
+  BookmarkHumor({
+    required super.uuid,
+    this.bookmarkOrd,
+    DateTime? bookmarkAddedDate, // exclusive to bookmark humor
+    required super.categoryCode,
+    required super.context,
+    super.contextList,
+    super.punchline,
+    super.author,
+    required super.sender,
+    required super.source,
+  }) : bookmarkAddedDate = bookmarkAddedDate ?? DateTime.now();
+
+  BookmarkHumor.fromDocument(
+      Map<String, dynamic> document) // Construct from Firebase server
+      : bookmarkAddedDate = DateTime.parse(document['bookmark_added_date']),
+        bookmarkOrd = document['bookmark_ord'],
+        super(
+          uuid: document['uuid'],
+          categoryCode: CategoryCode.values.firstWhere(
+            (e) => e.name == document['category'],
+            orElse: () =>
+                CategoryCode.YOUR_HUMORS, // Return null if no match is found
+          ),
+          context: document['context'],
+          contextList: document['context_list']?.split('@@@'),
+          punchline: document['punchline'],
+          author: document['author'],
+          sender: document['sender'],
+          source: document['source'],
+        );
+  @override
+  Map<String, dynamic> humorToMap() {
+    final Map<String, dynamic> map = {
+      'uuid': uuid,
+      'bookmark_ord': bookmarkOrd, // even if this value is null, use it!
+      'bookmark_added_date': bookmarkAddedDate.toIso8601String(),
+      'category': categoryCode.index,
+      'context': context,
+      'context_list': contextList?.join('@@@'),
+      'punchline': punchline,
+      'author': author,
+      'sender': sender,
+      'source': source,
+    };
     return map;
   }
 }

@@ -1,4 +1,4 @@
-package com.example.daily_dose_of_humors
+package com.boardcollie.daily_dose_of_humors
 
 import io.flutter.embedding.android.FlutterActivity
 

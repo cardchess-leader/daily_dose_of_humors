@@ -1,9 +1,12 @@
-// import 'package:daily_dose_of_humors/util/global_var.dart';
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:animated_flip_counter/animated_flip_counter.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lottie/lottie.dart';
+import 'package:daily_dose_of_humors/models/category.dart';
 import 'package:daily_dose_of_humors/widgets/humor_view.dart';
 import 'package:daily_dose_of_humors/widgets/banner_ad.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:daily_dose_of_humors/providers/app_state.dart';
 import 'package:daily_dose_of_humors/models/humor.dart';
 import 'package:daily_dose_of_humors/widgets/lottie_icon.dart';
@@ -19,19 +22,18 @@ enum BuildHumorScreenFrom {
 }
 
 class HumorScreen extends ConsumerStatefulWidget {
-  // final Category selectedCategory;
   final BuildHumorScreenFrom buildHumorScreenFrom;
-  final List<Humor>? humorList;
+  final List<Humor> humorList;
   final List<String>? humorUuidList;
   final int? initIndexInBookmark;
-  const HumorScreen(
-      // this.selectedCategory,
-      {
+  final Category? humorCategory;
+  const HumorScreen({
     super.key,
     required this.buildHumorScreenFrom,
-    this.humorList,
+    this.humorList = const [],
     this.humorUuidList,
     this.initIndexInBookmark,
+    this.humorCategory,
   });
 
   @override
@@ -48,7 +50,7 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
   late AnimationController _bookmarkAnimController;
   late AnimationController _fabLottieAnimController;
   late PageController _pageController;
-  late List<Humor?> humorList;
+  List<Humor> humorList = [];
   var bookmarkLottieAsset = 'assets/lottie/bookmark-mark.json';
   var _humorIndex = 0;
   var viewPunchLine = false;
@@ -57,6 +59,9 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
   double _bannerHeight = 0;
   bool _isFabAnimating = false;
   var _emojiLottieIndex = 0;
+  var _thumbsUpLeft = 5;
+  var _isLoading = false;
+  var _errorLoading = false;
 
   @override
   void initState() {
@@ -72,11 +77,12 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
     )..addStatusListener(_fabLottieAnimListener);
     _humorIndex = widget.initIndexInBookmark ?? 1;
     _pageController = PageController(keepPage: true, initialPage: _humorIndex);
-    if (widget.humorList != null) {
-      humorList = widget.humorList!;
+    if (widget.buildHumorScreenFrom != BuildHumorScreenFrom.daily) {
+      humorList = widget.humorList;
     } else {
-      humorList =
-          List<Humor?>.generate(widget.humorUuidList!.length, (index) => null);
+      // load from the server //
+      _isLoading = true;
+      _loadDailyHumors(widget.humorCategory!);
     }
   }
 
@@ -95,6 +101,42 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
     _fabLottieAnimController.dispose();
     _scaffoldMessengerState?.clearSnackBars();
     super.dispose();
+  }
+
+  Future<void> _loadDailyHumors(Category humorCategory) async {
+    try {
+      // Construct the full URL with query parameters
+      final Uri url = Uri.parse(
+          'https://us-central1-daily-dose-of-humors.cloudfunctions.net/getDailyHumors?category=${humorCategory.categoryCode.name}');
+
+      // Send a GET request to the Firebase function
+      final response = await http.get(url);
+
+      // Check if the request was successful
+      if (response.statusCode == 200) {
+        // Decode the JSON response
+        final data = jsonDecode(response.body);
+
+        // Handle the data as needed
+        print('Humor List: ${data['humorList']}');
+        humorList = data['humorList']
+            .map<DailyHumor>((json) => DailyHumor.fromDocument(json))
+            .toList();
+        // humorList = data.map(json => Humor.)
+      } else {
+        // Handle errors
+        print('Error: ${response.statusCode} - ${response.body}');
+        _errorLoading = true;
+      }
+    } catch (e) {
+      // Handle any exceptions that occur during the request
+      print('Request failed: $e');
+      _errorLoading = true;
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   void _fabLottieAnimListener(AnimationStatus status) {
@@ -154,12 +196,13 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
           snackBarAction = SnackBarAction(
             label: 'Sure',
             textColor: Colors.amber,
-            onPressed: () {
-              Navigator.of(context).push(
+            onPressed: () async {
+              await Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (ctx) => const SubscriptionScreen(),
                 ),
               );
+              setState(() {});
             },
           );
           break;
@@ -196,8 +239,8 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
         _shareAnimController.forward();
         break;
       case 2:
-        if (humorList[_humorIndex] != null) {
-          updateBookmark(humorList[_humorIndex]!);
+        if (!_isLoading && !_errorLoading) {
+          updateBookmark(humorList[_humorIndex]);
         }
         break;
     }
@@ -220,20 +263,25 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
     });
   }
 
+  bool _isDaily() {
+    return widget.buildHumorScreenFrom == BuildHumorScreenFrom.daily;
+  }
+
   void _handleFabPress() {
     setState(() {
       _isFabAnimating = true;
       _fabLottieAnimController.reset();
       _fabLottieAnimController.forward();
       if (widget.buildHumorScreenFrom == BuildHumorScreenFrom.daily) {
-        humorList[_humorIndex]!.thumbsUpCounter++;
+        (humorList[_humorIndex] as DailyHumor).thumbsUpCount++;
+        _thumbsUpLeft--;
         ScaffoldMessenger.of(context)
           ..hideCurrentSnackBar()
           ..showSnackBar(
             SnackBar(
               duration: const Duration(milliseconds: 3000),
-              content:
-                  const Text('Awesome! Thumbs up for this humor!  (10 left!)'),
+              content: Text(
+                  'Awesome! Thumbs up for this humor!  ($_thumbsUpLeft left!)'),
               behavior: SnackBarBehavior.floating, // Makes the Snackbar float
               shape:
                   const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
@@ -270,15 +318,17 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
   Widget build(BuildContext context) {
     bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
     Color blackOrWhite = isDarkMode ? Colors.white : Colors.black;
-    Color themeColor =
-        humorList[_humorIndex]?.getCategoryData().themeColor ?? Colors.amber;
-    bool isDaily = widget.buildHumorScreenFrom == BuildHumorScreenFrom.daily;
+    Color themeColor = _isDaily()
+        ? widget.humorCategory!.themeColor
+        : humorList[_humorIndex].getCategoryData().themeColor;
 
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
         title: Text(
-          humorList[_humorIndex]?.getCategoryData().title ?? 'Loading...',
+          _isDaily()
+              ? widget.humorCategory!.title
+              : humorList[_humorIndex].getCategoryData().title,
           style: const TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 25,
@@ -323,27 +373,25 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
           Expanded(
             child: Stack(
               children: [
-                PageView.builder(
-                  controller: _pageController,
-                  itemCount: humorList.length,
-                  itemBuilder: (context, index) => HumorView(
-                    humor: humorList[index],
-                    setHumor: (humor) {
-                      humorList[index] = humor;
-                      initBookmark(humor);
-                    },
-                    showThumbsUpCount: widget.buildHumorScreenFrom ==
-                        BuildHumorScreenFrom.daily,
-                  ),
-                  onPageChanged: (pageIndex) {
-                    // currentHumorIndex = pageIndex;
-                    ref.watch(adProvider.notifier).incrementCounter();
-                    _humorIndex = pageIndex;
-                    if (humorList[_humorIndex] != null) {
-                      initBookmark(humorList[_humorIndex]!);
-                    }
-                  },
-                ),
+                _isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : PageView.builder(
+                        controller: _pageController,
+                        itemCount: humorList.length,
+                        itemBuilder: (context, index) => HumorView(
+                          humor: humorList[index],
+                          setHumor: (humor) {
+                            humorList[index] = humor;
+                            initBookmark(humor);
+                          },
+                        ),
+                        onPageChanged: (pageIndex) {
+                          // currentHumorIndex = pageIndex;
+                          ref.watch(adProvider.notifier).incrementCounter();
+                          _humorIndex = pageIndex;
+                          initBookmark(humorList[_humorIndex]);
+                        },
+                      ),
                 Align(
                   alignment: Alignment.topRight,
                   child: AnimatedScale(
@@ -352,10 +400,9 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
                     scale: _isExpanded ? 1.0 : 0.0,
                     child: ManualWidget(
                       color: Colors.white,
-                      manualList: humorList[_humorIndex]
-                              ?.getCategoryData()
-                              .manualList ??
-                          [],
+                      manualList: _isDaily()
+                          ? widget.humorCategory!.manualList
+                          : humorList[_humorIndex].getCategoryData().manualList,
                       onTap: () => setState(() => _isExpanded = false),
                     ),
                   ),
@@ -411,19 +458,40 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
         disabledElevation: 1,
         backgroundColor: Colors.amber.shade400,
         onPressed: _isFabAnimating ? null : _handleFabPress,
-        tooltip: isDaily ? 'thumbs up!' : 'rate this humor!',
-        child: Lottie.asset(
-          isDaily
-              ? 'assets/lottie/thumb-up.json'
-              : 'assets/lottie/emoji-lottie/${emojiLottieList[_emojiLottieIndex]}.json',
-          width: isDaily ? 32 : 40,
-          controller: _fabLottieAnimController, // For bookmark, set to disabled
-          onLoaded: (composition) {
-            _fabLottieAnimController.duration = composition.duration;
-            if (!isDaily) {
-              _fabLottieAnimController.forward();
-            }
-          },
+        tooltip: _isDaily() ? 'thumbs up!' : 'rate this humor!',
+        child: Stack(
+          children: [
+            Center(
+              child: Lottie.asset(
+                _isDaily()
+                    ? 'assets/lottie/thumb-regular.json'
+                    : 'assets/lottie/emoji-lottie/${emojiLottieList[_emojiLottieIndex]}.json',
+                width: _isDaily() ? 32 : 40,
+                controller:
+                    _fabLottieAnimController, // For bookmark, set to disabled
+                onLoaded: (composition) {
+                  _fabLottieAnimController.duration = composition.duration;
+                  if (!_isDaily()) {
+                    _fabLottieAnimController.forward();
+                  }
+                },
+              ),
+            ),
+            if (_isDaily())
+              Align(
+                alignment: Alignment.topRight,
+                child: Container(
+                  padding: const EdgeInsets.only(right: 10),
+                  height: 32,
+                  child: AnimatedFlipCounter(
+                    value: _thumbsUpLeft,
+                    textStyle: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+          ],
         ),
       ),
     );

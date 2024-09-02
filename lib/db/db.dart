@@ -23,43 +23,41 @@ class DatabaseHelper {
         print('db newly created!');
         await db.execute('''
           CREATE TABLE bookmarks (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            bookmark_id INTEGER PRIMARY KEY AUTOINCREMENT,
             uuid TEXT UNIQUE NOT NULL,
-            ord INTEGER,
-            create_date TEXT,
-            added_date TEXT NOT NULL,
-            category INTEGER NOT NULL,
-            title TEXT,
+            bookmark_ord INTEGER,
+            bookmark_added_date TEXT NOT NULL,
+            category TEXT NOT NULL,
             context TEXT,
             context_list TEXT,
             punchline TEXT,
             author TEXT,
-            sender TEXT,
+            sender TEXT NOT NULL,
             source TEXT NOT NULL
           );
         ''');
+        // await db.execute('''
+        //   CREATE TABLE library (
+        //     id INTEGER PRIMARY KEY AUTOINCREMENT,
+        //     create_date TEXT,
+        //     added_date TEXT,
+        //     category INTEGER,
+        //     title TEXT,
+        //     context TEXT,
+        //     context_list TEXT,
+        //     punchline TEXT,
+        //     author TEXT,
+        //     sender TEXT,
+        //     source TEXT NOT NULL
+        //   );
+        // ''');
         await db.execute('''
-          CREATE TABLE library (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            create_date TEXT,
-            added_date TEXT,
-            category INTEGER,
-            title TEXT,
-            context TEXT,
-            context_list TEXT,
-            punchline TEXT,
-            author TEXT,
-            sender TEXT,
-            source TEXT NOT NULL
-          );
-        ''');
-        await db.execute('''
-          CREATE TRIGGER set_value_to_id 
+          CREATE TRIGGER set_bookmark_order
           AFTER INSERT ON bookmarks
           FOR EACH ROW
-          WHEN NEW.ord IS NULL
+          WHEN NEW.bookmark_ord IS NULL
           BEGIN
-            UPDATE bookmarks SET ord = NEW.id WHERE id = NEW.id;
+            UPDATE bookmarks SET bookmark_ord = NEW.bookmark_id WHERE bookmark_id = NEW.bookmark_id;
           END;
         ''');
       },
@@ -117,7 +115,7 @@ class DatabaseHelper {
     final List<Map<String, dynamic>> maps = await db.query(
       'bookmarks',
       orderBy:
-          'ord ASC', // This orders the results by the "order" column in ascending order
+          'bookmark_ord ASC', // This orders the results by the "order" column in ascending order
     );
 
     return List.generate(maps.length, (i) {
@@ -137,7 +135,7 @@ class DatabaseHelper {
       'bookmarks',
       where: 'context LIKE ? OR source LIKE ?',
       whereArgs: ['%$keyword%', '%$keyword%'],
-      orderBy: 'ord ASC',
+      orderBy: 'bookmark_ord ASC',
     );
 
     print(maps);

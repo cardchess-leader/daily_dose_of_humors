@@ -30,11 +30,13 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
           : const BoxConstraints(
               minHeight: 95.0, // Set minimum height here
             ),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(50),
-        border: Border.all(color: lighten(perk.color, 0.3), width: 2.5),
-      ),
+      decoration: isDarkMode
+          ? null
+          : BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(50),
+              border: Border.all(color: lighten(perk.color, 0.3), width: 2.5),
+            ),
       child: ListTile(
         leading: Row(
           mainAxisSize: MainAxisSize.min,
@@ -69,7 +71,6 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
         subtitle: Text(
           perk.subtitle,
           style: TextStyle(
-            // overflow: TextOverflow.ellipsis,
             fontWeight: FontWeight.bold,
             fontSize: 16,
             color: isDarkMode ? Colors.white : Colors.grey.shade900,
@@ -97,8 +98,6 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
                       alignment: Alignment.center,
                       child: Text(
                         'Begin Your Humorous Journey!',
-                        // 'The Real Humor Begins Now!',
-                        // 'Your Humor Journey Begins Now!',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontWeight: FontWeight.w700,
@@ -237,50 +236,36 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
                       // margin: const EdgeInsets.symmetric(horizontal: 4),
                     ),
                     const SizedBox(height: 30),
-                    Container(
-                      // padding: const EdgeInsets.symmetric(
-                      //     horizontal: 20, vertical: 10),
-                      // decoration: BoxDecoration(
-                      //   color: Color.fromARGB(81, 185, 246, 202),
-                      //   borderRadius: BorderRadius.circular(50),
-                      // ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Transform.flip(
-                            flipY: true,
-                            flipX: false,
-                            child: LottieIcon(
-                              lottiePath: 'assets/lottie/finger-up.json',
-                              // color: isDarkMode
-                              //     ? Colors.blueAccent
-                              //     : Colors.indigo,
-                              color: lighten(
-                                  subscriptionTypes[focusedIndex].color,
-                                  isDarkMode ? 0.1 : 0),
-                              size: 30,
-                              duration: 1000,
-                              delay: 250,
-                            ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Transform.flip(
+                          flipY: true,
+                          flipX: false,
+                          child: LottieIcon(
+                            lottiePath: 'assets/lottie/finger-up.json',
+                            color: lighten(
+                                subscriptionTypes[focusedIndex].color,
+                                isDarkMode ? 0.1 : 0),
+                            size: 30,
+                            duration: 1000,
+                            delay: 250,
                           ),
-                          const SizedBox(width: 10),
-                          Text(
-                            'Here\'s what you\'ll get',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 24,
-                              // color: isDarkMode
-                              //     ? Colors.blueAccent
-                              //     : Colors.indigo,
-                              color: lighten(
-                                  subscriptionTypes[focusedIndex].color,
-                                  isDarkMode ? 0.1 : 0),
-                            ),
+                        ),
+                        const SizedBox(width: 10),
+                        Text(
+                          'Here\'s what you\'ll get',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 24,
+                            color: lighten(
+                                subscriptionTypes[focusedIndex].color,
+                                isDarkMode ? 0.1 : 0),
                           ),
-                          const SizedBox(width: 40),
-                        ],
-                      ),
+                        ),
+                        const SizedBox(width: 40),
+                      ],
                     ),
                     const SizedBox(height: 20),
                     ...(subscriptionTypes[focusedIndex].perks.map(

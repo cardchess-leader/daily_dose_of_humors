@@ -40,12 +40,13 @@ class _AddHumorScreenState extends State<AddHumorScreen> {
     setState(() {
       _isLoading = true;
     });
-    final humor = Humor(
+    final humor = BookmarkHumor(
       uuid: GLOBAL.uuid.v4(),
       categoryCode: CategoryCode.YOUR_HUMORS,
       context: _contextController.text.trim(),
       punchline: _punchlineController.text.trim(),
       author: _nicknameController.text.trim(),
+      sender: _nicknameController.text.trim(),
       source: 'Your Own Humors',
     );
     if (_submitToUs) {
@@ -164,7 +165,7 @@ class _AddHumorScreenState extends State<AddHumorScreen> {
                         maxLines: 5,
                         maxLength: 250,
                         decoration: const InputDecoration(
-                          label: Text('Punchline (optional)'),
+                          label: Text('Punchline (if any)'),
                         ),
                       ),
                       TextField(
