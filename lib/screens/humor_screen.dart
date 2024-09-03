@@ -14,6 +14,7 @@ import 'package:daily_dose_of_humors/widgets/manual.dart';
 import 'package:daily_dose_of_humors/screens/subscription.dart';
 import 'package:daily_dose_of_humors/data/emoji_data.dart';
 import 'package:daily_dose_of_humors/util/util.dart';
+import 'package:daily_dose_of_humors/widgets/loading.dart';
 
 enum BuildHumorScreenFrom {
   daily,
@@ -44,7 +45,6 @@ class HumorScreen extends ConsumerStatefulWidget {
 
 class _HumorScreenState extends ConsumerState<HumorScreen>
     with TickerProviderStateMixin {
-  // late Category _selectedCategory;
   ScaffoldMessengerState? _scaffoldMessengerState;
   late AnimationController _shareAnimController;
   late AnimationController _bookmarkAnimController;
@@ -58,7 +58,6 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
   var _isBookmarkUpdated = false;
   double _bannerHeight = 0;
   bool _isFabAnimating = false;
-  var _emojiLottieIndex = 0;
   var _thumbsUpLeft = 5;
   var _isLoading = false;
   var _errorLoading = false;
@@ -111,7 +110,6 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
 
       // Send a GET request to the Firebase function
       final response = await http.get(url);
-
       // Check if the request was successful
       if (response.statusCode == 200) {
         // Decode the JSON response
@@ -292,15 +290,16 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
             ),
           );
       } else {
-        _emojiLottieIndex =
-            getDifferentRandInt(emojiLottieList.length, _emojiLottieIndex);
+        ref
+            .read(bookmarkProvider.notifier)
+            .updateBookmarkEmoji(humorList[_humorIndex] as BookmarkHumor);
         ScaffoldMessenger.of(context)
           ..hideCurrentSnackBar()
           ..showSnackBar(
             SnackBar(
               duration: const Duration(milliseconds: 3000),
               content: Text(
-                  'You rate this humor as: "${emojiLottieList[_emojiLottieIndex]}".'),
+                  'You rate this humor as: "${emojiLottieList[(humorList[_humorIndex] as BookmarkHumor).bookmarkEmojiIndex]}".'),
               behavior: SnackBarBehavior.floating, // Makes the Snackbar float
               shape:
                   const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
@@ -317,7 +316,7 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
   @override
   Widget build(BuildContext context) {
     bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    Color blackOrWhite = isDarkMode ? Colors.white : Colors.black;
+    Color textColor = isDarkMode ? Colors.white : Colors.black;
     Color themeColor = _isDaily()
         ? widget.humorCategory!.themeColor
         : humorList[_humorIndex].getCategoryData().themeColor;
@@ -350,7 +349,7 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
                     width: 30,
                     height: 30,
                     decoration: BoxDecoration(
-                      color: blackOrWhite, // Set the circle color
+                      color: textColor, // Set the circle color
                       shape: BoxShape.circle,
                     ),
                   ),
@@ -374,7 +373,7 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
             child: Stack(
               children: [
                 _isLoading
-                    ? const Center(child: CircularProgressIndicator())
+                    ? Center(child: LoadingWidget(color: textColor, size: 100))
                     : PageView.builder(
                         controller: _pageController,
                         itemCount: humorList.length,
@@ -431,21 +430,21 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
                 child: Image.asset(
                   'assets/icons/arrow-right.png',
                   width: 24,
-                  color: blackOrWhite,
+                  color: textColor,
                 ),
               ),
               onPressed: () => _onItemTapped(0),
             ),
             IconButton(
               tooltip: 'share this humor',
-              icon: getBottomNavLottie('assets/lottie/share.json', blackOrWhite,
-                  _shareAnimController),
+              icon: getBottomNavLottie(
+                  'assets/lottie/share.json', textColor, _shareAnimController),
               onPressed: () => _onItemTapped(1),
             ),
             IconButton(
               tooltip: 'bookmark this humor',
               icon: getBottomNavLottie(
-                  bookmarkLottieAsset, blackOrWhite, _bookmarkAnimController),
+                  bookmarkLottieAsset, textColor, _bookmarkAnimController),
               onPressed: () => _onItemTapped(2),
             ),
           ],
@@ -465,7 +464,7 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
               child: Lottie.asset(
                 _isDaily()
                     ? 'assets/lottie/thumb-regular.json'
-                    : 'assets/lottie/emoji-lottie/${emojiLottieList[_emojiLottieIndex]}.json',
+                    : 'assets/lottie/emoji-lottie/${emojiLottieList[(humorList[_humorIndex] as BookmarkHumor).bookmarkEmojiIndex]}.json',
                 width: _isDaily() ? 32 : 40,
                 controller:
                     _fabLottieAnimController, // For bookmark, set to disabled

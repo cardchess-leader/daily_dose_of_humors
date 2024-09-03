@@ -33,7 +33,8 @@ class DatabaseHelper {
             punchline TEXT,
             author TEXT,
             sender TEXT NOT NULL,
-            source TEXT NOT NULL
+            source TEXT NOT NULL,
+            bookmark_emoji_index INTEGER NOT NULL
           );
         ''');
         // await db.execute('''
@@ -65,33 +66,20 @@ class DatabaseHelper {
     );
   }
 
-  Future<bool> addBookmark(Humor humor) async {
+  Future<bool> addBookmark(BookmarkHumor humor) async {
     final db = await database;
     try {
-      await db.insert(
+      int bookmarkId = await db.insert(
         'bookmarks',
         humor.humorToMap(),
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
+      humor.bookmarkOrd ??= bookmarkId;
       return true;
     } catch (e) {
       print('Error adding bookmark: $e');
       return false;
     }
-  }
-
-  /// Add bookmarks in batch
-  Future<void> addBookmarks(List<Humor> humors) async {
-    final db = await database;
-    await db.transaction((txn) async {
-      for (final humor in humors) {
-        await txn.insert(
-          'bookmarks',
-          humor.humorToMap(),
-          conflictAlgorithm: ConflictAlgorithm.replace,
-        );
-      }
-    });
   }
 
   Future<bool> removeBookmark(Humor humor) async {
@@ -109,8 +97,26 @@ class DatabaseHelper {
     }
   }
 
+  Future<bool> syncBookmark(BookmarkHumor humor) async {
+    final db = await database;
+    try {
+      Map<String, dynamic> updatedValues = humor.humorToMap();
+      // Execute the update method
+      int result = await db.update(
+        'bookmarks',
+        updatedValues,
+        where: 'uuid = ?',
+        whereArgs: [humor.uuid],
+      );
+      return result > 0;
+    } catch (e) {
+      print('Error deleting humor: $e');
+      return false;
+    }
+  }
+
   /// Get all bookmarks
-  Future<List<Humor>> getAllBookmarks() async {
+  Future<List<BookmarkHumor>> getAllBookmarks() async {
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.query(
       'bookmarks',
@@ -119,7 +125,7 @@ class DatabaseHelper {
     );
 
     return List.generate(maps.length, (i) {
-      return Humor.fromDocument(maps[i]);
+      return BookmarkHumor.fromDocument(maps[i]);
     });
   }
 
@@ -129,7 +135,7 @@ class DatabaseHelper {
   }
 
   /// Get bookmarks by keyword
-  Future<List<Humor>> getBookmarksByKeyword(String keyword) async {
+  Future<List<BookmarkHumor>> getBookmarksByKeyword(String keyword) async {
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.query(
       'bookmarks',
@@ -141,7 +147,7 @@ class DatabaseHelper {
     print(maps);
 
     return List.generate(maps.length, (i) {
-      return Humor.fromDocument(maps[i]);
+      return BookmarkHumor.fromDocument(maps[i]);
     });
   }
 

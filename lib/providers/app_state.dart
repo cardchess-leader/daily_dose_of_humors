@@ -7,6 +7,8 @@ import 'package:daily_dose_of_humors/util/global_var.dart';
 import 'package:daily_dose_of_humors/models/subscription.dart';
 import 'package:daily_dose_of_humors/db/db.dart';
 import 'package:daily_dose_of_humors/models/humor.dart';
+import 'package:daily_dose_of_humors/util/util.dart';
+import 'package:daily_dose_of_humors/data/emoji_data.dart';
 
 class SubscriptionStatusNotifier extends StateNotifier<Subscription> {
   SubscriptionStatusNotifier() : super(freeSubscription) {
@@ -112,7 +114,17 @@ class BookmarkNotifier extends StateNotifier<void> {
   }
 
   Future<bool> addBookmark(Humor humor) async {
-    return await DatabaseHelper().addBookmark(humor);
+    BookmarkHumor humorToAdd = humor is BookmarkHumor
+        ? humor
+        : BookmarkHumor.fromDailyHumor(humor as DailyHumor);
+    return await DatabaseHelper().addBookmark(humorToAdd);
+  }
+
+  void updateBookmarkEmoji(BookmarkHumor humor) {
+    int newEmojiIndex =
+        getDifferentRandInt(emojiLottieList.length, humor.bookmarkEmojiIndex);
+    humor.bookmarkEmojiIndex = newEmojiIndex;
+    DatabaseHelper().syncBookmark(humor);
   }
 
   Future<int> toggleBookmark(Humor humor) async {

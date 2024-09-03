@@ -21,6 +21,7 @@ class BookmarkScreen extends ConsumerStatefulWidget {
 
 class _BookmarkScreenState extends ConsumerState<BookmarkScreen>
     with TickerProviderStateMixin {
+  ScaffoldMessengerState? _scaffoldMessengerState;
   late TabController _tabController;
   final _searchController = TextEditingController();
   bool isLoading = true;
@@ -34,9 +35,17 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen>
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Save a reference to ScaffoldMessengerState in didChangeDependencies
+    _scaffoldMessengerState = ScaffoldMessenger.of(context);
+  }
+
+  @override
   void dispose() {
     _tabController.dispose();
     _searchController.dispose();
+    _scaffoldMessengerState?.clearSnackBars();
     super.dispose();
   }
 

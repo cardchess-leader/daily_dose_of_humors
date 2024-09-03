@@ -2,14 +2,14 @@ import 'package:daily_dose_of_humors/models/category.dart';
 import 'package:daily_dose_of_humors/models/humor.dart';
 
 final todayHumorList = [
-  Humor(
+  DailyHumor(
       uuid: '7cd0636c-17ee-47a4-a966-72bf0fd8b2a8',
       categoryCode: CategoryCode.DAD_JOKES,
       context: 'Can a frog jump higher than a house?',
       punchline: 'Of course, a house can\'t jump.',
       sender: 'Board Collie',
       source: 'Daily Dose of Humors'),
-  Humor(
+  DailyHumor(
       uuid: '8b82fbd8-20b5-4a7f-9e2c-75b6fc3f5dab',
       categoryCode: CategoryCode.DAD_JOKES,
       context:
@@ -17,7 +17,7 @@ final todayHumorList = [
       punchline: 'Dad: I knew you\'d get stuck on that.',
       sender: 'Board Collie',
       source: 'Daily Dose of Humors'),
-  Humor(
+  DailyHumor(
       uuid: '767a1c3d-9e33-423c-928f-ceab408ee144',
       categoryCode: CategoryCode.KNOCK_KNOCK_JOKES,
       context: 'hello, world!',

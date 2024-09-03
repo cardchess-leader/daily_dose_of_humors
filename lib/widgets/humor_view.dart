@@ -134,10 +134,7 @@ class _HumorViewState extends ConsumerState<HumorView> {
                       padding: const EdgeInsets.symmetric(horizontal: 70),
                       child: Text(
                         (() {
-                          if (widget.humor == null) {
-                            return 'Loading Humors...';
-                          }
-                          if (widget.humor!.categoryCode ==
+                          if (widget.humor.categoryCode ==
                               CategoryCode.YOUR_HUMORS) {
                             return 'Your Own Humors';
                           }
@@ -153,24 +150,26 @@ class _HumorViewState extends ConsumerState<HumorView> {
                       ),
                     ),
                   ),
-                  Align(
-                    alignment: const Alignment(1.1, 0),
-                    child: Transform(
-                      transform: Matrix4.rotationZ(pi / 4),
-                      alignment: Alignment.center,
-                      child: Container(
-                        color: Colors.redAccent,
-                        padding: const EdgeInsets.symmetric(horizontal: 50),
-                        child: const Text(
-                          'NEW',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
+                  if (widget.humor is DailyHumor &&
+                      (widget.humor as DailyHumor).isNew)
+                    Align(
+                      alignment: const Alignment(1.1, 0),
+                      child: Transform(
+                        transform: Matrix4.rotationZ(pi / 4),
+                        alignment: Alignment.center,
+                        child: Container(
+                          color: Colors.redAccent,
+                          padding: const EdgeInsets.symmetric(horizontal: 50),
+                          child: const Text(
+                            'NEW',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
                 ],
               ),
             ),
