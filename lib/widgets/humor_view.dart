@@ -8,12 +8,10 @@ import 'package:daily_dose_of_humors/models/category.dart';
 
 class HumorView extends ConsumerStatefulWidget {
   final Humor humor;
-  final void Function(Humor humor) setHumor;
 
   const HumorView({
     super.key,
     required this.humor,
-    required this.setHumor,
   });
 
   @override
@@ -23,15 +21,6 @@ class HumorView extends ConsumerStatefulWidget {
 class _HumorViewState extends ConsumerState<HumorView> {
   final pageController = PageController(keepPage: true);
   bool viewPunchLine = false;
-
-  @override
-  void initState() {
-    super.initState();
-    // Invoke setHumor when the humor is loaded
-    if (widget.humor != null) {
-      widget.setHumor(widget.humor!);
-    }
-  }
 
   Widget _centerContentWidget(String text, Color textColor) {
     return Center(
@@ -198,21 +187,8 @@ class _HumorViewState extends ConsumerState<HumorView> {
                 ),
               ),
             Expanded(
-              child: _generateHumorContent(widget.humor!, textColor),
+              child: _generateHumorContent(widget.humor, textColor),
             ),
-            const SizedBox(height: 5),
-            // Container(
-            //   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-            //   child: Row(
-            //     children: [
-            //       const Spacer(),
-            //       const Text(
-            //         '2024.7.12 #3',
-            //         style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            //       ),
-            //     ],
-            //   ),
-            // ),
             const SizedBox(height: 5),
           ],
         ),

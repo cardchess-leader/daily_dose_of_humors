@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:convert';
 import 'package:daily_dose_of_humors/data/subscription_data.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -9,6 +10,8 @@ import 'package:daily_dose_of_humors/db/db.dart';
 import 'package:daily_dose_of_humors/models/humor.dart';
 import 'package:daily_dose_of_humors/util/util.dart';
 import 'package:daily_dose_of_humors/data/emoji_data.dart';
+import 'package:daily_dose_of_humors/models/category.dart';
+import 'package:http/http.dart' as http;
 
 class SubscriptionStatusNotifier extends StateNotifier<Subscription> {
   SubscriptionStatusNotifier() : super(freeSubscription) {
@@ -220,4 +223,41 @@ final adProvider = StateNotifierProvider<AdNotifier, void>((ref) {
   return AdNotifier();
 });
 
-// Require another provider for subscription management
+class ServerNotifier extends StateNotifier<void> {
+  ServerNotifier() : super(null);
+
+  Future<List<DailyHumor>> loadDailyHumors(Category humorCategory) async {
+    try {
+      // Construct the full URL with query parameters
+      final Uri url = Uri.parse(
+          'https://us-central1-daily-dose-of-humors.cloudfunctions.net/getDailyHumors?category=${humorCategory.categoryCode.name}');
+
+      // Send a GET request to the Firebase function
+      final response = await http.get(url);
+      // Check if the request was successful
+      if (response.statusCode == 200) {
+        // Decode the JSON response
+        final data = jsonDecode(response.body);
+
+        // Handle the data as needed
+        print('Humor List: ${data['humorList']}');
+        return data['humorList']
+            .map<DailyHumor>((json) => DailyHumor.fromDocument(json))
+            .toList();
+        // humorList = data.map(json => Humor.)
+      } else {
+        // Handle errors
+        print('Error: ${response.statusCode} - ${response.body}');
+        return [];
+      }
+    } catch (e) {
+      // Handle any exceptions that occur during the request
+      print('Request failed: $e');
+      return [];
+    }
+  }
+}
+
+final serverProvider = StateNotifierProvider<ServerNotifier, void>((ref) {
+  return ServerNotifier();
+});

@@ -13,8 +13,7 @@ import 'package:daily_dose_of_humors/widgets/lottie_icon.dart';
 import 'package:daily_dose_of_humors/widgets/manual.dart';
 import 'package:daily_dose_of_humors/screens/subscription.dart';
 import 'package:daily_dose_of_humors/data/emoji_data.dart';
-import 'package:daily_dose_of_humors/util/util.dart';
-import 'package:daily_dose_of_humors/widgets/loading.dart';
+import 'package:daily_dose_of_humors/widgets/humor_scaffold.dart';
 
 enum BuildHumorScreenFrom {
   daily,
@@ -60,7 +59,6 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
   bool _isFabAnimating = false;
   var _thumbsUpLeft = 5;
   var _isLoading = false;
-  var _errorLoading = false;
 
   @override
   void initState() {
@@ -78,6 +76,7 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
     _pageController = PageController(keepPage: true, initialPage: _humorIndex);
     if (widget.buildHumorScreenFrom != BuildHumorScreenFrom.daily) {
       humorList = widget.humorList;
+      initBookmark();
     } else {
       // load from the server //
       _isLoading = true;
@@ -103,38 +102,15 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
   }
 
   Future<void> _loadDailyHumors(Category humorCategory) async {
-    try {
-      // Construct the full URL with query parameters
-      final Uri url = Uri.parse(
-          'https://us-central1-daily-dose-of-humors.cloudfunctions.net/getDailyHumors?category=${humorCategory.categoryCode.name}');
-
-      // Send a GET request to the Firebase function
-      final response = await http.get(url);
-      // Check if the request was successful
-      if (response.statusCode == 200) {
-        // Decode the JSON response
-        final data = jsonDecode(response.body);
-
-        // Handle the data as needed
-        print('Humor List: ${data['humorList']}');
-        humorList = data['humorList']
-            .map<DailyHumor>((json) => DailyHumor.fromDocument(json))
-            .toList();
-        // humorList = data.map(json => Humor.)
-      } else {
-        // Handle errors
-        print('Error: ${response.statusCode} - ${response.body}');
-        _errorLoading = true;
+    final fetchedHumorList =
+        await ref.read(serverProvider.notifier).loadDailyHumors(humorCategory);
+    setState(() {
+      _isLoading = false;
+      if (fetchedHumorList.isNotEmpty) {
+        humorList = fetchedHumorList;
+        initBookmark();
       }
-    } catch (e) {
-      // Handle any exceptions that occur during the request
-      print('Request failed: $e');
-      _errorLoading = true;
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
-    }
+    });
   }
 
   void _fabLottieAnimListener(AnimationStatus status) {
@@ -150,10 +126,11 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
     }
   }
 
-  void initBookmark(Humor humor) async {
+  void initBookmark() async {
+    if (humorList.length <= _humorIndex) return;
+    Humor humor = humorList[_humorIndex];
     final isBookmarked =
         await ref.read(bookmarkProvider.notifier).isHumorBookmarked(humor);
-    // print('initBookmark: $isBookmarked');
     setState(() {
       bookmarkLottieAsset = isBookmarked
           ? 'assets/lottie/bookmark-mark.json'
@@ -162,11 +139,12 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
     });
   }
 
-  void updateBookmark(Humor humor) async {
+  void updateBookmark() async {
+    if (humorList.isEmpty) return;
+    Humor humor = humorList[_humorIndex];
     int resultCode =
         await ref.read(bookmarkProvider.notifier).toggleBookmark(humor);
     print('resultCode is: $resultCode');
-    // if (mounted) {
     setState(() {
       if (resultCode == 1 || resultCode == 3) {
         _isBookmarkUpdated = true;
@@ -237,9 +215,7 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
         _shareAnimController.forward();
         break;
       case 2:
-        if (!_isLoading && !_errorLoading) {
-          updateBookmark(humorList[_humorIndex]);
-        }
+        updateBookmark();
         break;
     }
   }
@@ -368,27 +344,21 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
       ),
       body: Column(
         children: [
-          // const BannerAdWidget(),
           Expanded(
             child: Stack(
               children: [
-                _isLoading
-                    ? Center(child: LoadingWidget(color: textColor, size: 100))
+                (_isLoading || humorList.isEmpty)
+                    ? HumorScreenScaffold(isLoading: _isLoading)
                     : PageView.builder(
                         controller: _pageController,
                         itemCount: humorList.length,
                         itemBuilder: (context, index) => HumorView(
                           humor: humorList[index],
-                          setHumor: (humor) {
-                            humorList[index] = humor;
-                            initBookmark(humor);
-                          },
                         ),
                         onPageChanged: (pageIndex) {
-                          // currentHumorIndex = pageIndex;
                           ref.watch(adProvider.notifier).incrementCounter();
                           _humorIndex = pageIndex;
-                          initBookmark(humorList[_humorIndex]);
+                          initBookmark();
                         },
                       ),
                 Align(
