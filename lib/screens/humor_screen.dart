@@ -11,7 +11,6 @@ import 'package:daily_dose_of_humors/models/humor.dart';
 import 'package:daily_dose_of_humors/widgets/lottie_icon.dart';
 import 'package:daily_dose_of_humors/widgets/manual.dart';
 import 'package:daily_dose_of_humors/screens/subscription.dart';
-import 'package:daily_dose_of_humors/data/emoji_data.dart';
 import 'package:daily_dose_of_humors/widgets/humor_scaffold.dart';
 
 enum BuildHumorScreenFrom {
@@ -116,11 +115,6 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
     if (status == AnimationStatus.completed) {
       setState(() {
         _isFabAnimating = false;
-        if (widget.buildHumorScreenFrom != BuildHumorScreenFrom.daily) {
-          print('why is this running?');
-          _fabLottieAnimController.reset();
-          _fabLottieAnimController.forward();
-        }
       });
     }
   }
@@ -248,53 +242,37 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
     });
   }
 
+  void _showSimpleSnackbar(String message) {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          duration: const Duration(milliseconds: 3000),
+          content: Text(message),
+          behavior: SnackBarBehavior.floating, // Makes the Snackbar float
+          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+          margin: EdgeInsets.only(
+            bottom:
+                _bannerHeight, // Adjust this value as needed to control position
+          ),
+        ),
+      );
+  }
+
   void _handleFabPress() {
-    setState(() {
-      _isFabAnimating = true;
-      _fabLottieAnimController.reset();
-      _fabLottieAnimController.forward();
-      if (widget.buildHumorScreenFrom == BuildHumorScreenFrom.daily) {
-        _incrementLikesCount();
-        // (humorList[_humorIndex] as DailyHumor).thumbsUpCount++;
+    if (_isLoading) {
+      _showSimpleSnackbar('Please wait until humors are fully loaded...');
+    } else {
+      setState(() {
+        _isFabAnimating = true;
+        _fabLottieAnimController.reset();
+        _fabLottieAnimController.forward();
         _thumbsUpLeft--;
-        ScaffoldMessenger.of(context)
-          ..hideCurrentSnackBar()
-          ..showSnackBar(
-            SnackBar(
-              duration: const Duration(milliseconds: 3000),
-              content: Text(
-                  'Awesome! Thumbs up for this humor!  ($_thumbsUpLeft left!)'),
-              behavior: SnackBarBehavior.floating, // Makes the Snackbar float
-              shape:
-                  const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-              margin: EdgeInsets.only(
-                bottom:
-                    _bannerHeight, // Adjust this value as needed to control position
-              ),
-            ),
-          );
-      } else {
-        ref
-            .read(bookmarkProvider.notifier)
-            .updateBookmarkEmoji(humorList[_humorIndex] as BookmarkHumor);
-        ScaffoldMessenger.of(context)
-          ..hideCurrentSnackBar()
-          ..showSnackBar(
-            SnackBar(
-              duration: const Duration(milliseconds: 3000),
-              content: Text(
-                  'You rate this humor as: "${emojiLottieList[(humorList[_humorIndex] as BookmarkHumor).bookmarkEmojiIndex]}".'),
-              behavior: SnackBarBehavior.floating, // Makes the Snackbar float
-              shape:
-                  const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-              margin: EdgeInsets.only(
-                bottom:
-                    _bannerHeight, // Adjust this value as needed to control position
-              ),
-            ),
-          );
-      }
-    });
+        _incrementLikesCount();
+        _showSimpleSnackbar(
+            'Awesome! Thumbs up for this humor!  ($_thumbsUpLeft left!)');
+      });
+    }
   }
 
   @override
@@ -435,39 +413,33 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
         disabledElevation: 1,
         backgroundColor: Colors.amber.shade400,
         onPressed: _isFabAnimating ? null : _handleFabPress,
-        tooltip: _isDaily() ? 'thumbs up!' : 'rate this humor!',
+        tooltip: 'thumbs up!',
         child: Stack(
           children: [
             Center(
               child: Lottie.asset(
-                _isDaily()
-                    ? 'assets/lottie/thumb-regular.json'
-                    : 'assets/lottie/emoji-lottie/${emojiLottieList[(humorList[_humorIndex] as BookmarkHumor).bookmarkEmojiIndex]}.json',
-                width: _isDaily() ? 32 : 40,
+                'assets/lottie/thumb-regular.json',
+                width: 32,
                 controller:
                     _fabLottieAnimController, // For bookmark, set to disabled
                 onLoaded: (composition) {
                   _fabLottieAnimController.duration = composition.duration;
-                  if (!_isDaily()) {
-                    _fabLottieAnimController.forward();
-                  }
                 },
               ),
             ),
-            if (_isDaily())
-              Align(
-                alignment: Alignment.topRight,
-                child: Container(
-                  padding: const EdgeInsets.only(right: 10),
-                  height: 32,
-                  child: AnimatedFlipCounter(
-                    value: _thumbsUpLeft,
-                    textStyle: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                    ),
+            Align(
+              alignment: Alignment.topRight,
+              child: Container(
+                padding: const EdgeInsets.only(right: 10),
+                height: 32,
+                child: AnimatedFlipCounter(
+                  value: _thumbsUpLeft,
+                  textStyle: const TextStyle(
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
+            ),
           ],
         ),
       ),

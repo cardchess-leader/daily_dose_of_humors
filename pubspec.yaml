@@ -85,7 +85,6 @@ flutter:
     - assets/images/
     - assets/lottie/
     - assets/lottie/card-lottie/
-    - assets/lottie/emoji-lottie/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

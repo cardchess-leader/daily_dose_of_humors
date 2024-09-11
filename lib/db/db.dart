@@ -33,8 +33,7 @@ class DatabaseHelper {
             punchline TEXT NOT NULL,
             author TEXT NOT NULL,
             sender TEXT NOT NULL,
-            source TEXT NOT NULL,
-            bookmark_emoji_index INTEGER NOT NULL
+            source TEXT NOT NULL
           );
         ''');
         // await db.execute('''

@@ -29,7 +29,6 @@ abstract class Humor {
 
 class DailyHumor extends Humor {
   final DateTime createdDate;
-  int thumbsUpCount;
   bool isNew;
 
   DailyHumor({
@@ -42,7 +41,6 @@ class DailyHumor extends Humor {
     super.author,
     required super.sender,
     required super.source,
-    this.thumbsUpCount = 0, // exclusive to daily humor
     this.isNew = false,
   });
 
@@ -50,7 +48,6 @@ class DailyHumor extends Humor {
   DailyHumor.loadFromServer(
       Map<String, dynamic> document) // Construct from Firebase server
       : createdDate = DateTime.parse(document['created_date']),
-        thumbsUpCount = document['thumbs_up_count'] ?? 0,
         isNew = document['is_new'] ?? false,
         super(
           uuid: document['uuid'],
@@ -71,7 +68,6 @@ class DailyHumor extends Humor {
 class BookmarkHumor extends Humor {
   int? bookmarkOrd;
   final DateTime bookmarkAddedDate;
-  int bookmarkEmojiIndex;
 
   BookmarkHumor({
     required super.uuid,
@@ -84,14 +80,12 @@ class BookmarkHumor extends Humor {
     super.author,
     required super.sender,
     required super.source,
-    this.bookmarkEmojiIndex = 0,
   }) : bookmarkAddedDate = bookmarkAddedDate ?? DateTime.now();
 
   BookmarkHumor.loadFromTable(
       Map<String, dynamic> document) // Construct from Firebase server
       : bookmarkAddedDate = DateTime.parse(document['bookmark_added_date']),
         bookmarkOrd = document['bookmark_ord'],
-        bookmarkEmojiIndex = document['bookmark_emoji_index'],
         super(
           uuid: document['uuid'],
           categoryCode: CategoryCode.values.firstWhere(
@@ -112,7 +106,6 @@ class BookmarkHumor extends Humor {
   BookmarkHumor.convertFromDailyHumor(DailyHumor dailyHumor)
       : bookmarkAddedDate = DateTime.now(),
         bookmarkOrd = null,
-        bookmarkEmojiIndex = 0,
         super(
           uuid: dailyHumor.uuid,
           categoryCode: dailyHumor.categoryCode,
@@ -135,7 +128,6 @@ class BookmarkHumor extends Humor {
       'author': author,
       'sender': sender,
       'source': source,
-      'bookmark_emoji_index': bookmarkEmojiIndex,
     };
     return map;
   }

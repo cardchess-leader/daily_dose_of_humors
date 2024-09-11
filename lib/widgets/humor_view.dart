@@ -183,29 +183,27 @@ class _HumorViewState extends ConsumerState<HumorView> {
               ),
             ),
             const SizedBox(height: 5),
-            if (widget.humor is DailyHumor)
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                child: Row(
-                  children: [
-                    Image.asset(
-                      'assets/icons/thumb-up.png',
-                      color: textColor,
-                      width: 18,
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              child: Row(
+                children: [
+                  Image.asset(
+                    'assets/icons/thumb-up.png',
+                    color: textColor,
+                    width: 18,
+                  ),
+                  const SizedBox(width: 5),
+                  AnimatedFlipCounter(
+                    value: likesCount,
+                    textStyle: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
                     ),
-                    const SizedBox(width: 5),
-                    AnimatedFlipCounter(
-                      value: likesCount,
-                      textStyle: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const Spacer(),
-                  ],
-                ),
+                  ),
+                  const Spacer(),
+                ],
               ),
+            ),
             Expanded(
               child: _generateHumorContent(widget.humor, textColor),
             ),

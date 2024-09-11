@@ -8,8 +8,6 @@ import 'package:daily_dose_of_humors/util/global_var.dart';
 import 'package:daily_dose_of_humors/models/subscription.dart';
 import 'package:daily_dose_of_humors/db/db.dart';
 import 'package:daily_dose_of_humors/models/humor.dart';
-import 'package:daily_dose_of_humors/util/util.dart';
-import 'package:daily_dose_of_humors/data/emoji_data.dart';
 import 'package:daily_dose_of_humors/models/category.dart';
 import 'package:http/http.dart' as http;
 
@@ -121,13 +119,6 @@ class BookmarkNotifier extends StateNotifier<void> {
         ? humor
         : BookmarkHumor.convertFromDailyHumor(humor as DailyHumor);
     return await DatabaseHelper().addBookmark(humorToAdd);
-  }
-
-  void updateBookmarkEmoji(BookmarkHumor humor) {
-    int newEmojiIndex =
-        getDifferentRandInt(emojiLottieList.length, humor.bookmarkEmojiIndex);
-    humor.bookmarkEmojiIndex = newEmojiIndex;
-    DatabaseHelper().syncBookmark(humor);
   }
 
   Future<int> toggleBookmark(Humor humor) async {
