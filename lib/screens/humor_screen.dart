@@ -1,6 +1,5 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:firebase_database/firebase_database.dart';
 import 'package:animated_flip_counter/animated_flip_counter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lottie/lottie.dart';
@@ -106,8 +105,8 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
         await ref.read(serverProvider.notifier).loadDailyHumors(humorCategory);
     setState(() {
       _isLoading = false;
+      humorList = fetchedHumorList;
       if (fetchedHumorList.isNotEmpty) {
-        humorList = fetchedHumorList;
         initBookmark();
       }
     });
@@ -241,13 +240,22 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
     return widget.buildHumorScreenFrom == BuildHumorScreenFrom.daily;
   }
 
+  void _incrementLikesCount() {
+    DatabaseReference ref =
+        FirebaseDatabase.instance.ref("likes/${humorList[_humorIndex].uuid}");
+    ref.set({
+      '.value': ServerValue.increment(1),
+    });
+  }
+
   void _handleFabPress() {
     setState(() {
       _isFabAnimating = true;
       _fabLottieAnimController.reset();
       _fabLottieAnimController.forward();
       if (widget.buildHumorScreenFrom == BuildHumorScreenFrom.daily) {
-        (humorList[_humorIndex] as DailyHumor).thumbsUpCount++;
+        _incrementLikesCount();
+        // (humorList[_humorIndex] as DailyHumor).thumbsUpCount++;
         _thumbsUpLeft--;
         ScaffoldMessenger.of(context)
           ..hideCurrentSnackBar()

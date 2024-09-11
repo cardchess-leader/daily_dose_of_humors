@@ -28,10 +28,10 @@ class DatabaseHelper {
             bookmark_ord INTEGER,
             bookmark_added_date TEXT NOT NULL,
             category TEXT NOT NULL,
-            context TEXT,
-            context_list TEXT,
-            punchline TEXT,
-            author TEXT,
+            context TEXT NOT NULL,
+            context_list TEXT NOT NULL,
+            punchline TEXT NOT NULL,
+            author TEXT NOT NULL,
             sender TEXT NOT NULL,
             source TEXT NOT NULL,
             bookmark_emoji_index INTEGER NOT NULL
@@ -125,7 +125,7 @@ class DatabaseHelper {
     );
 
     return List.generate(maps.length, (i) {
-      return BookmarkHumor.fromDocument(maps[i]);
+      return BookmarkHumor.loadFromTable(maps[i]);
     });
   }
 
@@ -147,7 +147,7 @@ class DatabaseHelper {
     print(maps);
 
     return List.generate(maps.length, (i) {
-      return BookmarkHumor.fromDocument(maps[i]);
+      return BookmarkHumor.loadFromTable(maps[i]);
     });
   }
 

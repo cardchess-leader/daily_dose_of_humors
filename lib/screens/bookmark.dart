@@ -174,7 +174,7 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen>
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       Text(
-                        humor.context ?? humor.contextList?[0] ?? '',
+                        humor.context,
                         overflow: TextOverflow.ellipsis,
                         maxLines: 2,
                         style: const TextStyle(

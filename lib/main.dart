@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -10,6 +11,15 @@ final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
 void main() async {
   WidgetsFlutterBinding
       .ensureInitialized(); // Ensure the WidgetsBinding is initialized
+
+  try {
+    await Firebase.initializeApp(); // Try to initialize Firebase
+  } catch (e) {
+    // Handle the error when Firebase initialization fails
+    print('Failed to initialize Firebase: $e');
+    // Optionally, show a user-friendly message or take specific actions
+  }
+
   MobileAds.instance.initialize();
   runApp(
     const ProviderScope(

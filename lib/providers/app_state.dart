@@ -119,7 +119,7 @@ class BookmarkNotifier extends StateNotifier<void> {
   Future<bool> addBookmark(Humor humor) async {
     BookmarkHumor humorToAdd = humor is BookmarkHumor
         ? humor
-        : BookmarkHumor.fromDailyHumor(humor as DailyHumor);
+        : BookmarkHumor.convertFromDailyHumor(humor as DailyHumor);
     return await DatabaseHelper().addBookmark(humorToAdd);
   }
 
@@ -242,9 +242,8 @@ class ServerNotifier extends StateNotifier<void> {
         // Handle the data as needed
         print('Humor List: ${data['humorList']}');
         return data['humorList']
-            .map<DailyHumor>((json) => DailyHumor.fromDocument(json))
+            .map<DailyHumor>((json) => DailyHumor.loadFromServer(json))
             .toList();
-        // humorList = data.map(json => Humor.)
       } else {
         // Handle errors
         print('Error: ${response.statusCode} - ${response.body}');

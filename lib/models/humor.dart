@@ -4,9 +4,9 @@ abstract class Humor {
   final String uuid;
   final CategoryCode categoryCode;
   final String context;
-  final List<String>? contextList;
-  final String? punchline;
-  final String? author;
+  final List<String> contextList;
+  final String punchline;
+  final String author;
   final String sender;
   final String source;
 
@@ -15,32 +15,16 @@ abstract class Humor {
     DateTime? addedDate,
     required this.categoryCode,
     required this.context,
-    this.contextList,
-    this.punchline,
-    this.author,
+    this.contextList = const [],
+    this.punchline = '',
+    this.author = '',
     required this.sender,
     required this.source,
   });
 
-  Humor.fromDocument(Map<String, dynamic> document)
-      : uuid = document['uuid'],
-        categoryCode = CategoryCode.values.firstWhere(
-          (e) => e.name == document['category'],
-          orElse: () =>
-              CategoryCode.YOUR_HUMORS, // Return null if no match is found
-        ),
-        context = document['context'],
-        contextList = document['context_list']?.split('@@@'),
-        punchline = document['punchline'],
-        author = document['author'],
-        sender = document['sender'],
-        source = document['source'];
-
   Category getCategoryData() {
     return Category.getCategoryByCode(categoryCode);
   }
-
-  Map<String, dynamic> humorToMap();
 }
 
 class DailyHumor extends Humor {
@@ -50,7 +34,7 @@ class DailyHumor extends Humor {
 
   DailyHumor({
     required super.uuid,
-    DateTime? createdDate, // exclusive to daily humor
+    required this.createdDate, // exclusive to daily humor
     required super.categoryCode,
     required super.context,
     super.contextList,
@@ -60,9 +44,10 @@ class DailyHumor extends Humor {
     required super.source,
     this.thumbsUpCount = 0, // exclusive to daily humor
     this.isNew = false,
-  }) : createdDate = createdDate ?? DateTime.now();
+  });
 
-  DailyHumor.fromDocument(
+  /// Constructor for loading humors from server
+  DailyHumor.loadFromServer(
       Map<String, dynamic> document) // Construct from Firebase server
       : createdDate = DateTime.parse(document['created_date']),
         thumbsUpCount = document['thumbs_up_count'] ?? 0,
@@ -75,27 +60,12 @@ class DailyHumor extends Humor {
                 CategoryCode.YOUR_HUMORS, // Return null if no match is found
           ),
           context: document['context'],
-          contextList: document['context_list']?.split('@@@'),
+          contextList: document['context_list'].cast<String>(),
           punchline: document['punchline'],
           author: document['author'],
           sender: document['sender'],
           source: document['source'],
         );
-
-  @override
-  Map<String, dynamic> humorToMap() {
-    final Map<String, dynamic> map = {
-      'uuid': uuid,
-      'category': categoryCode.name,
-      'context': context,
-      'context_list': contextList?.join('@@@'),
-      'punchline': punchline,
-      'source': source,
-      'author': author,
-      'sender': sender,
-    };
-    return map;
-  }
 }
 
 class BookmarkHumor extends Humor {
@@ -117,7 +87,7 @@ class BookmarkHumor extends Humor {
     this.bookmarkEmojiIndex = 0,
   }) : bookmarkAddedDate = bookmarkAddedDate ?? DateTime.now();
 
-  BookmarkHumor.fromDocument(
+  BookmarkHumor.loadFromTable(
       Map<String, dynamic> document) // Construct from Firebase server
       : bookmarkAddedDate = DateTime.parse(document['bookmark_added_date']),
         bookmarkOrd = document['bookmark_ord'],
@@ -130,27 +100,29 @@ class BookmarkHumor extends Humor {
                 CategoryCode.YOUR_HUMORS, // Return null if no match is found
           ),
           context: document['context'],
-          contextList: document['context_list']?.split('@@@'),
+          contextList: document['context_list'] == ''
+              ? []
+              : document['context_list'].split('@@@'),
           punchline: document['punchline'],
           author: document['author'],
           sender: document['sender'],
           source: document['source'],
         );
 
-  BookmarkHumor.fromDailyHumor(DailyHumor dailyHumor)
+  BookmarkHumor.convertFromDailyHumor(DailyHumor dailyHumor)
       : bookmarkAddedDate = DateTime.now(),
         bookmarkOrd = null,
         bookmarkEmojiIndex = 0,
         super(
-            uuid: dailyHumor.uuid,
-            categoryCode: dailyHumor.categoryCode,
-            context: dailyHumor.context,
-            contextList: dailyHumor.contextList,
-            punchline: dailyHumor.punchline,
-            sender: dailyHumor.sender,
-            source: dailyHumor.source);
+          uuid: dailyHumor.uuid,
+          categoryCode: dailyHumor.categoryCode,
+          context: dailyHumor.context,
+          contextList: dailyHumor.contextList,
+          punchline: dailyHumor.punchline,
+          sender: dailyHumor.sender,
+          source: dailyHumor.source,
+        );
 
-  @override
   Map<String, dynamic> humorToMap() {
     final Map<String, dynamic> map = {
       'uuid': uuid,
@@ -158,7 +130,7 @@ class BookmarkHumor extends Humor {
       'bookmark_added_date': bookmarkAddedDate.toIso8601String(),
       'category': categoryCode.name,
       'context': context,
-      'context_list': contextList?.join('@@@'),
+      'context_list': contextList.join('@@@'),
       'punchline': punchline,
       'author': author,
       'sender': sender,

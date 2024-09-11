@@ -1,5 +1,7 @@
 import 'dart:math'; // For using pi
+// import 'package:daily_dose_of_humors/data/category_data.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:animated_flip_counter/animated_flip_counter.dart';
@@ -21,6 +23,24 @@ class HumorView extends ConsumerStatefulWidget {
 class _HumorViewState extends ConsumerState<HumorView> {
   final pageController = PageController(keepPage: true);
   bool viewPunchLine = false;
+  int likesCount = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    DatabaseReference likesCountRef =
+        FirebaseDatabase.instance.ref('likes/${widget.humor.uuid}');
+    likesCountRef.onValue.listen((DatabaseEvent event) {
+      final data = event.snapshot.value;
+      setState(() {
+        if (data == null) {
+          likesCount = 0;
+        } else {
+          likesCount = data as int;
+        }
+      });
+    });
+  }
 
   Widget _centerContentWidget(String text, Color textColor) {
     return Center(
@@ -41,24 +61,24 @@ class _HumorViewState extends ConsumerState<HumorView> {
 
   Widget _generateHumorContent(Humor humor, Color textColor) {
     if (viewPunchLine) {
-      return _centerContentWidget(humor.punchline ?? '', textColor);
-    } else if (humor.contextList?.isNotEmpty ?? false) {
+      return _centerContentWidget(humor.punchline, textColor);
+    } else if (humor.contextList.isNotEmpty) {
       return Column(
         children: [
           Expanded(
             child: PageView.builder(
-              itemCount: humor.contextList!.length + 1,
+              itemCount: humor.contextList.length + 1,
               physics: const NeverScrollableScrollPhysics(),
               controller: pageController,
               itemBuilder: (context, index) {
                 return _centerContentWidget(
-                    [humor.context!, ...humor.contextList!][index], textColor);
+                    [humor.context, ...humor.contextList][index], textColor);
               },
             ),
           ),
           SmoothPageIndicator(
             controller: pageController,
-            count: humor.contextList!.length + 1,
+            count: humor.contextList.length + 1,
             effect: WormEffect(
               dotWidth: 12,
               dotHeight: 12,
@@ -75,7 +95,7 @@ class _HumorViewState extends ConsumerState<HumorView> {
         ],
       );
     } else {
-      return _centerContentWidget(humor.context!, textColor);
+      return _centerContentWidget(humor.context, textColor);
     }
   }
 
@@ -85,7 +105,7 @@ class _HumorViewState extends ConsumerState<HumorView> {
     final textColor = isDarkMode ? Colors.white : Colors.black;
 
     return InkWell(
-      onDoubleTap: widget.humor?.punchline != null
+      onDoubleTap: widget.humor.punchline != ''
           ? () {
               setState(() {
                 viewPunchLine = !viewPunchLine;
@@ -93,9 +113,9 @@ class _HumorViewState extends ConsumerState<HumorView> {
             }
           : null,
       onTap: () {
-        if (widget.humor?.contextList?.isNotEmpty ?? false) {
+        if (widget.humor.contextList.isNotEmpty) {
           final nextPage = (pageController.page!.toInt() + 1) %
-              (widget.humor!.contextList!.length + 1);
+              (widget.humor.contextList.length + 1);
           pageController.animateToPage(
             nextPage,
             duration: const Duration(milliseconds: 250),
@@ -176,7 +196,7 @@ class _HumorViewState extends ConsumerState<HumorView> {
                     ),
                     const SizedBox(width: 5),
                     AnimatedFlipCounter(
-                      value: (widget.humor as DailyHumor).thumbsUpCount,
+                      value: likesCount,
                       textStyle: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,

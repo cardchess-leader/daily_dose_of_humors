@@ -22,7 +22,7 @@ class _HomeScreenState extends State<HomeScreen> {
         builder: (ctx) => HumorScreen(
           humorCategory: selectedCategory,
           buildHumorScreenFrom: BuildHumorScreenFrom.daily,
-          humorList: todayHumorList,
+          // humorList: todayHumorList,
           initIndexInBookmark: 0,
         ),
       ),
