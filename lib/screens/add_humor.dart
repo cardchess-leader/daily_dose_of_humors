@@ -1,19 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lottie/lottie.dart';
 import 'package:daily_dose_of_humors/models/humor.dart';
 import 'package:daily_dose_of_humors/models/category.dart';
 import 'package:daily_dose_of_humors/util/global_var.dart';
+import 'package:daily_dose_of_humors/providers/app_state.dart';
 
-class AddHumorScreen extends StatefulWidget {
+class AddHumorScreen extends ConsumerStatefulWidget {
   final void Function(Humor humor) insertBookmark;
 
   const AddHumorScreen(this.insertBookmark, {super.key});
 
   @override
-  State<AddHumorScreen> createState() => _AddHumorScreenState();
+  ConsumerState<AddHumorScreen> createState() => _AddHumorScreenState();
 }
 
-class _AddHumorScreenState extends State<AddHumorScreen> {
+class _AddHumorScreenState extends ConsumerState<AddHumorScreen> {
   final _contextController = TextEditingController();
   final _punchlineController = TextEditingController();
   final _nicknameController = TextEditingController();
@@ -80,13 +82,18 @@ class _AddHumorScreenState extends State<AddHumorScreen> {
         },
       );
       if (response == true) {
-        print('submit successful!');
+        final resultMsg =
+            await ref.read(serverProvider.notifier).submitUserHumors(humor);
+        if (resultMsg != null) {
+          return setState(() {
+            _errMsg = resultMsg;
+            _isLoading = false;
+          });
+        }
       } else {
-        print('no submit');
-        setState(() {
+        return setState(() {
           _isLoading = false;
         });
-        return;
       }
     }
     if (_addToBookmark) {
@@ -224,7 +231,7 @@ class _AddHumorScreenState extends State<AddHumorScreen> {
                 children: [
                   if (_errMsg != '')
                     Text(
-                      _errMsg,
+                      '   $_errMsg',
                       style: const TextStyle(
                         color: Colors.red,
                       ),

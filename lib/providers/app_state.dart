@@ -64,6 +64,7 @@ class UserSettingsNotifier extends StateNotifier<Map<String, bool>> {
       await prefs.setBool('vibration', state['vibration']!);
       await prefs.setBool('notification', state['notification']!);
       await prefs.setBool('isFirstLaunch', false);
+      await prefs.setString('uuid', GLOBAL.uuid.v4());
     } else {
       // Load existing preferences
       state = {
@@ -131,6 +132,7 @@ class BookmarkNotifier extends StateNotifier<void> {
      * 5: Add Fail (Other issues)
      */
     Subscription subscription = ref.read(subscriptionStatusProvider);
+    print('response is: toggle working?');
     int maxBookmarkCount = subscription.maxBookmarks;
     if (await isHumorBookmarked(humor)) {
       // Try removing bookmark
@@ -214,13 +216,14 @@ final adProvider = StateNotifierProvider<AdNotifier, void>((ref) {
 });
 
 class ServerNotifier extends StateNotifier<void> {
-  ServerNotifier() : super(null);
+  final Ref ref;
+  ServerNotifier(this.ref) : super(null);
 
   Future<List<DailyHumor>> loadDailyHumors(Category humorCategory) async {
     try {
       // Construct the full URL with query parameters
       final Uri url = Uri.parse(
-          'https://us-central1-daily-dose-of-humors.cloudfunctions.net/getDailyHumors?category=${humorCategory.categoryCode.name}');
+          '${GLOBAL.serverPath()}/getDailyHumors?category=${humorCategory.categoryCode.name}');
 
       // Send a GET request to the Firebase function
       final response = await http.get(url);
@@ -245,8 +248,40 @@ class ServerNotifier extends StateNotifier<void> {
       return [];
     }
   }
+
+  Future<String?> submitUserHumors(BookmarkHumor humor) async {
+    try {
+      // Construct the full URL with query parameters
+      final Uri url = Uri.parse('${GLOBAL.serverPath()}/userSubmitDailyHumors');
+      // Send a GET request to the Firebase function
+      String appUuid =
+          (await SharedPreferences.getInstance()).getString('uuid') ?? '';
+      final response = await http.post(url, body: {
+        'nickname': humor.sender,
+        'context': humor.context,
+        'punchline': humor.punchline,
+        'humor_uuid': humor.uuid,
+        'subscription_type':
+            ref.read(subscriptionStatusProvider).subscriptionName,
+        'app_uuid': appUuid,
+      });
+      // Check if the request was successful
+      if (response.statusCode == 200) {
+        // Decode the JSON response
+        print('response is 200: $response');
+        return null;
+      } else {
+        print('response is: ${response.body}');
+        return jsonDecode(response.body)['error'];
+      }
+    } catch (e) {
+      // Handle any exceptions that occur during the request
+      print('response is: error: $e');
+      return 'Unexpected error. Please try again later.';
+    }
+  }
 }
 
 final serverProvider = StateNotifierProvider<ServerNotifier, void>((ref) {
-  return ServerNotifier();
+  return ServerNotifier(ref);
 });
