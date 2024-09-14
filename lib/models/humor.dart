@@ -25,6 +25,47 @@ abstract class Humor {
   Category getCategoryData() {
     return Category.getCategoryByCode(categoryCode);
   }
+
+  SharedFormat? toSharedFormat() {
+    switch (categoryCode) {
+      case CategoryCode.DAD_JOKES:
+      case CategoryCode.KNOCK_KNOCK_JOKES:
+      case CategoryCode.DARK_HUMORS:
+        return SharedFormat(
+          option1BtnText: 'With Punchline',
+          option1Format:
+              '$context\n\n$punchline\n\n--From Daily Dose of Humors :)',
+          option2BtnText: 'Without Punchline',
+          option2Format: '$context\n\n--From Daily Dose of Humors :)',
+        );
+      case CategoryCode.TRICKY_RIDDLES:
+      case CategoryCode.OX_QUIZ:
+        return SharedFormat(
+          dialogBody:
+              'Would you like to share this humor with or without answer?',
+          option1BtnText: 'With Answer',
+          option1Format:
+              '$context\n\n$punchline\n\n--From Daily Dose of Humors :)',
+          option2BtnText: 'Without Answer',
+          option2Format: '$context\n\n--From Daily Dose of Humors :)',
+        );
+      case CategoryCode.ONE_LINERS:
+        return SharedFormat(
+          defaultFormat: '$context\n\n--From Daily Dose of Humors :)',
+        );
+      case CategoryCode.FUNNY_QUOTES:
+        return SharedFormat(
+          defaultFormat:
+              '$context\n\n-Quote from $author\n\n--From Daily Dose of Humors :)',
+        );
+      case CategoryCode.YOUR_HUMORS:
+        return SharedFormat(
+          defaultFormat: '$context\n\n--From Daily Dose of Humors :)',
+        );
+      default:
+        return null;
+    }
+  }
 }
 
 class DailyHumor extends Humor {
@@ -131,4 +172,25 @@ class BookmarkHumor extends Humor {
     };
     return map;
   }
+}
+
+class SharedFormat {
+  final String dialogSubject;
+  final String dialogBody;
+  final String? defaultFormat;
+  final String? option1BtnText;
+  final String? option1Format;
+  final String? option2BtnText;
+  final String? option2Format;
+
+  const SharedFormat({
+    this.dialogSubject = 'You\'re almost there!',
+    this.dialogBody =
+        'Would you like to share this humor with or without punchline?',
+    this.defaultFormat,
+    this.option1BtnText,
+    this.option1Format,
+    this.option2BtnText,
+    this.option2Format,
+  });
 }

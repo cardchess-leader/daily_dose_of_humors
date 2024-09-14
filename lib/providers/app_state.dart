@@ -202,7 +202,6 @@ class AdNotifier extends StateNotifier<void> {
 
   void incrementCounter() {
     _counter++;
-    print('counter is: $_counter');
     if (_counter >= GLOBAL.SHOW_AD_FREQUENCY) {
       showAd();
       _counter = 0; // Reset counter after showing the ad

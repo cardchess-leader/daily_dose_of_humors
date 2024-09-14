@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:animated_flip_counter/animated_flip_counter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lottie/lottie.dart';
@@ -137,7 +138,6 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
     Humor humor = humorList[_humorIndex];
     int resultCode =
         await ref.read(bookmarkProvider.notifier).toggleBookmark(humor);
-    print('resultCode is: $resultCode');
     setState(() {
       if (resultCode == 1 || resultCode == 3) {
         _isBookmarkUpdated = true;
@@ -206,6 +206,55 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
       case 1:
         _shareAnimController.reset();
         _shareAnimController.forward();
+        // if the humor value is null or humor list is empty, show snackbar
+        if (_isLoading || humorList.isEmpty) {
+          return _showSimpleSnackbar(
+              'Please wait until humors are fully loaded...');
+        }
+        final sharedFormat = humorList[_humorIndex].toSharedFormat();
+        if (sharedFormat == null) {
+          return;
+        } else if (sharedFormat.defaultFormat != null) {
+          Share.share(sharedFormat.defaultFormat!,
+              subject: sharedFormat.dialogSubject);
+        } else {
+          final response = await showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text(sharedFormat.dialogSubject),
+                content: Text(
+                  sharedFormat.dialogBody,
+                  style: const TextStyle(fontSize: 18),
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop('option1'); // Close the dialog
+                    },
+                    child: Text(sharedFormat.option1BtnText!,
+                        style: const TextStyle(fontSize: 18)),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop('option2'); // Close the dialog
+                    },
+                    child: Text(
+                      sharedFormat.option2BtnText!,
+                      style: const TextStyle(fontSize: 18),
+                    ),
+                  ),
+                ],
+              );
+            },
+          );
+          const emailSubject = 'Shared Humor From Daily Dose of Humors';
+          if (response == 'option1') {
+            Share.share(sharedFormat.option1Format!, subject: emailSubject);
+          } else if (response == 'option2') {
+            Share.share(sharedFormat.option2Format!, subject: emailSubject);
+          }
+        }
         break;
       case 2:
         updateBookmark();
@@ -260,7 +309,7 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
   }
 
   void _handleFabPress() {
-    if (_isLoading) {
+    if (_isLoading || humorList.isEmpty) {
       _showSimpleSnackbar('Please wait until humors are fully loaded...');
     } else {
       setState(() {

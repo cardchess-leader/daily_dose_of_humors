@@ -1,5 +1,5 @@
 import 'dart:math'; // For using pi
-// import 'package:daily_dose_of_humors/data/category_data.dart';
+import 'dart:async'; // Import for StreamSubscription
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -21,6 +21,7 @@ class HumorView extends ConsumerStatefulWidget {
 }
 
 class _HumorViewState extends ConsumerState<HumorView> {
+  late StreamSubscription<DatabaseEvent> likesCountSubscription;
   final pageController = PageController(keepPage: true);
   bool viewPunchLine = false;
   int likesCount = 0;
@@ -28,9 +29,11 @@ class _HumorViewState extends ConsumerState<HumorView> {
   @override
   void initState() {
     super.initState();
+    print('humorview init');
     DatabaseReference likesCountRef =
         FirebaseDatabase.instance.ref('likes/${widget.humor.uuid}');
-    likesCountRef.onValue.listen((DatabaseEvent event) {
+    likesCountSubscription =
+        likesCountRef.onValue.listen((DatabaseEvent event) {
       final data = event.snapshot.value;
       setState(() {
         if (data == null) {
@@ -40,6 +43,14 @@ class _HumorViewState extends ConsumerState<HumorView> {
         }
       });
     });
+  }
+
+  @override
+  void dispose() {
+    print('humorview disposed!');
+    // Remove the listener when the widget is disposed
+    likesCountSubscription.cancel();
+    super.dispose();
   }
 
   Widget _centerContentWidget(String text, Color textColor) {

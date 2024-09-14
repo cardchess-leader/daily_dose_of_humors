@@ -20,7 +20,6 @@ class DatabaseHelper {
     return await openDatabase(
       join(await getDatabasesPath(), 'my_database.db'),
       onCreate: (db, version) async {
-        print('db newly created!');
         await db.execute('''
           CREATE TABLE bookmarks (
             bookmark_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -143,8 +142,6 @@ class DatabaseHelper {
       orderBy: 'bookmark_ord ASC',
     );
 
-    print(maps);
-
     return List.generate(maps.length, (i) {
       return BookmarkHumor.loadFromTable(maps[i]);
     });
@@ -154,7 +151,6 @@ class DatabaseHelper {
     final db = await database;
     final List<Map<String, dynamic>> result =
         await db.query('bookmarks', where: 'uuid = ?', whereArgs: [humor.uuid]);
-    print('query result: $result');
     if (result.isEmpty) {
       return false;
     }
