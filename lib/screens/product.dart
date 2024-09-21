@@ -12,6 +12,9 @@ class ProductScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final textColor = isDarkMode ? Colors.white : Colors.black;
+
     final verticalBar = Container(
       height: 35,
       margin: const EdgeInsets.symmetric(horizontal: 20),
@@ -112,7 +115,7 @@ class ProductScreen extends StatelessWidget {
                               'assets/icons/category.png',
                               width: 28,
                               height: 28,
-                              color: Colors.white,
+                              color: textColor,
                             ),
                           ),
                           const Text(

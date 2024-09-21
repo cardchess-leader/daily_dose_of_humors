@@ -177,33 +177,35 @@ class _HumorCategoryCardState extends State<HumorCategoryCard>
                             color: adaptiveTextColor,
                           ),
                         ),
-                        if (widget.category.subscriberOnly)
-                          Chip(
-                            avatar: Icon(
-                              Icons.lock,
-                              color: isDarkMode ? lightenThemeColor : null,
-                            ),
-                            backgroundColor: isDarkMode
-                                ? darkenThemeColor
-                                : Colors.grey.shade100,
-                            shape: StadiumBorder(
-                              side: BorderSide(
-                                color: isDarkMode
-                                    ? lightenThemeColor
-                                    : Colors.transparent,
-                                width: isDarkMode ? 0.5 : 0,
-                              ),
-                            ),
-                            shadowColor:
-                                isDarkMode ? null : Colors.grey.shade100,
-                            label: Text(
-                              'Subscribers Only',
-                              style: TextStyle(
-                                fontWeight: FontWeight.w700,
-                                color: isDarkMode ? lightenThemeColor : null,
-                              ),
+                        Chip(
+                          avatar: Icon(
+                            widget.category.subscriberOnly
+                                ? Icons.lock
+                                : Icons.emoji_emotions_rounded,
+                            color: adaptiveTextColor,
+                          ),
+                          backgroundColor: isDarkMode
+                              ? darkenThemeColor
+                              : Colors.grey.shade100,
+                          shape: StadiumBorder(
+                            side: BorderSide(
+                              color: isDarkMode
+                                  ? lightenThemeColor
+                                  : Colors.transparent,
+                              width: isDarkMode ? 0.5 : 0,
                             ),
                           ),
+                          shadowColor: isDarkMode ? null : Colors.grey.shade100,
+                          label: Text(
+                            widget.category.subscriberOnly
+                                ? 'Subscribers Only'
+                                : 'Free Contents For All',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w700,
+                              color: isDarkMode ? lightenThemeColor : null,
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ],

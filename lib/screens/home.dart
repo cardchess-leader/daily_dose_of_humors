@@ -1,30 +1,36 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:daily_dose_of_humors/providers/app_state.dart';
 import 'package:daily_dose_of_humors/models/category.dart';
+import 'package:daily_dose_of_humors/screens/subscription.dart';
 import 'package:daily_dose_of_humors/widgets/background.dart';
 import 'package:daily_dose_of_humors/widgets/app_bar.dart';
 import 'package:daily_dose_of_humors/widgets/humor_card.dart';
 import 'package:daily_dose_of_humors/screens/humor_screen.dart';
-import 'package:daily_dose_of_humors/data/humor_data.dart';
 import 'package:daily_dose_of_humors/util/physics.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends ConsumerState<HomeScreen> {
   var _focusCardIndex = 0;
-  void _openHumorCategory(selectedCategory, context) {
+  void _openHumorCategory(Category selectedCategory, context) {
+    final targetScreen =
+        (ref.read(subscriptionStatusProvider.notifier).isSubscribed() ||
+                !selectedCategory.subscriberOnly)
+            ? HumorScreen(
+                humorCategory: selectedCategory,
+                buildHumorScreenFrom: BuildHumorScreenFrom.daily,
+                initIndexInBookmark: 0,
+              )
+            : const SubscriptionScreen();
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (ctx) => HumorScreen(
-          humorCategory: selectedCategory,
-          buildHumorScreenFrom: BuildHumorScreenFrom.daily,
-          // humorList: todayHumorList,
-          initIndexInBookmark: 0,
-        ),
+        builder: (ctx) => targetScreen,
       ),
     );
   }
@@ -66,11 +72,13 @@ class _HomeScreenState extends State<HomeScreen> {
             },
             children:
                 List.generate(Category.getDailyCategories().length, (index) {
+              Category selectedCategory = Category.getDailyCategories()[index];
               return InkWell(
-                child: HumorCategoryCard(Category.getDailyCategories()[index],
-                    index == _focusCardIndex),
-                onTap: () => _openHumorCategory(
-                    Category.getDailyCategories()[index], context),
+                child: HumorCategoryCard(
+                  selectedCategory,
+                  index == _focusCardIndex,
+                ),
+                onTap: () => _openHumorCategory(selectedCategory, context),
               );
             }),
           ),

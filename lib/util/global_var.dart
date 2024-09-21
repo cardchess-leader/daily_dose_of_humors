@@ -8,8 +8,11 @@ class GLOBAL {
   /* EDIT BELOW VALUES FOR APP CONFIG CHANGE */
   static const IS_PRODUCTION = true; // Make this true before build
   static const SHOW_AD_FREQUENCY =
-      30; // after how many page swipes the ad should show
+      100; // after how many page swipes the ad should show
   static const SMALL_MAX_INT = 1000000; // max bookmark limit
+  static const MAX_THUMBSUP_COUNT = 10; // max thumbs up (FAB) limit per day
+  static const MAX_SUBMIT_COUNT =
+      5; // max user-created humor submission limit per day
   /* BELOW ARE STATIC FUNCTIONS */
   static String serverPath() {
     return IS_PRODUCTION

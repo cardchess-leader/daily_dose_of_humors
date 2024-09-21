@@ -1,6 +1,7 @@
 import 'dart:math'; // For using pi
 import 'dart:async'; // Import for StreamSubscription
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
@@ -54,13 +55,21 @@ class _HumorViewState extends ConsumerState<HumorView> {
   }
 
   Widget _centerContentWidget(String text, Color textColor) {
+    late double fontSize;
+    if (text.length > 200) {
+      fontSize = 24;
+    } else if (text.length > 70) {
+      fontSize = 27;
+    } else {
+      fontSize = 30;
+    }
     return Center(
       child: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 20),
+        padding: const EdgeInsets.symmetric(horizontal: 10),
         child: Text(
           text,
           style: TextStyle(
-            fontSize: 26,
+            fontSize: fontSize,
             fontWeight: FontWeight.w600,
             color: textColor,
           ),
@@ -119,6 +128,7 @@ class _HumorViewState extends ConsumerState<HumorView> {
       onDoubleTap: widget.humor.punchline != ''
           ? () {
               setState(() {
+                HapticFeedback.mediumImpact();
                 viewPunchLine = !viewPunchLine;
               });
             }
@@ -136,7 +146,7 @@ class _HumorViewState extends ConsumerState<HumorView> {
       },
       child: Padding(
         // color: Colors.transparent,
-        padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
+        padding: const EdgeInsets.all(10),
         child: Column(
           children: [
             Container(
@@ -218,7 +228,7 @@ class _HumorViewState extends ConsumerState<HumorView> {
             Expanded(
               child: _generateHumorContent(widget.humor, textColor),
             ),
-            const SizedBox(height: 5),
+            const SizedBox(height: 10),
           ],
         ),
       ),

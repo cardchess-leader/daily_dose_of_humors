@@ -1,9 +1,10 @@
 import 'dart:io';
 import 'dart:convert';
-import 'package:daily_dose_of_humors/data/subscription_data.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:riverpod/riverpod.dart';
+import 'package:daily_dose_of_humors/data/subscription_data.dart';
 import 'package:daily_dose_of_humors/util/global_var.dart';
 import 'package:daily_dose_of_humors/models/subscription.dart';
 import 'package:daily_dose_of_humors/db/db.dart';
@@ -32,7 +33,7 @@ class SubscriptionStatusNotifier extends StateNotifier<Subscription> {
         'subscriptionStatus', newSubscription.subscriptionCode.index);
   }
 
-  bool isSubscriptionAdFree() {
+  bool isSubscribed() {
     return state.subscriptionCode != SubscriptionCode.FREE &&
         state.subscriptionCode != SubscriptionCode.MONTHLY;
   }
@@ -48,7 +49,7 @@ class UserSettingsNotifier extends StateNotifier<Map<String, bool>> {
       : super({
           'darkMode': false,
           'vibration': true,
-          'notification': true,
+          'notification': false,
         }) {
     _loadPreferences();
   }
@@ -59,6 +60,16 @@ class UserSettingsNotifier extends StateNotifier<Map<String, bool>> {
     // Check if it's the first launch
     final isFirstLaunch = prefs.getBool('isFirstLaunch') ?? true;
     if (isFirstLaunch) {
+      // Ask for notification user permission permission
+      final notificationSettings =
+          await FirebaseMessaging.instance.requestPermission();
+      if (notificationSettings.authorizationStatus ==
+          AuthorizationStatus.authorized) {
+        state['notification'] = true;
+        FirebaseMessaging.instance.subscribeToTopic("daily_humor");
+        FirebaseMessaging.instance.subscribeToTopic("promotion");
+      }
+
       // Set default preferences
       await prefs.setBool('darkMode', state['darkMode']!);
       await prefs.setBool('vibration', state['vibration']!);
@@ -76,6 +87,7 @@ class UserSettingsNotifier extends StateNotifier<Map<String, bool>> {
   }
 
   Future<void> toggleSettings(String key) async {
+    print('token is: ${await FirebaseMessaging.instance.getToken()}');
     final prefs = await SharedPreferences.getInstance();
     final currentValue = state[key] ?? false;
     state = {
@@ -83,6 +95,15 @@ class UserSettingsNotifier extends StateNotifier<Map<String, bool>> {
       key: !currentValue,
     };
     await prefs.setBool(key, !currentValue);
+    if (key == 'notification') {
+      if (state['notification'] == true) {
+        FirebaseMessaging.instance.subscribeToTopic("daily_humor");
+        FirebaseMessaging.instance.subscribeToTopic("promotion");
+      } else {
+        FirebaseMessaging.instance.unsubscribeFromTopic("daily_humor");
+        FirebaseMessaging.instance.unsubscribeFromTopic("promotion");
+      }
+    }
   }
 }
 
@@ -251,6 +272,9 @@ class ServerNotifier extends StateNotifier<void> {
 
   Future<String?> submitUserHumors(BookmarkHumor humor) async {
     try {
+      if ((ref.read(appStateProvider)['submit_count_remaining'] ?? 0) <= 0) {
+        return 'You can submit upto ${GLOBAL.MAX_SUBMIT_COUNT} humors daily!\nPlease try again tomorrow!';
+      }
       // Construct the full URL with query parameters
       final Uri url = Uri.parse('${GLOBAL.serverPath()}/userSubmitDailyHumors');
       // Send a GET request to the Firebase function
@@ -269,6 +293,7 @@ class ServerNotifier extends StateNotifier<void> {
       if (response.statusCode == 200) {
         // Decode the JSON response
         print('response is 200: $response');
+        ref.read(appStateProvider.notifier).submitUserHumors();
         return null;
       } else {
         print('response is: ${response.body}');
@@ -280,8 +305,101 @@ class ServerNotifier extends StateNotifier<void> {
       return 'Unexpected error. Please try again later.';
     }
   }
+
+  Future<dynamic> resetAppStateFromServer(String lastResetDate) async {
+    try {
+      final Uri url = Uri.parse(
+          '${GLOBAL.serverPath()}/resetAppState?lastResetDate=$lastResetDate');
+      // Send a GET request to the Firebase function
+      final response = await http.get(url);
+      // Check if the request was successful
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body)['last_reset_date'];
+      } else {
+        return false;
+      }
+    } catch (e) {
+      // Handle any exceptions that occur during the request
+      print('response is: error: $e');
+      return false;
+    }
+  }
 }
 
 final serverProvider = StateNotifierProvider<ServerNotifier, void>((ref) {
   return ServerNotifier(ref);
+});
+
+class AppStateNotifier extends StateNotifier<Map<String, dynamic>> {
+  final Ref ref;
+
+  AppStateNotifier(this.ref)
+      : super({
+          'likes_count_remaining': 0,
+          'submit_count_remaining': 0,
+          'last_reset_date': '0000-00-00',
+        }) {
+    _initializeAppState();
+  }
+
+  Future<void> _initializeAppState() async {
+    final prefs = await SharedPreferences.getInstance();
+    state = {
+      ...state,
+      'likes_count_remaining': prefs.getInt('likes_count_remaining') ?? 0,
+      'submit_count_remaining': prefs.getInt('submit_count_remaining') ?? 0,
+      'last_reset_date': prefs.getString('last_reset_date') ?? '0000-00-00',
+    };
+
+    final resetAppStateFromServerResult = await ref
+        .read(serverProvider.notifier)
+        .resetAppStateFromServer(state['last_reset_date']);
+    if (resetAppStateFromServerResult != false) {
+      state = {
+        'likes_count_remaining': GLOBAL.MAX_THUMBSUP_COUNT,
+        'submit_count_remaining': GLOBAL.MAX_SUBMIT_COUNT,
+        'last_reset_date': resetAppStateFromServerResult,
+      };
+      syncAppState();
+    }
+  }
+
+  Future<bool> hitThumbsUpFab() async {
+    if (state['likes_count_remaining'] <= 0) {
+      return false;
+    }
+    state = {
+      ...state,
+      'likes_count_remaining': state['likes_count_remaining'] - 1,
+    };
+    syncAppState();
+    return true;
+  }
+
+  void submitUserHumors() async {
+    if (state['submit_count_remaining'] <= 0) {
+      return;
+    }
+    state = {
+      ...state,
+      'submit_count_remaining': state['submit_count_remaining'] - 1,
+    };
+    syncAppState();
+  }
+
+  Future<void> syncAppState() async {
+    final prefs = await SharedPreferences.getInstance();
+    for (final stateKey in state.keys) {
+      if (state[stateKey] is int) {
+        await prefs.setInt(stateKey, state[stateKey]);
+      } else if (state[stateKey] is String) {
+        await prefs.setString(stateKey, state[stateKey]);
+      }
+    }
+  }
+}
+
+final appStateProvider =
+    StateNotifierProvider<AppStateNotifier, Map<String, dynamic>>((ref) {
+  return AppStateNotifier(ref);
 });

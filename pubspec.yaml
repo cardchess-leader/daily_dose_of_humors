@@ -54,6 +54,7 @@ dependencies:
   http: ^1.2.2
   firebase_database: ^10.5.7
   share_plus: ^10.0.2
+  firebase_messaging: ^14.7.10
 
 dev_dependencies:
   flutter_test:

@@ -230,10 +230,13 @@ class _AddHumorScreenState extends ConsumerState<AddHumorScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   if (_errMsg != '')
-                    Text(
-                      '   $_errMsg',
-                      style: const TextStyle(
-                        color: Colors.red,
+                    Padding(
+                      padding: const EdgeInsets.only(left: 16.0),
+                      child: Text(
+                        _errMsg,
+                        style: const TextStyle(
+                          color: Colors.red,
+                        ),
                       ),
                     ),
                   const SizedBox(height: 16),

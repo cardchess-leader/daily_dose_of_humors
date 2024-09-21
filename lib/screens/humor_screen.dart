@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:animated_flip_counter/animated_flip_counter.dart';
@@ -13,6 +14,7 @@ import 'package:daily_dose_of_humors/widgets/lottie_icon.dart';
 import 'package:daily_dose_of_humors/widgets/manual.dart';
 import 'package:daily_dose_of_humors/screens/subscription.dart';
 import 'package:daily_dose_of_humors/widgets/humor_scaffold.dart';
+import 'package:daily_dose_of_humors/util/global_var.dart';
 
 enum BuildHumorScreenFrom {
   daily,
@@ -56,7 +58,6 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
   var _isBookmarkUpdated = false;
   double _bannerHeight = 0;
   bool _isFabAnimating = false;
-  var _thumbsUpLeft = 5;
   var _isLoading = false;
 
   @override
@@ -308,19 +309,24 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
       );
   }
 
-  void _handleFabPress() {
+  void _handleFabPress() async {
     if (_isLoading || humorList.isEmpty) {
       _showSimpleSnackbar('Please wait until humors are fully loaded...');
     } else {
       setState(() {
+        HapticFeedback.mediumImpact();
         _isFabAnimating = true;
         _fabLottieAnimController.reset();
         _fabLottieAnimController.forward();
-        _thumbsUpLeft--;
+      });
+      if (await ref.read(appStateProvider.notifier).hitThumbsUpFab()) {
         _incrementLikesCount();
         _showSimpleSnackbar(
-            'Awesome! Thumbs up for this humor!  ($_thumbsUpLeft left!)');
-      });
+            'Awesome! Thumbs up for this humor!  (${ref.read(appStateProvider)['likes_count_remaining']} left today!)');
+      } else {
+        _showSimpleSnackbar(
+            'You already gave ${GLOBAL.MAX_THUMBSUP_COUNT} thumbs-ups for today!');
+      }
     }
   }
 
@@ -414,9 +420,7 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
               ],
             ),
           ),
-          if (!ref
-              .read(subscriptionStatusProvider.notifier)
-              .isSubscriptionAdFree())
+          if (!ref.read(subscriptionStatusProvider.notifier).isSubscribed())
             BannerAdWidget(
                 setBannerHeight: (bannerHeight) =>
                     _bannerHeight = bannerHeight),
@@ -482,7 +486,8 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
                 padding: const EdgeInsets.only(right: 10),
                 height: 32,
                 child: AnimatedFlipCounter(
-                  value: _thumbsUpLeft,
+                  value: ref.watch(appStateProvider)['likes_count_remaining'],
+                  // _thumbsUpLeft,
                   textStyle: const TextStyle(
                     fontWeight: FontWeight.bold,
                   ),
