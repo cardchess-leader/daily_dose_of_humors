@@ -80,6 +80,26 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
     );
   }
 
+  Future<void> _handleSubscription() async {
+    final subscriptionResult = await ref
+        .read(subscriptionStatusProvider.notifier)
+        .updateSubscription(subscriptionTypes[focusedIndex].subscriptionCode);
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(subscriptionResult
+              ? 'Subscription successful!\nPlease enjoy the app with all subscription benefits! :)'
+              : 'Subscription failed unexpectedly...\nPlease try again later :('),
+        ),
+      );
+      if (subscriptionResult) {
+        Navigator.pop(context);
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
@@ -317,12 +337,7 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
                         .color, // Background color
                     foregroundColor: Colors.white, // Text color
                   ),
-                  onPressed: () => {
-                    ref
-                        .read(subscriptionStatusProvider.notifier)
-                        .updateSubscription(
-                            subscriptionTypes[focusedIndex].subscriptionCode)
-                  },
+                  onPressed: _handleSubscription,
                   child: const Text(
                     'Start My Subscription',
                     style: TextStyle(

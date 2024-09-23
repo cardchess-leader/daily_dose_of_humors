@@ -170,5 +170,6 @@ const humorCategoryList = [
     numDailyNew: 0,
     themeColor: Color.fromARGB(255, 123, 218, 202),
     categoryCode: CategoryCode.YOUR_HUMORS,
+    isDaily: false,
   ),
 ];

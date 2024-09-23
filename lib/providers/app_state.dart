@@ -25,12 +25,13 @@ class SubscriptionStatusNotifier extends StateNotifier<Subscription> {
         SubscriptionCode.values[subscriptionCode]);
   }
 
-  Future<void> updateSubscription(SubscriptionCode code) async {
+  Future<bool> updateSubscription(SubscriptionCode code) async {
     final prefs = await SharedPreferences.getInstance();
     final newSubscription = Subscription.getSubscriptionByCode(code);
     state = newSubscription;
     await prefs.setInt(
         'subscriptionStatus', newSubscription.subscriptionCode.index);
+    return true;
   }
 
   bool isSubscribed() {
@@ -153,7 +154,6 @@ class BookmarkNotifier extends StateNotifier<void> {
      * 5: Add Fail (Other issues)
      */
     Subscription subscription = ref.read(subscriptionStatusProvider);
-    print('response is: toggle working?');
     int maxBookmarkCount = subscription.maxBookmarks;
     if (await isHumorBookmarked(humor)) {
       // Try removing bookmark
