@@ -9,7 +9,6 @@ final todayHumorList = [
     punchline: 'Of course, a house can\'t jump.',
     sender: 'Board Collie',
     source: 'Daily Dose of Humors',
-    createdDate: DateTime.now(),
   ),
   DailyHumor(
     uuid: '8b82fbd8-20b5-4a7f-9e2c-75b6fc3f5dab',
@@ -19,7 +18,6 @@ final todayHumorList = [
     punchline: 'Dad: I knew you\'d get stuck on that.',
     sender: 'Board Collie',
     source: 'Daily Dose of Humors',
-    createdDate: DateTime.now(),
   ),
   DailyHumor(
     uuid: '767a1c3d-9e33-423c-928f-ceab408ee144',
@@ -33,6 +31,5 @@ final todayHumorList = [
     // punchline: 'Punch Punch Babe.',
     sender: 'Board Collie',
     source: 'Daily Dose of Humors',
-    createdDate: DateTime.now(),
   ),
 ];

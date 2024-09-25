@@ -69,12 +69,10 @@ abstract class Humor {
 }
 
 class DailyHumor extends Humor {
-  final DateTime createdDate;
   bool isNew;
 
   DailyHumor({
     required super.uuid,
-    required this.createdDate, // exclusive to daily humor
     required super.categoryCode,
     required super.context,
     super.contextList,
@@ -88,8 +86,7 @@ class DailyHumor extends Humor {
   /// Constructor for loading humors from server
   DailyHumor.loadFromServer(
       Map<String, dynamic> document) // Construct from Firebase server
-      : createdDate = DateTime.parse(document['created_date']),
-        isNew = document['is_new'] ?? false,
+      : isNew = document['is_new'] ?? false,
         super(
           uuid: document['uuid'],
           categoryCode: CategoryCode.values.firstWhere(
