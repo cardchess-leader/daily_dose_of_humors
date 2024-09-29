@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+import 'package:daily_dose_of_humors/models/bundle.dart';
+import 'package:daily_dose_of_humors/models/category.dart';
+import 'package:daily_dose_of_humors/widgets/network_image.dart';
 
 class ProductScreen extends StatelessWidget {
-  final String productName;
+  final Bundle bundle;
   final controller = PageController();
 
   ProductScreen({
     super.key,
-    required this.productName,
+    required this.bundle,
   });
 
   @override
@@ -30,7 +33,7 @@ class ProductScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          productName,
+          bundle.title,
           style: const TextStyle(
             fontWeight: FontWeight.bold,
           ),
@@ -42,7 +45,6 @@ class ProductScreen extends StatelessWidget {
           child: SizedBox(
             width: double.infinity,
             child: Column(
-              // crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 LayoutBuilder(
                   builder: (BuildContext context, BoxConstraints constraints) {
@@ -56,21 +58,21 @@ class ProductScreen extends StatelessWidget {
                         child: Stack(
                           children: [
                             PageView.builder(
-                              itemCount: 2,
+                              itemCount: bundle.coverImgList.length,
                               controller: controller,
                               itemBuilder: (context, index) {
-                                return const Card(
-                                  color: Colors.amber,
-                                );
+                                return Card(
+                                    color: Colors.amber,
+                                    child: CustomNetworkImage(
+                                        bundle.coverImgList[index]));
                               },
                             ),
                             Container(
-                              // color: Colors.green,
                               alignment: Alignment.bottomCenter,
                               padding: const EdgeInsets.only(bottom: 14),
                               child: SmoothPageIndicator(
                                 controller: controller, // PageController
-                                count: 2,
+                                count: bundle.coverImgList.length,
                                 effect: const WormEffect(
                                   dotWidth: 10,
                                   dotHeight: 10,
@@ -92,9 +94,9 @@ class ProductScreen extends StatelessWidget {
                   },
                 ),
                 const SizedBox(height: 10),
-                const Text(
-                  'Best Dad Jokes of 2023',
-                  style: TextStyle(
+                Text(
+                  bundle.title,
+                  style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
                   ),
@@ -118,26 +120,27 @@ class ProductScreen extends StatelessWidget {
                               color: textColor,
                             ),
                           ),
-                          const Text(
-                            'Dad Jokes',
-                            style: TextStyle(
+                          Text(
+                            Category.getCategoryByCode(bundle.categoryCode)
+                                .title,
+                            style: const TextStyle(
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                         ],
                       ),
                       verticalBar,
-                      const Column(
+                      Column(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            '100',
-                            style: TextStyle(
+                            bundle.humorCount.toString(),
+                            style: const TextStyle(
                               fontSize: 24,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          Text(
+                          const Text(
                             'Unique Humors',
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
@@ -146,17 +149,17 @@ class ProductScreen extends StatelessWidget {
                         ],
                       ),
                       verticalBar,
-                      const Column(
+                      Column(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'EN',
-                            style: TextStyle(
+                            bundle.languageCode,
+                            style: const TextStyle(
                               fontSize: 24,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          Text(
+                          const Text(
                             'Language',
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
@@ -178,13 +181,13 @@ class ProductScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-                const SizedBox(
+                SizedBox(
                   // The Product Description Part //
                   width: double.infinity,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
+                      const Text(
                         '<Product Description>',
                         style: TextStyle(
                           fontSize: 20,
@@ -192,8 +195,8 @@ class ProductScreen extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\nLorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero. Sed cursus ante dapibus diam.',
-                        style: TextStyle(
+                        bundle.description,
+                        style: const TextStyle(
                           fontSize: 16,
                         ),
                       ),

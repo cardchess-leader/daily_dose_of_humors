@@ -81,8 +81,7 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
                             Navigator.of(context).push(
                               MaterialPageRoute(
                                 builder: (ctx) => ProductScreen(
-                                  productName:
-                                      snapshot.data?[index].title ?? '',
+                                  bundle: snapshot.data![index],
                                 ),
                               ),
                             );

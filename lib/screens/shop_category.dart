@@ -40,9 +40,10 @@ class ShopCategoryScreen extends StatelessWidget {
                     onTap: () {
                       Navigator.of(context).push(
                         MaterialPageRoute(
-                          builder: (ctx) => ProductScreen(
-                            productName: 'Best Dad Jokes of 2023',
-                          ),
+                          builder: (ctx) => Container(),
+                          // ProductScreen(
+                          //   productName: 'Best Dad Jokes of 2023',
+                          // ),
                         ),
                       );
                     },
