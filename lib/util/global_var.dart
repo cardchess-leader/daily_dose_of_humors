@@ -12,7 +12,7 @@ class GLOBAL {
   static const SMALL_MAX_INT = 1000000; // max bookmark limit
   static const MAX_THUMBSUP_COUNT = 10; // max thumbs up (FAB) limit per day
   static const MAX_SUBMIT_COUNT =
-      5; // max user-created humor submission limit per day
+      10; // max user-created humor submission limit per day
   /* BELOW ARE STATIC FUNCTIONS */
   static String serverPath() {
     return IS_PRODUCTION

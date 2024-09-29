@@ -8,7 +8,7 @@ enum CategoryCode {
   ONE_LINERS,
   DARK_HUMORS,
   TRICKY_RIDDLES,
-  OX_QUIZ,
+  TRIVIA_QUIZ,
   FUNNY_QUOTES,
   STORY_JOKES,
   DETECTIVE_PUZZLES,
@@ -31,7 +31,6 @@ class Category {
   final CategoryCode categoryCode;
   final List<ManualItem> manualList;
 
-  // final List<Color> themeColorGradient;
   const Category({
     required this.title,
     required this.description,

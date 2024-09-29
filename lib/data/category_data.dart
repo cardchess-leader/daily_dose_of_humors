@@ -85,7 +85,7 @@ const humorCategoryList = [
     ],
   ),
   Category(
-    title: 'OX Quiz',
+    title: 'Trivia Quiz',
     lottiePath: 'assets/lottie/card-lottie/ox-quiz.json',
     lottiePointInTime: 0.6,
     imgSize: 200,
@@ -95,7 +95,7 @@ const humorCategoryList = [
     subscriberOnly: false,
     themeColor: Color.fromARGB(255, 57, 199, 218),
     themeColor2: Color.fromARGB(255, 198, 230, 234),
-    categoryCode: CategoryCode.OX_QUIZ,
+    categoryCode: CategoryCode.TRIVIA_QUIZ,
     manualList: [
       ManualItem(
           lottiePath: 'assets/lottie/swipe-right.json',

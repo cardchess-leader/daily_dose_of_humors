@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -10,7 +11,8 @@ import 'package:daily_dose_of_humors/models/subscription.dart';
 import 'package:daily_dose_of_humors/db/db.dart';
 import 'package:daily_dose_of_humors/models/humor.dart';
 import 'package:daily_dose_of_humors/models/category.dart';
-import 'package:http/http.dart' as http;
+import 'package:daily_dose_of_humors/models/bundle_set.dart';
+import 'package:daily_dose_of_humors/models/bundle.dart';
 
 class SubscriptionStatusNotifier extends StateNotifier<Subscription> {
   SubscriptionStatusNotifier() : super(freeSubscription) {
@@ -324,6 +326,64 @@ class ServerNotifier extends StateNotifier<void> {
       return false;
     }
   }
+
+  Future<List<BundleSet>> fetchHumorBundleSets() async {
+    try {
+      // Construct the full URL with query parameters
+      final Uri url = Uri.parse('${GLOBAL.serverPath()}/getBundleSetList');
+
+      // Send a GET request to the Firebase function
+      final response = await http.get(url);
+      // Check if the request was successful
+      if (response.statusCode == 200) {
+        // Decode the JSON response
+        final data = jsonDecode(response.body);
+
+        // Handle the data as needed
+        print('Bundle Set: ${data['bundleSetList']}');
+        return data['bundleSetList']
+            .map<BundleSet>((json) => BundleSet.fromJson(json))
+            .toList();
+      } else {
+        // Handle errors
+        print('Error: ${response.statusCode} - ${response.body}');
+        return [];
+      }
+    } catch (e) {
+      // Handle any exceptions that occur during the request
+      print('Request failed: $e');
+      return [];
+    }
+  }
+
+  Future<List<Bundle>> getBundleListInSet(BundleSet bundleSet) async {
+    try {
+      // Construct the full URL with query parameters
+      final Uri url = Uri.parse(
+          '${GLOBAL.serverPath()}/getBundleListInSet?uuid=${bundleSet.uuid}');
+
+      // Send a GET request to the Firebase function
+      final response = await http.get(url);
+      // Check if the request was successful
+      if (response.statusCode == 200) {
+        // Decode the JSON response
+        final data = jsonDecode(response.body);
+        print('bundleSet.uuid is: ${bundleSet.uuid}');
+        print('data is: ${data}');
+        return data['bundleList']
+            .map<Bundle>((json) => Bundle.fromJson(json))
+            .toList();
+      } else {
+        // Handle errors
+        print('Error: ${response.statusCode} - ${response.body}');
+        return [];
+      }
+    } catch (e) {
+      // Handle any exceptions that occur during the request
+      print('Request failedaaa: $e');
+      return [];
+    }
+  }
 }
 
 final serverProvider = StateNotifierProvider<ServerNotifier, void>((ref) {
@@ -377,6 +437,7 @@ class AppStateNotifier extends StateNotifier<Map<String, dynamic>> {
   }
 
   void submitUserHumors() async {
+    print('submit count remaining is: ${state['submit_count_remaining']}');
     if (state['submit_count_remaining'] <= 0) {
       return;
     }

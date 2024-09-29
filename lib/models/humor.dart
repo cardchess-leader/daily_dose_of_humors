@@ -39,7 +39,7 @@ abstract class Humor {
           option2Format: '$context\n\n--From Daily Dose of Humors :)',
         );
       case CategoryCode.TRICKY_RIDDLES:
-      case CategoryCode.OX_QUIZ:
+      case CategoryCode.TRIVIA_QUIZ:
         return SharedFormat(
           dialogBody:
               'Would you like to share this humor with or without answer?',
