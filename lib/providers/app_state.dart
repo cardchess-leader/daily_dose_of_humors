@@ -175,6 +175,27 @@ final bookmarkProvider = StateNotifierProvider<BookmarkNotifier, void>((ref) {
   return BookmarkNotifier(ref); // Pass ref to BookmarkNotifier
 });
 
+class LibraryNotifier extends StateNotifier<void> {
+  LibraryNotifier() : super(null);
+
+  Future<bool> saveBundleHumorsIntoLibrary(
+      Bundle bundle, List<Humor> bundleHumors) async {
+    return await DatabaseHelper().saveBundleIntoLibrary(bundle, bundleHumors);
+  }
+
+  Future<List<Bundle>> getAllBundles() async {
+    return await DatabaseHelper().getAllBundles();
+  }
+
+  Future<List<Humor>> getAllBundleHumors(Bundle bundle) async {
+    return await DatabaseHelper().getAllBundleHumors(bundle);
+  }
+}
+
+final libraryProvider = StateNotifierProvider<LibraryNotifier, void>((ref) {
+  return LibraryNotifier(); // Pass ref to BookmarkNotifier
+});
+
 class AdNotifier extends StateNotifier<void> {
   AdNotifier() : super(null) {
     loadAd();
@@ -381,6 +402,35 @@ class ServerNotifier extends StateNotifier<void> {
     } catch (e) {
       // Handle any exceptions that occur during the request
       print('Request failedaaa: $e');
+      return [];
+    }
+  }
+
+  Future<List<Humor>> downloadHumorBundle(Bundle bundle) async {
+    try {
+      // Construct the full URL with query parameters
+      final Uri url = Uri.parse(
+          '${GLOBAL.serverPath()}/downloadHumorBundle?uuid=${bundle.uuid}');
+
+      // Send a GET request to the Firebase function
+      final response = await http.get(url);
+      // Check if the request was successful
+      if (response.statusCode == 200) {
+        // Decode the JSON response
+        final data = jsonDecode(response.body);
+        print('data is: ${data}');
+        print('data length is: ${data['humorList'].length}');
+        return data['humorList']
+            .map<Humor>((json) => DailyHumor.loadFromServer(json))
+            .toList();
+      } else {
+        // Handle errors
+        print('Error: ${response.statusCode} - ${response.body}');
+        return [];
+      }
+    } catch (e) {
+      // Handle any exceptions that occur during the request
+      print('Request failed: $e');
       return [];
     }
   }

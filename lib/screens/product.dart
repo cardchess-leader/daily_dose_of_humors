@@ -1,17 +1,85 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lottie/lottie.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:daily_dose_of_humors/models/bundle.dart';
 import 'package:daily_dose_of_humors/models/category.dart';
 import 'package:daily_dose_of_humors/widgets/network_image.dart';
+import 'package:daily_dose_of_humors/providers/app_state.dart';
+import 'package:daily_dose_of_humors/screens/humor_screen.dart';
 
-class ProductScreen extends StatelessWidget {
+class ProductScreen extends ConsumerStatefulWidget {
   final Bundle bundle;
-  final controller = PageController();
+  final bool fromLibrary;
 
-  ProductScreen({
+  const ProductScreen({
     super.key,
     required this.bundle,
+    this.fromLibrary = false,
   });
+
+  @override
+  ConsumerState<ProductScreen> createState() => _ProductScreenState();
+}
+
+class _ProductScreenState extends ConsumerState<ProductScreen> {
+  final controller = PageController();
+  var purchased = false;
+  var isLoading = false;
+
+  Future<void> downloadBundle() async {
+    setState(() {
+      isLoading = true;
+    });
+    // 1. Download all bundle humors
+    final downloadSuccess = await (() async {
+      final bundleHumors = await ref
+          .read(serverProvider.notifier)
+          .downloadHumorBundle(widget.bundle);
+      if (bundleHumors.isEmpty) {
+        return false;
+      }
+      // 2. Put them (both bundle & bundle humors) into library
+      return await ref
+          .read(libraryProvider.notifier)
+          .saveBundleHumorsIntoLibrary(widget.bundle, bundleHumors);
+    })();
+
+    setState(() {
+      isLoading = false;
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            duration: const Duration(milliseconds: 3000),
+            content: Text(downloadSuccess.toString()),
+          ),
+        );
+    });
+  }
+
+  Future<void> viewAllHumors() async {
+    setState(() {
+      isLoading = true;
+    });
+    final bundleHumors = await ref
+        .read(libraryProvider.notifier)
+        .getAllBundleHumors(widget.bundle);
+    print('length is: ${bundleHumors.length}');
+    if (mounted) {
+      setState(() {
+        isLoading = false;
+      });
+      await Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (ctx) => HumorScreen(
+            buildHumorScreenFrom: BuildHumorScreenFrom.bookmark,
+            humorList: bundleHumors,
+          ),
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +101,7 @@ class ProductScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          bundle.title,
+          widget.bundle.title,
           style: const TextStyle(
             fontWeight: FontWeight.bold,
           ),
@@ -58,13 +126,13 @@ class ProductScreen extends StatelessWidget {
                         child: Stack(
                           children: [
                             PageView.builder(
-                              itemCount: bundle.coverImgList.length,
+                              itemCount: widget.bundle.coverImgList.length,
                               controller: controller,
                               itemBuilder: (context, index) {
                                 return Card(
                                     color: Colors.amber,
                                     child: CustomNetworkImage(
-                                        bundle.coverImgList[index]));
+                                        widget.bundle.coverImgList[index]));
                               },
                             ),
                             Container(
@@ -72,7 +140,7 @@ class ProductScreen extends StatelessWidget {
                               padding: const EdgeInsets.only(bottom: 14),
                               child: SmoothPageIndicator(
                                 controller: controller, // PageController
-                                count: bundle.coverImgList.length,
+                                count: widget.bundle.coverImgList.length,
                                 effect: const WormEffect(
                                   dotWidth: 10,
                                   dotHeight: 10,
@@ -95,7 +163,7 @@ class ProductScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  bundle.title,
+                  widget.bundle.title,
                   style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -121,7 +189,8 @@ class ProductScreen extends StatelessWidget {
                             ),
                           ),
                           Text(
-                            Category.getCategoryByCode(bundle.categoryCode)
+                            Category.getCategoryByCode(
+                                    widget.bundle.categoryCode)
                                 .title,
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
@@ -134,7 +203,7 @@ class ProductScreen extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            bundle.humorCount.toString(),
+                            widget.bundle.humorCount.toString(),
                             style: const TextStyle(
                               fontSize: 24,
                               fontWeight: FontWeight.bold,
@@ -153,7 +222,7 @@ class ProductScreen extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            bundle.languageCode,
+                            widget.bundle.languageCode,
                             style: const TextStyle(
                               fontSize: 24,
                               fontWeight: FontWeight.bold,
@@ -195,7 +264,7 @@ class ProductScreen extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        bundle.description,
+                        widget.bundle.description,
                         style: const TextStyle(
                           fontSize: 16,
                         ),
@@ -209,63 +278,132 @@ class ProductScreen extends StatelessWidget {
         ),
       ),
       bottomNavigationBar: BottomAppBar(
-        // padding: EdgeInsets.zero,
-        // height: 0,
-        color: Colors.transparent,
-        // shape: CircularNotchedRectangle(),
-        // notchMargin: 6.0,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          // crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Expanded(
-              child: TextButton(
+          color: Colors.transparent,
+          child: (() {
+            if (widget.fromLibrary) {
+              return TextButton(
                 style: TextButton.styleFrom(
-                  // backgroundColor: Colors.blue, // Background color
-                  foregroundColor: Colors.blue, // Text color
+                  backgroundColor: Colors.blue,
+                  foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
-                    borderRadius:
-                        BorderRadius.circular(30.0), // Rounded borders
-                    side: const BorderSide(
-                      color: Colors.blueAccent,
-                      width: 1.0,
-                    ), // Border color and width
+                    borderRadius: BorderRadius.circular(30.0),
                   ),
                 ),
-                onPressed: () => {},
-                child: const Text(
-                  'Preview',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: TextButton(
-                style: TextButton.styleFrom(
-                  backgroundColor: Colors.blue, // Background color
-                  foregroundColor: Colors.white, // Text color
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(
-                        30.0), // Rounded borders // Border color and width
-                  ),
-                ),
-                onPressed: () => {},
-                child: const Text(
-                  'Buy at \$2.99',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
+                onPressed: () {
+                  viewAllHumors();
+                },
+                child: isLoading
+                    ? Lottie.asset(
+                        'assets/lottie/loading.json',
+                        width: 35,
+                        height: 35,
+                        delegates: LottieDelegates(
+                          values: [
+                            ValueDelegate.colorFilter(
+                              ['**'],
+                              value: const ColorFilter.mode(
+                                  Colors.white, BlendMode.src),
+                            ),
+                          ],
+                        ),
+                      )
+                    : const Text(
+                        'View All Humors',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+              );
+            } else {
+              return !purchased
+                  ? Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        Expanded(
+                          child: TextButton(
+                            style: TextButton.styleFrom(
+                              foregroundColor: Colors.blue,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(30.0),
+                                side: const BorderSide(
+                                  color: Colors.blueAccent,
+                                  width: 1.0,
+                                ),
+                              ),
+                            ),
+                            onPressed: () => {},
+                            child: const Text(
+                              'Preview',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: TextButton(
+                            style: TextButton.styleFrom(
+                              backgroundColor: Colors.blue,
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(30.0),
+                              ),
+                            ),
+                            onPressed: () => {
+                              setState(() {
+                                purchased = true;
+                              })
+                            },
+                            child: const Text(
+                              'Buy at \$2.99',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    )
+                  : TextButton(
+                      style: TextButton.styleFrom(
+                        backgroundColor: Colors.blue,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30.0),
+                        ),
+                      ),
+                      onPressed: () {
+                        downloadBundle();
+                      },
+                      child: isLoading
+                          ? Lottie.asset(
+                              'assets/lottie/loading.json',
+                              width: 35,
+                              height: 35,
+                              delegates: LottieDelegates(
+                                values: [
+                                  ValueDelegate.colorFilter(
+                                    ['**'],
+                                    value: const ColorFilter.mode(
+                                        Colors.white, BlendMode.src),
+                                  ),
+                                ],
+                              ),
+                            )
+                          : const Text(
+                              'Download Humors',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                    );
+            }
+          })()),
     );
   }
 }

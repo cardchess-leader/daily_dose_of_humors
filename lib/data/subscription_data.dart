@@ -25,7 +25,7 @@ const freeSubscription = Subscription(
   text3: '',
   text4: '',
   lottiePath: 'assets/lottie/monthly-face.json',
-  maxBookmarks: 0,
+  maxBookmarks: 5,
   perks: [],
   color: Colors.amberAccent,
 );

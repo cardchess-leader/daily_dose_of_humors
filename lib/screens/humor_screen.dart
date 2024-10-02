@@ -26,14 +26,14 @@ class HumorScreen extends ConsumerStatefulWidget {
   final BuildHumorScreenFrom buildHumorScreenFrom;
   final List<Humor> humorList;
   final List<String>? humorUuidList;
-  final int? initIndexInBookmark;
+  final int initIndexInBookmark;
   final Category? humorCategory;
   const HumorScreen({
     super.key,
     required this.buildHumorScreenFrom,
     this.humorList = const [],
     this.humorUuidList,
-    this.initIndexInBookmark,
+    this.initIndexInBookmark = 0,
     this.humorCategory,
   });
 
@@ -72,7 +72,7 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
     _fabLottieAnimController = AnimationController(
       vsync: this,
     )..addStatusListener(_fabLottieAnimListener);
-    _humorIndex = widget.initIndexInBookmark ?? 1;
+    _humorIndex = widget.initIndexInBookmark;
     _pageController = PageController(keepPage: true, initialPage: _humorIndex);
     if (widget.buildHumorScreenFrom != BuildHumorScreenFrom.daily) {
       humorList = widget.humorList;

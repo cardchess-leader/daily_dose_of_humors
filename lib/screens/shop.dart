@@ -57,7 +57,11 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
                   .getBundleListInSet(bundleSet),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: LoadingWidget(color: textColor));
+                  return Center(
+                      child: LoadingWidget(
+                    color: textColor,
+                    size: 50,
+                  ));
                 } else if (snapshot.hasError) {
                   return Text(
                       'Error: ${snapshot.error}'); // Replace with check internet connection lottie widget (that fills the entire remaining screen)
@@ -145,7 +149,11 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
           // Checking the connection state
           if (snapshot.connectionState == ConnectionState.waiting) {
             // While waiting for the future to complete
-            return Center(child: LoadingWidget(color: textColor));
+            return Center(
+                child: LoadingWidget(
+              color: textColor,
+              size: 80,
+            ));
           } else if (snapshot.hasError) {
             // If an error occurred
             return Text(

@@ -11,6 +11,9 @@ import 'package:daily_dose_of_humors/util/util.dart';
 import 'package:daily_dose_of_humors/models/category.dart';
 import 'package:daily_dose_of_humors/providers/app_state.dart';
 import 'package:daily_dose_of_humors/util/global_var.dart';
+import 'package:daily_dose_of_humors/models/bundle.dart';
+import 'package:daily_dose_of_humors/screens/product.dart';
+import 'package:daily_dose_of_humors/widgets/network_image.dart';
 
 class BookmarkScreen extends ConsumerStatefulWidget {
   const BookmarkScreen({super.key});
@@ -26,12 +29,14 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen>
   final _searchController = TextEditingController();
   bool isLoading = true;
   List<Humor> bookmarks = [];
+  List<Bundle> bundles = [];
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
     _initBookmarks();
+    _loadBundles();
   }
 
   @override
@@ -47,6 +52,14 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen>
     _searchController.dispose();
     _scaffoldMessengerState?.clearSnackBars();
     super.dispose();
+  }
+
+  Future<void> _loadBundles() async {
+    final bundles = await ref.read(libraryProvider.notifier).getAllBundles();
+    print('bundles is: $bundles');
+    setState(() {
+      this.bundles = bundles;
+    });
   }
 
   Future<void> _initBookmarks() async {
@@ -250,6 +263,72 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen>
     );
   }
 
+  Widget _buildLibraryTabView(Color color) {
+    if (bundles.isEmpty) {
+      return _emptyPlaceHolder(color, 'Wow, such empty!');
+    } else {
+      return Padding(
+        padding: const EdgeInsets.all(16),
+        child: SingleChildScrollView(
+          child: LayoutBuilder(builder: (context, constraints) {
+            double spacing = 16;
+            double itemWidth = ((constraints.maxWidth - spacing) / 2) -
+                0.1; // Adjust the width for 2 items per row, 0.1 is safe margin
+            return Wrap(
+              spacing: spacing,
+              runSpacing: 20,
+              alignment: WrapAlignment.start,
+              children: List.generate(
+                bundles.length,
+                (index) {
+                  final bundle = bundles[index];
+                  return SizedBox(
+                    width: itemWidth,
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (ctx) => ProductScreen(
+                              bundle: bundle,
+                              fromLibrary: true,
+                            ),
+                          ),
+                        );
+                      },
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          AspectRatio(
+                            aspectRatio: 140 / 200,
+                            child: Card(
+                                color: Colors.amber,
+                                margin: EdgeInsets.zero,
+                                child:
+                                    CustomNetworkImage(bundle.coverImgList[0])),
+                          ),
+                          const SizedBox(height: 10),
+                          Text(
+                            ' ${bundle.title}',
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 15,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            );
+          }),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final maxBookmarkCount = ref.watch(subscriptionStatusProvider).maxBookmarks;
@@ -278,7 +357,7 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen>
               if (maxBookmarkCount == GLOBAL.SMALL_MAX_INT) return '';
               return '/$maxBookmarkCount';
             })()})'),
-            const Tab(text: 'Library (0)'),
+            Tab(text: 'Library (${bundles.length})'),
           ],
         ),
       ),
@@ -338,7 +417,7 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen>
                     ],
                   ),
           ),
-          _emptyPlaceHolder(blackOrWhite, 'Wow, such empty!'),
+          _buildLibraryTabView(blackOrWhite),
         ],
       ),
       floatingActionButton: FloatingActionButton(

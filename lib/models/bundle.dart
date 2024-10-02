@@ -22,7 +22,7 @@ class Bundle {
     required this.languageCode,
     required this.productId,
     required this.releaseDate,
-    required this.price,
+    this.price = '',
   });
 
   Bundle.fromJson(Map<String, dynamic> json)
@@ -42,4 +42,19 @@ class Bundle {
         productId = json['product_id'] ?? '',
         releaseDate = json['release_date'] ?? '2024-01-01',
         price = json['price'] ?? '';
+
+  Map<String, dynamic> bundleToMap() {
+    final Map<String, dynamic> map = {
+      'category': categoryCode.name,
+      'cover_img_list': coverImgList.join('@@@'),
+      'description': description,
+      'humor_count': humorCount,
+      'language_code': languageCode,
+      'product_id': productId,
+      'title': title,
+      'release_date': releaseDate,
+      'uuid': uuid,
+    };
+    return map;
+  }
 }

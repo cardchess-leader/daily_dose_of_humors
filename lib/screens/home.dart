@@ -24,9 +24,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 !selectedCategory.subscriberOnly)
             ? HumorScreen(
                 humorCategory: selectedCategory,
-                buildHumorScreenFrom: BuildHumorScreenFrom.daily,
-                initIndexInBookmark: 0,
-              )
+                buildHumorScreenFrom: BuildHumorScreenFrom.daily)
             : const SubscriptionScreen();
     Navigator.of(context).push(
       MaterialPageRoute(

@@ -66,10 +66,14 @@ abstract class Humor {
         return null;
     }
   }
+
+  Map<String, dynamic> humorToMap();
 }
 
 class DailyHumor extends Humor {
+  // Both daily and bundle humors
   bool isNew;
+  int humorIndex;
 
   DailyHumor({
     required super.uuid,
@@ -81,12 +85,14 @@ class DailyHumor extends Humor {
     required super.sender,
     required super.source,
     this.isNew = false,
+    required this.humorIndex,
   });
 
   /// Constructor for loading humors from server
   DailyHumor.loadFromServer(
       Map<String, dynamic> document) // Construct from Firebase server
       : isNew = document['is_new'] ?? false,
+        humorIndex = document['humor_index'] ?? 0,
         super(
           uuid: document['uuid'],
           categoryCode: CategoryCode.values.firstWhere(
@@ -101,6 +107,42 @@ class DailyHumor extends Humor {
           sender: document['sender'],
           source: document['source'],
         );
+
+  DailyHumor.loadFromTable(Map<String, dynamic> document)
+      : isNew = false,
+        humorIndex = document['humor_index'] ?? 0,
+        super(
+          uuid: document['uuid'],
+          categoryCode: CategoryCode.values.firstWhere(
+            (e) => e.name == document['category'],
+            orElse: () =>
+                CategoryCode.YOUR_HUMORS, // Return null if no match is found
+          ),
+          context: document['context'],
+          contextList: document['context_list'] == ''
+              ? []
+              : document['context_list'].split('@@@'),
+          punchline: document['punchline'],
+          author: document['author'],
+          sender: document['sender'],
+          source: document['source'],
+        );
+
+  @override
+  Map<String, dynamic> humorToMap() {
+    final Map<String, dynamic> map = {
+      'author': author,
+      'category': categoryCode.name,
+      'context': context,
+      'context_list': contextList.join('@@@'),
+      'humor_index': humorIndex,
+      'punchline': punchline,
+      'sender': sender,
+      'source': source,
+      'uuid': uuid,
+    };
+    return map;
+  }
 }
 
 class BookmarkHumor extends Humor {
@@ -154,6 +196,7 @@ class BookmarkHumor extends Humor {
           source: dailyHumor.source,
         );
 
+  @override
   Map<String, dynamic> humorToMap() {
     final Map<String, dynamic> map = {
       'uuid': uuid,

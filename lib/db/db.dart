@@ -1,6 +1,7 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:daily_dose_of_humors/models/humor.dart';
+import 'package:daily_dose_of_humors/models/bundle.dart';
 
 class DatabaseHelper {
   static final DatabaseHelper _instance = DatabaseHelper._internal();
@@ -35,28 +36,41 @@ class DatabaseHelper {
             source TEXT NOT NULL
           );
         ''');
-        // await db.execute('''
-        //   CREATE TABLE library (
-        //     id INTEGER PRIMARY KEY AUTOINCREMENT,
-        //     create_date TEXT,
-        //     added_date TEXT,
-        //     category INTEGER,
-        //     title TEXT,
-        //     context TEXT,
-        //     context_list TEXT,
-        //     punchline TEXT,
-        //     author TEXT,
-        //     sender TEXT,
-        //     source TEXT NOT NULL
-        //   );
-        // ''');
+        await db.execute('''
+          CREATE TABLE bundle_humors (
+            humor_id INTEGER PRIMARY KEY,
+            author TEXT NOT NULL,
+            category TEXT NOT NULL,
+            context TEXT NOT NULL,
+            context_list TEXT NOT NULL,
+            humor_index INTEGER NOT NULL,
+            punchline TEXT NOT NULL,
+            sender TEXT NOT NULL,
+            source TEXT NOT NULL,
+            uuid TEXT UNIQUE NOT NULL
+          );
+        ''');
+        await db.execute('''
+          CREATE TABLE library (
+            bundle_id INTEGER PRIMARY KEY,
+            category TEXT NOT NULL,
+            cover_img_list TEXT NOT NULL,
+            description TEXT NOT NULL,
+            humor_count INTEGER NOT NULL,
+            language_code TEXT NOT NULL,
+            product_id TEXT NOT NULL,
+            title TEXT NOT NULL,
+            release_date TEXT NOT NULL,
+            uuid TEXT UNIQUE NOT NULL
+          );
+        ''');
         await db.execute('''
           CREATE TRIGGER set_bookmark_order
           AFTER INSERT ON bookmarks
           FOR EACH ROW
           WHEN NEW.bookmark_ord IS NULL
           BEGIN
-            UPDATE bookmarks SET bookmark_ord = NEW.bookmark_id WHERE bookmark_id = NEW.bookmark_id;
+            UPDATE bookmarks SET bookmark_ord = NEW.bookmark_id WHERE rowid = NEW.rowid;
           END;
         ''');
       },
@@ -160,5 +174,76 @@ class DatabaseHelper {
   Future<void> clearBookmarks() async {
     final db = await database;
     await db.delete('bookmarks');
+  }
+
+  Future<bool> saveBundleIntoLibrary(
+      Bundle bundle, List<Humor> bundleHumors) async {
+    try {
+      final db = await database;
+      // Add bundle into bundle (if exist then update)
+      await db.insert(
+        'library',
+        bundle.bundleToMap(),
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+      // Remove all humors with source equal to bundle
+      await db.delete(
+        'bundle_humors',
+        where: 'source = ?',
+        whereArgs: [bundle.uuid],
+      );
+
+      // Add all bundle humors
+      Batch batch = db.batch();
+      for (var humor in bundleHumors) {
+        batch.insert(
+          'bundle_humors',
+          humor.humorToMap(),
+          conflictAlgorithm: ConflictAlgorithm.replace,
+        );
+      }
+
+      // Commit the batch
+      await batch.commit(noResult: true);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  Future<List<Bundle>> getAllBundles() async {
+    try {
+      final db = await database;
+      final List<Map<String, dynamic>> maps = await db.query('library');
+
+      print('maps is: ${maps}');
+
+      return List.generate(maps.length, (i) {
+        return Bundle.fromJson({
+          ...maps[i],
+          'cover_img_list': maps[i]['cover_img_list'].split('@@@')
+        });
+      });
+    } catch (e) {
+      print('error is: $e');
+      return [];
+    }
+  }
+
+  Future<List<Humor>> getAllBundleHumors(Bundle bundle) async {
+    try {
+      final db = await database;
+      final List<Map<String, dynamic>> maps = await db.query(
+        'bundle_humors',
+        where: 'source = ?',
+        whereArgs: [bundle.uuid],
+      );
+
+      return List.generate(
+          maps.length, (i) => DailyHumor.loadFromTable(maps[i]));
+    } catch (e) {
+      print('error is: $e');
+      return [];
+    }
   }
 }
