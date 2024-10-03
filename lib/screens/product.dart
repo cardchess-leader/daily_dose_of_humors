@@ -8,6 +8,13 @@ import 'package:daily_dose_of_humors/widgets/network_image.dart';
 import 'package:daily_dose_of_humors/providers/app_state.dart';
 import 'package:daily_dose_of_humors/screens/humor_screen.dart';
 
+enum ProductMessage {
+  Buy,
+  Download,
+  ReDownload,
+  View,
+}
+
 class ProductScreen extends ConsumerStatefulWidget {
   final Bundle bundle;
   final bool fromLibrary;
@@ -24,8 +31,46 @@ class ProductScreen extends ConsumerStatefulWidget {
 
 class _ProductScreenState extends ConsumerState<ProductScreen> {
   final controller = PageController();
-  var purchased = false;
-  var isLoading = false;
+  ScaffoldMessengerState? _scaffoldMessengerState;
+  var productMessage = ProductMessage
+      .Buy; // Process: raw >> purchase >> library (fromLibrary assumes downloaded)
+  var isLoading = false; // is currently loading (downloading)
+
+  @override
+  void initState() {
+    super.initState();
+    initProductMessage();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Save a reference to ScaffoldMessengerState in didChangeDependencies
+    _scaffoldMessengerState = ScaffoldMessenger.of(context);
+  }
+
+  @override
+  void dispose() {
+    _scaffoldMessengerState?.clearSnackBars();
+    super.dispose();
+  }
+
+  Future<void> initProductMessage() async {
+    if (widget.fromLibrary) {
+      productMessage = ProductMessage.View;
+    } else {
+      final isInLibrary =
+          (await ref.read(libraryProvider.notifier).getAllBundles())
+              .any((bundle) => bundle.uuid == widget.bundle.uuid);
+      if (isInLibrary) {
+        setState(() {
+          productMessage = ProductMessage.ReDownload;
+        });
+      } else {
+        // Check if purchased or not => Set product message accordingly! (Fetch from Store SDK)
+      }
+    }
+  }
 
   Future<void> downloadBundle() async {
     setState(() {
@@ -47,12 +92,21 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
 
     setState(() {
       isLoading = false;
+      late String snackBarMessage;
+      if (downloadSuccess) {
+        snackBarMessage =
+            'Download Successful!\nCheck downloaded humors from Bookmarks > Library tab!';
+        productMessage = ProductMessage.View;
+      } else {
+        snackBarMessage =
+            'Download failed unexpectedly...\nPlease check your internet connection and try again!';
+      }
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
         ..showSnackBar(
           SnackBar(
-            duration: const Duration(milliseconds: 3000),
-            content: Text(downloadSuccess.toString()),
+            duration: const Duration(milliseconds: 5000),
+            content: Text(snackBarMessage),
           ),
         );
     });
@@ -65,8 +119,8 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
     final bundleHumors = await ref
         .read(libraryProvider.notifier)
         .getAllBundleHumors(widget.bundle);
-    print('length is: ${bundleHumors.length}');
     if (mounted) {
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
       setState(() {
         isLoading = false;
       });
@@ -114,53 +168,57 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
             width: double.infinity,
             child: Column(
               children: [
-                LayoutBuilder(
-                  builder: (BuildContext context, BoxConstraints constraints) {
-                    double maxHeight = MediaQuery.of(context).size.height * 0.6;
-                    return ConstrainedBox(
-                      constraints: BoxConstraints(
-                        maxHeight: maxHeight,
-                      ),
-                      child: AspectRatio(
-                        aspectRatio: 140 / 200,
-                        child: Stack(
-                          children: [
-                            PageView.builder(
-                              itemCount: widget.bundle.coverImgList.length,
-                              controller: controller,
-                              itemBuilder: (context, index) {
-                                return Card(
-                                    color: Colors.amber,
-                                    child: CustomNetworkImage(
-                                        widget.bundle.coverImgList[index]));
-                              },
-                            ),
-                            Container(
-                              alignment: Alignment.bottomCenter,
-                              padding: const EdgeInsets.only(bottom: 14),
-                              child: SmoothPageIndicator(
-                                controller: controller, // PageController
-                                count: widget.bundle.coverImgList.length,
-                                effect: const WormEffect(
-                                  dotWidth: 10,
-                                  dotHeight: 10,
-                                  spacing: 6,
-                                ), // your preferred effect
-                                onDotClicked: (index) {
-                                  controller.animateToPage(
-                                    index,
-                                    duration: const Duration(milliseconds: 300),
-                                    curve: Curves.easeInOut,
-                                  );
+                if (widget.bundle.coverImgList.isNotEmpty)
+                  LayoutBuilder(
+                    builder:
+                        (BuildContext context, BoxConstraints constraints) {
+                      double maxHeight =
+                          MediaQuery.of(context).size.height * 0.6;
+                      return ConstrainedBox(
+                        constraints: BoxConstraints(
+                          maxHeight: maxHeight,
+                        ),
+                        child: AspectRatio(
+                          aspectRatio: 140 / 200,
+                          child: Stack(
+                            children: [
+                              PageView.builder(
+                                itemCount: widget.bundle.coverImgList.length,
+                                controller: controller,
+                                itemBuilder: (context, index) {
+                                  return Card(
+                                      color: Colors.amber,
+                                      child: CustomNetworkImage(
+                                          widget.bundle.coverImgList[index]));
                                 },
                               ),
-                            )
-                          ],
+                              Container(
+                                alignment: Alignment.bottomCenter,
+                                padding: const EdgeInsets.only(bottom: 14),
+                                child: SmoothPageIndicator(
+                                  controller: controller, // PageController
+                                  count: widget.bundle.coverImgList.length,
+                                  effect: const WormEffect(
+                                    dotWidth: 10,
+                                    dotHeight: 10,
+                                    spacing: 6,
+                                  ), // your preferred effect
+                                  onDotClicked: (index) {
+                                    controller.animateToPage(
+                                      index,
+                                      duration:
+                                          const Duration(milliseconds: 300),
+                                      curve: Curves.easeInOut,
+                                    );
+                                  },
+                                ),
+                              )
+                            ],
+                          ),
                         ),
-                      ),
-                    );
-                  },
-                ),
+                      );
+                    },
+                  ),
                 const SizedBox(height: 10),
                 Text(
                   widget.bundle.title,
@@ -280,7 +338,69 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
       bottomNavigationBar: BottomAppBar(
           color: Colors.transparent,
           child: (() {
-            if (widget.fromLibrary) {
+            if (productMessage == ProductMessage.Buy) {
+              // Raw case
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Expanded(
+                    child: TextButton(
+                      style: TextButton.styleFrom(
+                        foregroundColor: Colors.blue,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30.0),
+                          side: const BorderSide(
+                            color: Colors.blueAccent,
+                            width: 1.0,
+                          ),
+                        ),
+                      ),
+                      onPressed: () => {},
+                      child: const Text(
+                        'Preview',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: TextButton(
+                      style: TextButton.styleFrom(
+                        backgroundColor: Colors.blue,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30.0),
+                        ),
+                      ),
+                      onPressed: () => {
+                        setState(() {
+                          productMessage = ProductMessage.Download;
+                        })
+                      },
+                      child: const Text(
+                        'Buy at \$2.99',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            } else {
+              late String btnText;
+              switch (productMessage) {
+                case ProductMessage.Download:
+                  btnText = 'Download Humors';
+                case ProductMessage.ReDownload:
+                  btnText = 'Re-Download Humors';
+                default:
+                  btnText = 'View All Humors';
+              }
               return TextButton(
                 style: TextButton.styleFrom(
                   backgroundColor: Colors.blue,
@@ -290,7 +410,11 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                   ),
                 ),
                 onPressed: () {
-                  viewAllHumors();
+                  if (productMessage == ProductMessage.View) {
+                    viewAllHumors();
+                  } else {
+                    downloadBundle();
+                  }
                 },
                 child: isLoading
                     ? Lottie.asset(
@@ -307,101 +431,14 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                           ],
                         ),
                       )
-                    : const Text(
-                        'View All Humors',
-                        style: TextStyle(
+                    : Text(
+                        btnText,
+                        style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
               );
-            } else {
-              return !purchased
-                  ? Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        Expanded(
-                          child: TextButton(
-                            style: TextButton.styleFrom(
-                              foregroundColor: Colors.blue,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(30.0),
-                                side: const BorderSide(
-                                  color: Colors.blueAccent,
-                                  width: 1.0,
-                                ),
-                              ),
-                            ),
-                            onPressed: () => {},
-                            child: const Text(
-                              'Preview',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: TextButton(
-                            style: TextButton.styleFrom(
-                              backgroundColor: Colors.blue,
-                              foregroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(30.0),
-                              ),
-                            ),
-                            onPressed: () => {
-                              setState(() {
-                                purchased = true;
-                              })
-                            },
-                            child: const Text(
-                              'Buy at \$2.99',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    )
-                  : TextButton(
-                      style: TextButton.styleFrom(
-                        backgroundColor: Colors.blue,
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30.0),
-                        ),
-                      ),
-                      onPressed: () {
-                        downloadBundle();
-                      },
-                      child: isLoading
-                          ? Lottie.asset(
-                              'assets/lottie/loading.json',
-                              width: 35,
-                              height: 35,
-                              delegates: LottieDelegates(
-                                values: [
-                                  ValueDelegate.colorFilter(
-                                    ['**'],
-                                    value: const ColorFilter.mode(
-                                        Colors.white, BlendMode.src),
-                                  ),
-                                ],
-                              ),
-                            )
-                          : const Text(
-                              'Download Humors',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                    );
             }
           })()),
     );

@@ -56,7 +56,6 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen>
 
   Future<void> _loadBundles() async {
     final bundles = await ref.read(libraryProvider.notifier).getAllBundles();
-    print('bundles is: $bundles');
     setState(() {
       this.bundles = bundles;
     });
@@ -197,7 +196,7 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen>
                       ),
                       const SizedBox(height: 5),
                       Text(
-                        '- From "${humor.source}"',
+                        '- From "${humor.sourceName}"',
                         style: TextStyle(
                           fontWeight: FontWeight.w600,
                           fontSize: 16,

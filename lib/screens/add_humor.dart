@@ -46,10 +46,12 @@ class _AddHumorScreenState extends ConsumerState<AddHumorScreen> {
       uuid: GLOBAL.uuid.v4(),
       categoryCode: CategoryCode.YOUR_HUMORS,
       context: _contextController.text.trim(),
+      contextList: [],
       punchline: _punchlineController.text.trim(),
       author: _nicknameController.text.trim(),
       sender: _nicknameController.text.trim(),
       source: 'Your Own Humors',
+      sourceName: 'Your Own Humors',
     );
     if (_submitToUs) {
       final response = await showDialog(

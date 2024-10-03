@@ -30,6 +30,7 @@ class DatabaseHelper {
             category TEXT NOT NULL,
             context TEXT NOT NULL,
             context_list TEXT NOT NULL,
+            humor_index INTEGER NOT NULL,
             punchline TEXT NOT NULL,
             author TEXT NOT NULL,
             sender TEXT NOT NULL,
@@ -130,14 +131,20 @@ class DatabaseHelper {
   /// Get all bookmarks
   Future<List<BookmarkHumor>> getAllBookmarks() async {
     final db = await database;
-    final List<Map<String, dynamic>> maps = await db.query(
-      'bookmarks',
-      orderBy:
-          'bookmark_ord ASC', // This orders the results by the "order" column in ascending order
-    );
+    final List<Map<String, dynamic>> maps = await db.rawQuery('''
+      SELECT bookmarks.*, library.title as source_name
+      FROM bookmarks
+      LEFT JOIN library ON bookmarks.source = library.uuid
+      ORDER BY bookmarks.bookmark_ord ASC
+    ''');
+
+    print('getAllBookmarks is: $maps');
 
     return List.generate(maps.length, (i) {
-      return BookmarkHumor.loadFromTable(maps[i]);
+      return BookmarkHumor.loadFromTable({
+        ...maps[i],
+        'source_name': maps[i]['source_name'] ?? maps[i]['source']
+      });
     });
   }
 
@@ -237,10 +244,13 @@ class DatabaseHelper {
         'bundle_humors',
         where: 'source = ?',
         whereArgs: [bundle.uuid],
+        orderBy: 'humor_index ASC',
       );
 
       return List.generate(
-          maps.length, (i) => DailyHumor.loadFromTable(maps[i]));
+          maps.length,
+          (i) => DailyHumor.loadFromTable(
+              {...maps[i], 'source_name': bundle.title}));
     } catch (e) {
       print('error is: $e');
       return [];

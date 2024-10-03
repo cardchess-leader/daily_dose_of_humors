@@ -100,8 +100,15 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
                                   width: double.infinity,
                                   height: 200,
                                   child: CustomNetworkImage(
-                                      snapshot.data?[index].coverImgList[0] ??
-                                          ''),
+                                    (() {
+                                      try {
+                                        return snapshot
+                                            .data![index].coverImgList[0];
+                                      } catch (e) {
+                                        return '';
+                                      }
+                                    })(),
+                                  ),
                                 ),
                               ),
                               const SizedBox(height: 10),

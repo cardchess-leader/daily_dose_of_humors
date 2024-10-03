@@ -279,7 +279,8 @@ class ServerNotifier extends StateNotifier<void> {
         // Handle the data as needed
         print('Humor List: ${data['humorList']}');
         return data['humorList']
-            .map<DailyHumor>((json) => DailyHumor.loadFromServer(json))
+            .map<DailyHumor>((json) => DailyHumor.loadFromServer(
+                {...json, 'source_name': 'Daily Dose of Humors'}))
             .toList();
       } else {
         // Handle errors
@@ -421,7 +422,8 @@ class ServerNotifier extends StateNotifier<void> {
         print('data is: ${data}');
         print('data length is: ${data['humorList'].length}');
         return data['humorList']
-            .map<Humor>((json) => DailyHumor.loadFromServer(json))
+            .map<Humor>((json) => DailyHumor.loadFromServer(
+                {...json, 'source_name': bundle.title}))
             .toList();
       } else {
         // Handle errors

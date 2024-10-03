@@ -9,17 +9,20 @@ abstract class Humor {
   final String author;
   final String sender;
   final String source;
+  final String sourceName;
+  final int humorIndex;
 
   Humor({
     required this.uuid,
-    DateTime? addedDate,
     required this.categoryCode,
     required this.context,
-    this.contextList = const [],
-    this.punchline = '',
-    this.author = '',
+    required this.contextList,
+    required this.punchline,
+    required this.author,
     required this.sender,
     required this.source,
+    required this.sourceName,
+    this.humorIndex = 0,
   });
 
   Category getCategoryData() {
@@ -73,27 +76,27 @@ abstract class Humor {
 class DailyHumor extends Humor {
   // Both daily and bundle humors
   bool isNew;
-  int humorIndex;
 
   DailyHumor({
     required super.uuid,
     required super.categoryCode,
     required super.context,
-    super.contextList,
-    super.punchline,
-    super.author,
+    required super.contextList,
+    required super.punchline,
+    required super.author,
     required super.sender,
     required super.source,
+    required super.sourceName,
     this.isNew = false,
-    required this.humorIndex,
+    super.humorIndex,
   });
 
   /// Constructor for loading humors from server
   DailyHumor.loadFromServer(
       Map<String, dynamic> document) // Construct from Firebase server
       : isNew = document['is_new'] ?? false,
-        humorIndex = document['humor_index'] ?? 0,
         super(
+          humorIndex: document['index'],
           uuid: document['uuid'],
           categoryCode: CategoryCode.values.firstWhere(
             (e) => e.name == document['category'],
@@ -106,12 +109,13 @@ class DailyHumor extends Humor {
           author: document['author'],
           sender: document['sender'],
           source: document['source'],
+          sourceName: document['source_name'],
         );
 
   DailyHumor.loadFromTable(Map<String, dynamic> document)
       : isNew = false,
-        humorIndex = document['humor_index'] ?? 0,
         super(
+          humorIndex: document['humor_index'],
           uuid: document['uuid'],
           categoryCode: CategoryCode.values.firstWhere(
             (e) => e.name == document['category'],
@@ -126,6 +130,7 @@ class DailyHumor extends Humor {
           author: document['author'],
           sender: document['sender'],
           source: document['source'],
+          sourceName: document['source_name'],
         );
 
   @override
@@ -155,11 +160,13 @@ class BookmarkHumor extends Humor {
     DateTime? bookmarkAddedDate, // exclusive to bookmark humor
     required super.categoryCode,
     required super.context,
-    super.contextList,
-    super.punchline,
-    super.author,
+    required super.contextList,
+    required super.punchline,
+    required super.author,
     required super.sender,
     required super.source,
+    required super.sourceName,
+    super.humorIndex,
   }) : bookmarkAddedDate = bookmarkAddedDate ?? DateTime.now();
 
   BookmarkHumor.loadFromTable(
@@ -167,6 +174,7 @@ class BookmarkHumor extends Humor {
       : bookmarkAddedDate = DateTime.parse(document['bookmark_added_date']),
         bookmarkOrd = document['bookmark_ord'],
         super(
+          humorIndex: document['humor_index'],
           uuid: document['uuid'],
           categoryCode: CategoryCode.values.firstWhere(
             (e) => e.name == document['category'],
@@ -181,24 +189,29 @@ class BookmarkHumor extends Humor {
           author: document['author'],
           sender: document['sender'],
           source: document['source'],
+          sourceName: document['source_name'],
         );
 
   BookmarkHumor.convertFromDailyHumor(DailyHumor dailyHumor)
       : bookmarkAddedDate = DateTime.now(),
         bookmarkOrd = null,
         super(
+          humorIndex: dailyHumor.humorIndex,
           uuid: dailyHumor.uuid,
           categoryCode: dailyHumor.categoryCode,
           context: dailyHumor.context,
           contextList: dailyHumor.contextList,
           punchline: dailyHumor.punchline,
+          author: dailyHumor.author,
           sender: dailyHumor.sender,
           source: dailyHumor.source,
+          sourceName: dailyHumor.sourceName,
         );
 
   @override
   Map<String, dynamic> humorToMap() {
     final Map<String, dynamic> map = {
+      'humor_index': humorIndex,
       'uuid': uuid,
       'bookmark_ord': bookmarkOrd, // even if this value is null, use it!
       'bookmark_added_date': bookmarkAddedDate.toIso8601String(),

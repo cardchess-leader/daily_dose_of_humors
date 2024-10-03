@@ -341,13 +341,17 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: Text(
-          _isDaily()
-              ? widget.humorCategory!.title
-              : humorList[_humorIndex].getCategoryData().title,
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 25,
+        title: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 25),
+          child: Text(
+            _isDaily()
+                ? widget.humorCategory!.title
+                // : humorList[_humorIndex].getCategoryData().title,
+                : humorList[_humorIndex].sourceName,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 25,
+            ),
           ),
         ),
         backgroundColor: themeColor,

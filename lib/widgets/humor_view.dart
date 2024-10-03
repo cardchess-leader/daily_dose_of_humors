@@ -7,7 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:animated_flip_counter/animated_flip_counter.dart';
 import 'package:daily_dose_of_humors/models/humor.dart';
-import 'package:daily_dose_of_humors/models/category.dart';
+import 'package:daily_dose_of_humors/util/util.dart';
 
 class HumorView extends ConsumerStatefulWidget {
   final Humor humor;
@@ -48,8 +48,6 @@ class _HumorViewState extends ConsumerState<HumorView> {
 
   @override
   void dispose() {
-    print('humorview disposed!');
-    // Remove the listener when the widget is disposed
     likesCountSubscription.cancel();
     super.dispose();
   }
@@ -161,14 +159,16 @@ class _HumorViewState extends ConsumerState<HumorView> {
                   Align(
                     alignment: Alignment.center,
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 70),
+                      padding: const EdgeInsets.symmetric(horizontal: 50),
                       child: Text(
                         (() {
-                          if (widget.humor.categoryCode ==
-                              CategoryCode.YOUR_HUMORS) {
+                          if (widget.humor.source == 'Daily Dose of Humors') {
+                            return 'Sent by: ${widget.humor.sender}';
+                          } else if (widget.humor.source == 'Your Own Humors') {
                             return 'Your Own Humors';
+                          } else {
+                            return '${intToNumeralString(widget.humor.humorIndex)} humor!';
                           }
-                          return 'Sent by: Board Collie';
                         })(),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
