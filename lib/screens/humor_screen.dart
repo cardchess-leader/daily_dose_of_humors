@@ -20,6 +20,7 @@ enum BuildHumorScreenFrom {
   daily,
   bookmark,
   library,
+  preview,
 }
 
 class HumorScreen extends ConsumerStatefulWidget {
@@ -448,18 +449,20 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
               ),
               onPressed: () => _onItemTapped(0),
             ),
-            IconButton(
-              tooltip: 'share this humor',
-              icon: getBottomNavLottie(
-                  'assets/lottie/share.json', textColor, _shareAnimController),
-              onPressed: () => _onItemTapped(1),
-            ),
-            IconButton(
-              tooltip: 'bookmark this humor',
-              icon: getBottomNavLottie(
-                  bookmarkLottieAsset, textColor, _bookmarkAnimController),
-              onPressed: () => _onItemTapped(2),
-            ),
+            if (widget.buildHumorScreenFrom != BuildHumorScreenFrom.preview)
+              IconButton(
+                tooltip: 'share this humor',
+                icon: getBottomNavLottie('assets/lottie/share.json', textColor,
+                    _shareAnimController),
+                onPressed: () => _onItemTapped(1),
+              ),
+            if (widget.buildHumorScreenFrom != BuildHumorScreenFrom.preview)
+              IconButton(
+                tooltip: 'bookmark this humor',
+                icon: getBottomNavLottie(
+                    bookmarkLottieAsset, textColor, _bookmarkAnimController),
+                onPressed: () => _onItemTapped(2),
+              ),
           ],
         ),
       ),

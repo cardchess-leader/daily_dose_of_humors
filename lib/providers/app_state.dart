@@ -436,6 +436,34 @@ class ServerNotifier extends StateNotifier<void> {
       return [];
     }
   }
+
+  Future<List<Humor>> previewHumorBundle(Bundle bundle) async {
+    try {
+      // Construct the full URL with query parameters
+      final Uri url = Uri.parse(
+          '${GLOBAL.serverPath()}/previewHumorBundle?uuid=${bundle.uuid}');
+
+      // Send a GET request to the Firebase function
+      final response = await http.get(url);
+      // Check if the request was successful
+      if (response.statusCode == 200) {
+        // Decode the JSON response
+        final data = jsonDecode(response.body);
+        return data['humorList']
+            .map<Humor>((json) => DailyHumor.loadFromServer(
+                {...json, 'source_name': bundle.title}))
+            .toList();
+      } else {
+        // Handle errors
+        print('Error: ${response.statusCode} - ${response.body}');
+        return [];
+      }
+    } catch (e) {
+      // Handle any exceptions that occur during the request
+      print('Request failed: $e');
+      return [];
+    }
+  }
 }
 
 final serverProvider = StateNotifierProvider<ServerNotifier, void>((ref) {

@@ -72,6 +72,29 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
     }
   }
 
+  Future<void> loadPreview() async {
+    setState(() {
+      isLoading = true;
+    });
+    // 1. Load the bundle preview from server
+    final previewHumors = await ref
+        .read(serverProvider.notifier)
+        .previewHumorBundle(widget.bundle);
+
+    setState(() {
+      isLoading = false;
+      if (previewHumors.isNotEmpty) {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (ctx) => HumorScreen(
+                buildHumorScreenFrom: BuildHumorScreenFrom.preview,
+                humorList: previewHumors),
+          ),
+        );
+      }
+    });
+  }
+
   Future<void> downloadBundle() async {
     setState(() {
       isLoading = true;
@@ -355,14 +378,31 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                           ),
                         ),
                       ),
-                      onPressed: () => {},
-                      child: const Text(
-                        'Preview',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                      onPressed: () {
+                        loadPreview();
+                      },
+                      child: isLoading
+                          ? Lottie.asset(
+                              'assets/lottie/loading.json',
+                              width: 25,
+                              height: 25,
+                              delegates: LottieDelegates(
+                                values: [
+                                  ValueDelegate.colorFilter(
+                                    ['**'],
+                                    value: const ColorFilter.mode(
+                                        Colors.blueAccent, BlendMode.src),
+                                  ),
+                                ],
+                              ),
+                            )
+                          : const Text(
+                              'Preview',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                     ),
                   ),
                   const SizedBox(width: 10),
