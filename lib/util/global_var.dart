@@ -5,6 +5,7 @@ class GLOBAL {
   /* DO NOT CHANGE BELOW VALUES */
   static const uuid = Uuid();
   static final random = Random();
+  static const aspectRatio = 3 / 4;
   /* EDIT BELOW VALUES FOR APP CONFIG CHANGE */
   static const IS_PRODUCTION = true; // Make this true before build
   static const SHOW_AD_FREQUENCY =

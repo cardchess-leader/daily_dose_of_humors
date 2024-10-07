@@ -96,6 +96,7 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
                               Card(
                                 color: Colors.amber,
                                 margin: EdgeInsets.zero,
+                                clipBehavior: Clip.hardEdge,
                                 child: SizedBox(
                                   width: double.infinity,
                                   height: 200,

@@ -19,7 +19,7 @@ class CustomNetworkImage extends StatelessWidget {
               'Unable to\nload image...'), // Later change this with default img from asset or such
         );
       },
-      fit: BoxFit.contain,
+      fit: BoxFit.cover,
       loadingBuilder: (BuildContext context, Widget child,
           ImageChunkEvent? loadingProgress) {
         if (loadingProgress == null) {

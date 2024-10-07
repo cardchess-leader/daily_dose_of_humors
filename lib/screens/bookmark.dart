@@ -302,6 +302,7 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen>
                             child: Card(
                                 color: Colors.amber,
                                 margin: EdgeInsets.zero,
+                                clipBehavior: Clip.hardEdge,
                                 child:
                                     CustomNetworkImage(bundle.coverImgList[0])),
                           ),

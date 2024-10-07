@@ -7,6 +7,7 @@ import 'package:daily_dose_of_humors/models/category.dart';
 import 'package:daily_dose_of_humors/widgets/network_image.dart';
 import 'package:daily_dose_of_humors/providers/app_state.dart';
 import 'package:daily_dose_of_humors/screens/humor_screen.dart';
+import 'package:daily_dose_of_humors/util/global_var.dart';
 
 enum ProductMessage {
   Buy,
@@ -73,6 +74,9 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
   }
 
   Future<void> loadPreview() async {
+    if (isLoading) {
+      return;
+    }
     setState(() {
       isLoading = true;
     });
@@ -96,6 +100,9 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
   }
 
   Future<void> downloadBundle() async {
+    if (isLoading) {
+      return;
+    }
     setState(() {
       isLoading = true;
     });
@@ -136,6 +143,9 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
   }
 
   Future<void> viewAllHumors() async {
+    if (isLoading) {
+      return;
+    }
     setState(() {
       isLoading = true;
     });
@@ -202,7 +212,7 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                           maxHeight: maxHeight,
                         ),
                         child: AspectRatio(
-                          aspectRatio: 140 / 200,
+                          aspectRatio: GLOBAL.aspectRatio,
                           child: Stack(
                             children: [
                               PageView.builder(
@@ -210,9 +220,11 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                                 controller: controller,
                                 itemBuilder: (context, index) {
                                   return Card(
-                                      color: Colors.amber,
-                                      child: CustomNetworkImage(
-                                          widget.bundle.coverImgList[index]));
+                                    color: Colors.amber,
+                                    clipBehavior: Clip.hardEdge,
+                                    child: CustomNetworkImage(
+                                        widget.bundle.coverImgList[index]),
+                                  );
                                 },
                               ),
                               Container(
