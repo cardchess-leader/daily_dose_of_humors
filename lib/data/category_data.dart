@@ -137,7 +137,7 @@ const humorCategoryList = [
     categoryCode: CategoryCode.STORY_JOKES,
   ),
   Category(
-    title: 'Detective Puzzles',
+    title: 'Mystery Puzzles',
     lottiePath: 'assets/lottie/card-lottie/detective-puzzles.json',
     lottiePointInTime: 0.7,
     imgSize: 200,
@@ -147,7 +147,7 @@ const humorCategoryList = [
     numDailyNew: 7,
     subscriberOnly: true,
     themeColor: Color.fromARGB(255, 123, 137, 218),
-    categoryCode: CategoryCode.DETECTIVE_PUZZLES,
+    categoryCode: CategoryCode.MYSTERY_PUZZLES,
     manualList: [
       ManualItem(
           lottiePath: 'assets/lottie/swipe-right.json',

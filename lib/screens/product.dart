@@ -213,47 +213,17 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                         ),
                         child: AspectRatio(
                           aspectRatio: GLOBAL.aspectRatio,
-                          child: Stack(
-                            children: [
-                              PageView.builder(
-                                itemCount: widget.bundle.coverImgList.length,
-                                controller: controller,
-                                itemBuilder: (context, index) {
-                                  return Card(
-                                    color: Colors.amber,
-                                    clipBehavior: Clip.hardEdge,
-                                    child: CustomNetworkImage(
-                                        widget.bundle.coverImgList[index]),
-                                  );
-                                },
-                              ),
-                              Container(
-                                alignment: Alignment.bottomCenter,
-                                padding: const EdgeInsets.only(bottom: 14),
-                                child: SmoothPageIndicator(
-                                  controller: controller, // PageController
-                                  count: widget.bundle.coverImgList.length,
-                                  effect: const WormEffect(
-                                    dotWidth: 10,
-                                    dotHeight: 10,
-                                    spacing: 6,
-                                  ), // your preferred effect
-                                  onDotClicked: (index) {
-                                    controller.animateToPage(
-                                      index,
-                                      duration:
-                                          const Duration(milliseconds: 300),
-                                      curve: Curves.easeInOut,
-                                    );
-                                  },
-                                ),
-                              )
-                            ],
+                          child: Card(
+                            color: Colors.amber,
+                            clipBehavior: Clip.hardEdge,
+                            child: CustomNetworkImage(
+                                widget.bundle.coverImgList[0]),
                           ),
                         ),
                       );
                     },
                   ),
+                const Text('Cover design by Freepik AI'),
                 const SizedBox(height: 10),
                 Text(
                   widget.bundle.title,
