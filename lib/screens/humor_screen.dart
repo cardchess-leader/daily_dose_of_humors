@@ -261,6 +261,9 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
       case 2:
         updateBookmark();
         break;
+      case 3:
+        print('hello robot?');
+        break;
     }
   }
 
@@ -462,6 +465,16 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
                 icon: getBottomNavLottie(
                     bookmarkLottieAsset, textColor, _bookmarkAnimController),
                 onPressed: () => _onItemTapped(2),
+              ),
+            if (widget.buildHumorScreenFrom != BuildHumorScreenFrom.preview)
+              IconButton(
+                tooltip: 'ai humor analysis',
+                icon: Image.asset(
+                  'assets/icons/bot2.png',
+                  width: 24,
+                  color: textColor,
+                ),
+                onPressed: () => _onItemTapped(3),
               ),
           ],
         ),
