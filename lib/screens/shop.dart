@@ -9,6 +9,7 @@ import 'package:daily_dose_of_humors/providers/app_state.dart';
 import 'package:daily_dose_of_humors/models/bundle.dart';
 import 'package:daily_dose_of_humors/widgets/network_image.dart';
 import 'package:daily_dose_of_humors/widgets/loading.dart';
+import 'package:daily_dose_of_humors/util/global_var.dart';
 
 class ShopScreen extends ConsumerStatefulWidget {
   const ShopScreen({super.key});
@@ -74,63 +75,70 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
                     onItemFocus: (index) => (),
                     itemSize: 150,
                     itemCount: snapshot.data?.length ?? 0,
-                    itemBuilder: (context, index) => Container(
-                      margin: const EdgeInsets.symmetric(
-                        horizontal: 5,
-                      ),
-                      width: 140,
-                      child: IntrinsicHeight(
-                        child: InkWell(
-                          onTap: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (ctx) => ProductScreen(
-                                  bundle: snapshot.data![index],
-                                ),
-                              ),
-                            );
-                          },
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Card(
-                                color: Colors.amber,
-                                margin: EdgeInsets.zero,
-                                clipBehavior: Clip.hardEdge,
-                                child: SizedBox(
-                                  width: double.infinity,
-                                  height: 200,
-                                  child: CustomNetworkImage(
-                                    (() {
-                                      try {
-                                        return snapshot
-                                            .data![index].coverImgList[0];
-                                      } catch (e) {
-                                        return '';
-                                      }
-                                    })(),
+                    itemBuilder: (context, index) {
+                      final heroTagUuid = GLOBAL.uuid.v4();
+                      return Container(
+                        margin: const EdgeInsets.symmetric(
+                          horizontal: 5,
+                        ),
+                        width: 140,
+                        child: IntrinsicHeight(
+                          child: InkWell(
+                            onTap: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (ctx) => ProductScreen(
+                                    bundle: snapshot.data![index],
+                                    heroTagUuid: heroTagUuid,
                                   ),
                                 ),
-                              ),
-                              const SizedBox(height: 10),
-                              Text(
-                                ' ${snapshot.data?[index].title ?? ''}',
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w600,
+                              );
+                            },
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Hero(
+                                  tag: heroTagUuid,
+                                  child: Card(
+                                    color: Colors.amber,
+                                    margin: EdgeInsets.zero,
+                                    clipBehavior: Clip.hardEdge,
+                                    child: SizedBox(
+                                      width: double.infinity,
+                                      height: 200,
+                                      child: CustomNetworkImage(
+                                        (() {
+                                          try {
+                                            return snapshot
+                                                .data![index].coverImgList[0];
+                                          } catch (e) {
+                                            return '';
+                                          }
+                                        })(),
+                                      ),
+                                    ),
+                                  ),
                                 ),
-                              ),
-                              Text(
-                                ' ${snapshot.data?[index].price ?? ''}',
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ],
+                                const SizedBox(height: 10),
+                                Text(
+                                  ' ${snapshot.data?[index].title ?? ''}',
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                Text(
+                                  ' ${snapshot.data?[index].price ?? ''}',
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                    ),
+                      );
+                    },
                   );
                 }
               }),

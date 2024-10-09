@@ -281,6 +281,7 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen>
                 bundles.length,
                 (index) {
                   final bundle = bundles[index];
+                  final heroTagUuid = GLOBAL.uuid.v4();
                   return SizedBox(
                     width: itemWidth,
                     child: InkWell(
@@ -290,6 +291,7 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen>
                             builder: (ctx) => ProductScreen(
                               bundle: bundle,
                               fromLibrary: true,
+                              heroTagUuid: heroTagUuid,
                             ),
                           ),
                         );
@@ -298,13 +300,16 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen>
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           AspectRatio(
-                            aspectRatio: 140 / 200,
-                            child: Card(
-                                color: Colors.amber,
-                                margin: EdgeInsets.zero,
-                                clipBehavior: Clip.hardEdge,
-                                child:
-                                    CustomNetworkImage(bundle.coverImgList[0])),
+                            aspectRatio: GLOBAL.aspectRatio,
+                            child: Hero(
+                              tag: heroTagUuid,
+                              child: Card(
+                                  color: Colors.amber,
+                                  margin: EdgeInsets.zero,
+                                  clipBehavior: Clip.hardEdge,
+                                  child: CustomNetworkImage(
+                                      bundle.coverImgList[0])),
+                            ),
                           ),
                           const SizedBox(height: 10),
                           Text(

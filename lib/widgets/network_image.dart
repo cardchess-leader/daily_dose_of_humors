@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class CustomNetworkImage extends StatelessWidget {
   final String imageUrl;
@@ -10,31 +11,21 @@ class CustomNetworkImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Image.network(
-      imageUrl,
-      errorBuilder:
-          (BuildContext context, Object error, StackTrace? stackTrace) {
-        return const Center(
-          child: Text(
-              'Unable to\nload image...'), // Later change this with default img from asset or such
-        );
-      },
+    return CachedNetworkImage(
+      imageUrl: imageUrl,
+      fadeInDuration: const Duration(milliseconds: 0),
+      fadeOutDuration: const Duration(milliseconds: 0),
       fit: BoxFit.cover,
-      loadingBuilder: (BuildContext context, Widget child,
-          ImageChunkEvent? loadingProgress) {
-        if (loadingProgress == null) {
-          return child;
-        } else {
-          return Center(
-            child: CircularProgressIndicator(
-              value: loadingProgress.expectedTotalBytes != null
-                  ? loadingProgress.cumulativeBytesLoaded /
-                      (loadingProgress.expectedTotalBytes ?? 1)
-                  : null,
-            ),
-          ); // Show a loading indicator while the image is being loaded
-        }
-      },
+      placeholder: (context, url) => const Center(
+        child:
+            CircularProgressIndicator(), // Show a loading indicator while the image is loading
+      ),
+      errorWidget: (context, url, error) => const Center(
+        child: Text(
+          'Unable to\nload image...', // Fallback when the image fails to load
+          textAlign: TextAlign.center,
+        ),
+      ),
     );
   }
 }

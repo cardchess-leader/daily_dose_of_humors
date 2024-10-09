@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:lottie/lottie.dart';
-import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:daily_dose_of_humors/models/bundle.dart';
 import 'package:daily_dose_of_humors/models/category.dart';
 import 'package:daily_dose_of_humors/widgets/network_image.dart';
@@ -19,11 +19,13 @@ enum ProductMessage {
 class ProductScreen extends ConsumerStatefulWidget {
   final Bundle bundle;
   final bool fromLibrary;
+  final String heroTagUuid;
 
   const ProductScreen({
     super.key,
     required this.bundle,
     this.fromLibrary = false,
+    required this.heroTagUuid,
   });
 
   @override
@@ -213,11 +215,14 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                         ),
                         child: AspectRatio(
                           aspectRatio: GLOBAL.aspectRatio,
-                          child: Card(
-                            color: Colors.amber,
-                            clipBehavior: Clip.hardEdge,
-                            child: CustomNetworkImage(
-                                widget.bundle.coverImgList[0]),
+                          child: Hero(
+                            tag: widget.heroTagUuid,
+                            child: Card(
+                              color: Colors.amber,
+                              clipBehavior: Clip.hardEdge,
+                              child: CustomNetworkImage(
+                                  widget.bundle.coverImgList[0]),
+                            ),
                           ),
                         ),
                       );
@@ -326,12 +331,22 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      Text(
-                        widget.bundle.description,
-                        style: const TextStyle(
-                          fontSize: 16,
-                        ),
-                      ),
+                      Transform.translate(
+                        offset: const Offset(0, 0),
+                        child: Html(data: widget.bundle.description, style: {
+                          'div': Style(
+                            fontSize: FontSize(17),
+                          ),
+                          'p': Style(
+                            margin:
+                                Margins(top: Margin.zero(), bottom: Margin(16)),
+                          ),
+                          'ul': Style(
+                            padding: HtmlPaddings(left: HtmlPadding(20)),
+                            margin: Margins(left: Margin.zero()),
+                          ),
+                        }),
+                      )
                     ],
                   ),
                 )
