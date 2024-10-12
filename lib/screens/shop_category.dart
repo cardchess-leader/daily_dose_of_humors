@@ -1,21 +1,34 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:daily_dose_of_humors/providers/app_state.dart';
 import 'package:daily_dose_of_humors/screens/product.dart';
+import 'package:daily_dose_of_humors/models/bundle_set.dart';
+import 'package:daily_dose_of_humors/models/bundle.dart';
+import 'package:daily_dose_of_humors/widgets/loading.dart';
+import 'package:daily_dose_of_humors/util/global_var.dart';
+import 'package:daily_dose_of_humors/widgets/network_image.dart';
 
-class ShopCategoryScreen extends StatelessWidget {
-  final String title;
-  final String subtitle;
+class ShopCategoryScreen extends ConsumerStatefulWidget {
+  final BundleSet bundleSet;
   const ShopCategoryScreen({
     super.key,
-    required this.title,
-    required this.subtitle,
+    required this.bundleSet,
   });
 
   @override
+  ConsumerState<ShopCategoryScreen> createState() => _ShopCategoryScreenState();
+}
+
+class _ShopCategoryScreenState extends ConsumerState<ShopCategoryScreen> {
+  @override
   Widget build(BuildContext context) {
+    bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final textColor = isDarkMode ? Colors.white : Colors.black;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          title,
+          widget.bundleSet.title,
           style: const TextStyle(
             fontWeight: FontWeight.bold,
           ),
@@ -33,48 +46,89 @@ class ShopCategoryScreen extends StatelessWidget {
               runSpacing: 20,
               alignment: WrapAlignment.start,
               children: List.generate(
-                9,
+                widget.bundleSet.bundleList.length,
                 (index) => SizedBox(
                   width: itemWidth,
-                  child: InkWell(
-                    onTap: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (ctx) => Container(),
-                          // ProductScreen(
-                          //   productName: 'Best Dad Jokes of 2023',
-                          // ),
-                        ),
-                      );
-                    },
-                    child: const Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        AspectRatio(
-                          aspectRatio: 140 / 200,
-                          child: Card(
-                            color: Colors.amber,
-                            margin: EdgeInsets.zero,
-                          ),
-                        ),
-                        SizedBox(height: 10),
-                        Text(
-                          ' Best Dad Jokes of 2023',
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        Text(
-                          ' \$2.24',
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(),
-                        ),
-                      ],
-                    ),
-                  ),
+                  child: FutureBuilder<Bundle?>(
+                      future: ref
+                          .read(serverProvider.notifier)
+                          .getBundleDetail(widget.bundleSet.bundleList[index]),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              AspectRatio(
+                                aspectRatio: 140 / 200,
+                                child: Card(
+                                  color: Colors.amber,
+                                  margin: EdgeInsets.zero,
+                                  child: Center(
+                                    child: LoadingWidget(
+                                      color: textColor,
+                                      size: 50,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 10), // placeholder
+                              const Text(''), // placeholder
+                              const Text(''), // placeholder
+                            ],
+                          );
+                        } else if (snapshot.hasError || snapshot.data == null) {
+                          return Text(
+                              'Error: ${snapshot.error}'); // Replace with check internet connection lottie widget (that fills the entire remaining screen)
+                        } else {
+                          final bundle = snapshot.data!;
+                          final heroTagUuid = GLOBAL.uuid.v4();
+                          return InkWell(
+                            onTap: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (ctx) => ProductScreen(
+                                    bundle: bundle,
+                                    heroTagUuid: heroTagUuid,
+                                  ),
+                                ),
+                              );
+                            },
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                AspectRatio(
+                                  aspectRatio: 140 / 200,
+                                  child: Hero(
+                                    tag: heroTagUuid,
+                                    child: Card(
+                                      color: Colors.amber,
+                                      margin: EdgeInsets.zero,
+                                      clipBehavior: Clip.hardEdge,
+                                      child: CustomNetworkImage(
+                                          bundle.coverImgList[0]),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 10),
+                                Text(
+                                  ' ${bundle.title}',
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                Text(
+                                  ' ${bundle.price}',
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
+                            ),
+                          );
+                        }
+                      }),
                 ),
               ),
             );

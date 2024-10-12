@@ -17,15 +17,16 @@ class CustomNetworkImage extends StatelessWidget {
       fadeOutDuration: const Duration(milliseconds: 0),
       fit: BoxFit.cover,
       placeholder: (context, url) => const Center(
-        child:
-            CircularProgressIndicator(), // Show a loading indicator while the image is loading
+        child: CircularProgressIndicator(),
       ),
       errorWidget: (context, url, error) => const Center(
         child: Text(
-          'Unable to\nload image...', // Fallback when the image fails to load
+          'Unable to\nload image...',
           textAlign: TextAlign.center,
         ),
       ),
+      cacheKey: imageUrl, // Ensure caching based on URL
+      useOldImageOnUrlChange: true, // Use cached image during rebuild
     );
   }
 }

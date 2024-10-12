@@ -32,6 +32,7 @@ class DatabaseHelper {
             context_list TEXT NOT NULL,
             humor_index INTEGER NOT NULL,
             punchline TEXT NOT NULL,
+            ai_analysis TEXT NOT NULL,
             author TEXT NOT NULL,
             sender TEXT NOT NULL,
             source TEXT NOT NULL
@@ -46,6 +47,7 @@ class DatabaseHelper {
             context_list TEXT NOT NULL,
             humor_index INTEGER NOT NULL,
             punchline TEXT NOT NULL,
+            ai_analysis TEXT NOT NULL,
             sender TEXT NOT NULL,
             source TEXT NOT NULL,
             uuid TEXT UNIQUE NOT NULL

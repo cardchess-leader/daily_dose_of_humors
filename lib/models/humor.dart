@@ -6,6 +6,7 @@ abstract class Humor {
   final String context;
   final List<String> contextList;
   final String punchline;
+  final String aiAnalysis;
   final String author;
   final String sender;
   final String source;
@@ -18,6 +19,7 @@ abstract class Humor {
     required this.context,
     required this.contextList,
     required this.punchline,
+    this.aiAnalysis = '',
     required this.author,
     required this.sender,
     required this.source,
@@ -86,6 +88,7 @@ class DailyHumor extends Humor {
     required super.author,
     required super.sender,
     required super.source,
+    super.aiAnalysis,
     required super.sourceName,
     this.isNew = false,
     super.humorIndex,
@@ -106,6 +109,7 @@ class DailyHumor extends Humor {
           context: document['context'],
           contextList: document['context_list'].cast<String>(),
           punchline: document['punchline'],
+          aiAnalysis: document['ai_analysis'] ?? '',
           author: document['author'],
           sender: document['sender'],
           source: document['source'],
@@ -127,6 +131,7 @@ class DailyHumor extends Humor {
               ? []
               : document['context_list'].split('@@@'),
           punchline: document['punchline'],
+          aiAnalysis: document['ai_analysis'],
           author: document['author'],
           sender: document['sender'],
           source: document['source'],
@@ -142,6 +147,7 @@ class DailyHumor extends Humor {
       'context_list': contextList.join('@@@'),
       'humor_index': humorIndex,
       'punchline': punchline,
+      'ai_analysis': aiAnalysis,
       'sender': sender,
       'source': source,
       'uuid': uuid,
@@ -162,6 +168,7 @@ class BookmarkHumor extends Humor {
     required super.context,
     required super.contextList,
     required super.punchline,
+    super.aiAnalysis,
     required super.author,
     required super.sender,
     required super.source,
@@ -186,6 +193,7 @@ class BookmarkHumor extends Humor {
               ? []
               : document['context_list'].split('@@@'),
           punchline: document['punchline'],
+          aiAnalysis: document['ai_analysis'],
           author: document['author'],
           sender: document['sender'],
           source: document['source'],
@@ -202,6 +210,7 @@ class BookmarkHumor extends Humor {
           context: dailyHumor.context,
           contextList: dailyHumor.contextList,
           punchline: dailyHumor.punchline,
+          aiAnalysis: dailyHumor.aiAnalysis,
           author: dailyHumor.author,
           sender: dailyHumor.sender,
           source: dailyHumor.source,
@@ -219,6 +228,7 @@ class BookmarkHumor extends Humor {
       'context': context,
       'context_list': contextList.join('@@@'),
       'punchline': punchline,
+      'ai_analysis': aiAnalysis,
       'author': author,
       'sender': sender,
       'source': source,

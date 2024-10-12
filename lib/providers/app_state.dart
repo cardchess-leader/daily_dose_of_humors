@@ -407,6 +407,31 @@ class ServerNotifier extends StateNotifier<void> {
     }
   }
 
+  Future<Bundle?> getBundleDetail(String uuid) async {
+    try {
+      // Construct the full URL with query parameters
+      final Uri url =
+          Uri.parse('${GLOBAL.serverPath()}/getBundleDetail?uuid=$uuid');
+
+      // Send a GET request to the Firebase function
+      final response = await http.get(url);
+      // Check if the request was successful
+      if (response.statusCode == 200) {
+        // Decode the JSON response
+        final data = jsonDecode(response.body);
+        return Bundle.fromJson(data['bundle']);
+      } else {
+        // Handle errors
+        print('Error: ${response.statusCode} - ${response.body}');
+        return null;
+      }
+    } catch (e) {
+      // Handle any exceptions that occur during the request
+      print('Request failed: $e');
+      return null;
+    }
+  }
+
   Future<List<Humor>> downloadHumorBundle(Bundle bundle) async {
     try {
       // Construct the full URL with query parameters

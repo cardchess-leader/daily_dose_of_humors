@@ -17,6 +17,13 @@ const _unlockContentsPerk = Perk(
   color: Colors.green,
 );
 
+const _aiHumorAnalysis = Perk(
+    title: 'AI Humor Analysis',
+    subtitle:
+        'You don\'t get why it\'s funny? No problem! AI bot will explain it to you!',
+    imgPath: 'assets/images/humor-bot-color.png',
+    color: Colors.purple);
+
 const freeSubscription = Subscription(
   subscriptionCode: SubscriptionCode.FREE,
   subscriptionName: 'Free',
@@ -48,6 +55,7 @@ const monthlySubscription = Subscription(
       imgPath: 'assets/images/bookmark-color.png',
       color: Colors.blue,
     ),
+    _aiHumorAnalysis,
     Perk(
       title: 'Higher priority',
       subtitle:
@@ -76,6 +84,7 @@ const yearlySubscription = Subscription(
       imgPath: 'assets/images/bookmark-color.png',
       color: Colors.blue,
     ),
+    _aiHumorAnalysis,
     Perk(
       title: 'Higher priority',
       subtitle:
@@ -105,6 +114,7 @@ const lifetimeSubscription = Subscription(
       imgPath: 'assets/images/bookmark-color.png',
       color: Colors.blue,
     ),
+    _aiHumorAnalysis,
     Perk(
       title: 'Highest priority',
       subtitle:

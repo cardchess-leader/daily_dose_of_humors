@@ -15,6 +15,7 @@ import 'package:daily_dose_of_humors/widgets/manual.dart';
 import 'package:daily_dose_of_humors/screens/subscription.dart';
 import 'package:daily_dose_of_humors/widgets/humor_scaffold.dart';
 import 'package:daily_dose_of_humors/util/global_var.dart';
+import 'package:daily_dose_of_humors/models/subscription.dart';
 
 enum BuildHumorScreenFrom {
   daily,
@@ -150,7 +151,6 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
         _bookmarkAnimController.forward();
       }
       String snackBarMsg = '';
-      SnackBarAction? snackBarAction;
       switch (resultCode) {
         case 1:
           snackBarMsg = 'Bookmark removed successfully.';
@@ -162,41 +162,13 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
           snackBarMsg = 'Bookmark added successfully.';
           break;
         case 4:
-          snackBarMsg =
-              'Bookmark feature is exclusive to subscribers.\nWould you like to find out subscription benefits?';
-          snackBarAction = SnackBarAction(
-            label: 'Sure',
-            textColor: Colors.amber,
-            onPressed: () async {
-              await Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (ctx) => const SubscriptionScreen(),
-                ),
-              );
-              setState(() {});
-            },
-          );
-          break;
+          return showSubscriptionSnackbar(
+              'Bookmark feature is exclusive to subscribers.\nWould you like to find out subscription benefits?');
         case 5:
           snackBarMsg = 'Could not add bookmark.\nPlease try again later.';
           break;
       }
-      ScaffoldMessenger.of(context)
-        ..hideCurrentSnackBar()
-        ..showSnackBar(
-          SnackBar(
-            duration: const Duration(milliseconds: 3000),
-            content: Text(snackBarMsg),
-            action: snackBarAction,
-            behavior: SnackBarBehavior.floating, // Makes the Snackbar float
-            shape:
-                const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-            margin: EdgeInsets.only(
-              bottom:
-                  _bannerHeight, // Adjust this value as needed to control position
-            ),
-          ),
-        );
+      showSnackbar(snackBarMsg);
     });
   }
 
@@ -262,9 +234,79 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
         updateBookmark();
         break;
       case 3:
-        print('hello robot?');
+        if (_isLoading || humorList.isEmpty) {
+          return _showSimpleSnackbar(
+              'Please wait until humors are fully loaded...');
+        }
+        if (!ref.read(subscriptionStatusProvider.notifier).isSubscribed()) {
+          showSubscriptionSnackbar(
+              'Bookmark feature is exclusive to subscribers.\nWould you like to find out subscription benefits?');
+        } else {
+          await showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: const Text('Why Is This Funny?'),
+                  content: ConstrainedBox(
+                    constraints: const BoxConstraints(maxHeight: 400),
+                    child: SingleChildScrollView(
+                      child: SizedBox(
+                        width: double.infinity,
+                        child: Text(
+                          humorList[_humorIndex].aiAnalysis,
+                          style: const TextStyle(fontSize: 17),
+                        ),
+                      ),
+                    ),
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop(); // Close the dialog
+                      },
+                      child:
+                          const Text('Got it!', style: TextStyle(fontSize: 18)),
+                    ),
+                  ],
+                );
+              });
+        }
         break;
     }
+  }
+
+  void showSnackbar(String msg, {SnackBarAction? action}) {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          duration: const Duration(milliseconds: 3000),
+          content: Text(msg),
+          action: action,
+          behavior: SnackBarBehavior.floating, // Makes the Snackbar float
+          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+          margin: EdgeInsets.only(
+            bottom:
+                _bannerHeight, // Adjust this value as needed to control position
+          ),
+        ),
+      );
+  }
+
+  void showSubscriptionSnackbar(String msg) {
+    final snackBarAction = SnackBarAction(
+      label: 'Sure',
+      textColor: Colors.amber,
+      onPressed: () async {
+        await Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (ctx) => const SubscriptionScreen(),
+          ),
+        );
+        setState(() {});
+      },
+    );
+    showSnackbar(msg, action: snackBarAction);
   }
 
   Widget getBottomNavLottie(

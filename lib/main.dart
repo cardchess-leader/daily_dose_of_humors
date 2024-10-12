@@ -21,6 +21,10 @@ void main() async {
   }
 
   MobileAds.instance.initialize();
+  PaintingBinding.instance.imageCache.maximumSize = 100; // Number of images
+  PaintingBinding.instance.imageCache.maximumSizeBytes =
+      200 << 20; // 100MB cache size
+
   runApp(
     const ProviderScope(
       child: MyApp(),
