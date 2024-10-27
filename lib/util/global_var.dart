@@ -7,6 +7,7 @@ class GLOBAL {
   static final random = Random();
   static const aspectRatio = 3 / 4.1;
   /* EDIT BELOW VALUES FOR APP CONFIG CHANGE */
+  static const VERSION_NO = 'v1.0.0';
   static const IS_PRODUCTION = true; // Make this true before build
   static const SHOW_AD_FREQUENCY =
       100; // after how many page swipes the ad should show

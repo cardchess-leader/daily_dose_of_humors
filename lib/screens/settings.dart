@@ -4,6 +4,7 @@ import 'package:daily_dose_of_humors/widgets/lottie_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:daily_dose_of_humors/widgets/app_bar.dart';
+import 'package:daily_dose_of_humors/util/global_var.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -205,7 +206,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             alignment: Alignment.center,
             padding: const EdgeInsets.symmetric(vertical: 50),
             child: const Text(
-              'Daily Dose Of Humor v1.0.0\nBy Board Collie',
+              'Daily Dose Of Humor ${GLOBAL.VERSION_NO}\nBy Board Collie',
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: Colors.grey,

@@ -42,7 +42,7 @@ const monthlySubscription = Subscription(
   subscriptionName: 'Monthly',
   text1: 'MOST AFFORDABLE',
   text2: '1 Month',
-  text3: 'KRW 1,900 per month',
+  text3: 'KRW 2,900 per month',
   text4: '≈ KRW 475.00 / week only',
   lottiePath: 'assets/lottie/monthly-face.json',
   maxBookmarks: 0,
@@ -102,7 +102,7 @@ const lifetimeSubscription = Subscription(
   subscriptionName: 'Lifetime',
   text1: 'BEST VALUE',
   text2: 'Lifetime',
-  text3: 'KRW 39,900 only',
+  text3: 'KRW 29,900 only',
   text4: 'One-time payment only',
   lottiePath: 'assets/lottie/lifetime-face.json',
   perks: [

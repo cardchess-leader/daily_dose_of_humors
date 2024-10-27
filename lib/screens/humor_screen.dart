@@ -172,6 +172,15 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
     });
   }
 
+  bool _currentHumorHasAnalysis() {
+    if (_isLoading ||
+        humorList.isEmpty ||
+        humorList[_humorIndex].aiAnalysis == '') {
+      return false;
+    }
+    return true;
+  }
+
   void _onItemTapped(int index) async {
     switch (index) {
       case 0:
@@ -508,7 +517,8 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
                     bookmarkLottieAsset, textColor, _bookmarkAnimController),
                 onPressed: () => _onItemTapped(2),
               ),
-            if (widget.buildHumorScreenFrom != BuildHumorScreenFrom.preview)
+            if (widget.buildHumorScreenFrom != BuildHumorScreenFrom.preview &&
+                _currentHumorHasAnalysis())
               IconButton(
                 tooltip: 'ai humor analysis',
                 icon: Image.asset(
