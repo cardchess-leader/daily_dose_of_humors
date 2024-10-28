@@ -100,7 +100,8 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
                                 Hero(
                                   tag: heroTagUuid,
                                   child: Card(
-                                    color: Colors.amber,
+                                    color: const Color.fromARGB(
+                                        255, 255, 254, 200),
                                     margin: EdgeInsets.zero,
                                     clipBehavior: Clip.hardEdge,
                                     child: SizedBox(

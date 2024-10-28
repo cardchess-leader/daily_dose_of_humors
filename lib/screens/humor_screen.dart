@@ -15,7 +15,6 @@ import 'package:daily_dose_of_humors/widgets/manual.dart';
 import 'package:daily_dose_of_humors/screens/subscription.dart';
 import 'package:daily_dose_of_humors/widgets/humor_scaffold.dart';
 import 'package:daily_dose_of_humors/util/global_var.dart';
-import 'package:daily_dose_of_humors/models/subscription.dart';
 
 enum BuildHumorScreenFrom {
   daily,

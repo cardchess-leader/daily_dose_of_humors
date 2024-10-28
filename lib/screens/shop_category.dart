@@ -62,7 +62,8 @@ class _ShopCategoryScreenState extends ConsumerState<ShopCategoryScreen> {
                               AspectRatio(
                                 aspectRatio: 140 / 200,
                                 child: Card(
-                                  color: Colors.amber,
+                                  color:
+                                      const Color.fromARGB(255, 255, 254, 200),
                                   margin: EdgeInsets.zero,
                                   child: Center(
                                     child: LoadingWidget(
@@ -102,7 +103,7 @@ class _ShopCategoryScreenState extends ConsumerState<ShopCategoryScreen> {
                                   child: Hero(
                                     tag: heroTagUuid,
                                     child: Card(
-                                      color: Colors.amber,
+                                      // color: Colors.amber,
                                       margin: EdgeInsets.zero,
                                       clipBehavior: Clip.hardEdge,
                                       child: CustomNetworkImage(
