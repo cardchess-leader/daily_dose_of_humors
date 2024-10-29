@@ -181,6 +181,13 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
   }
 
   void _onItemTapped(int index) async {
+    if (index > 0) {
+      // if the humor value is null or humor list is empty, show snackbar
+      if (_isLoading || humorList.isEmpty) {
+        return _showSimpleSnackbar(
+            'Please wait until humors are fully loaded...');
+      }
+    }
     switch (index) {
       case 0:
         Navigator.of(context).pop(_isBookmarkUpdated);
@@ -188,11 +195,6 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
       case 1:
         _shareAnimController.reset();
         _shareAnimController.forward();
-        // if the humor value is null or humor list is empty, show snackbar
-        if (_isLoading || humorList.isEmpty) {
-          return _showSimpleSnackbar(
-              'Please wait until humors are fully loaded...');
-        }
         final sharedFormat = humorList[_humorIndex].toSharedFormat();
         if (sharedFormat == null) {
           return;
@@ -242,13 +244,9 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
         updateBookmark();
         break;
       case 3:
-        if (_isLoading || humorList.isEmpty) {
-          return _showSimpleSnackbar(
-              'Please wait until humors are fully loaded...');
-        }
         if (!ref.read(subscriptionStatusProvider.notifier).isSubscribed()) {
           showSubscriptionSnackbar(
-              'Bookmark feature is exclusive to subscribers.\nWould you like to find out subscription benefits?');
+              'AI humor analysis feature is exclusive to subscribers.\nWould you like to find out subscription benefits?');
         } else {
           await showDialog(
               context: context,
@@ -366,6 +364,8 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
   void _handleFabPress() async {
     if (_isLoading || humorList.isEmpty) {
       _showSimpleSnackbar('Please wait until humors are fully loaded...');
+    } else if (widget.buildHumorScreenFrom == BuildHumorScreenFrom.preview) {
+      _showSimpleSnackbar('Thumbs up not available for preview humors...');
     } else {
       setState(() {
         HapticFeedback.mediumImpact();
