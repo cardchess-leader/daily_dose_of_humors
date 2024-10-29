@@ -158,15 +158,22 @@ class DatabaseHelper {
   /// Get bookmarks by keyword
   Future<List<BookmarkHumor>> getBookmarksByKeyword(String keyword) async {
     final db = await database;
-    final List<Map<String, dynamic>> maps = await db.query(
-      'bookmarks',
-      where: 'context LIKE ? OR source LIKE ?',
-      whereArgs: ['%$keyword%', '%$keyword%'],
-      orderBy: 'bookmark_ord ASC',
+    final List<Map<String, dynamic>> maps = await db.rawQuery(
+      '''
+      SELECT bookmarks.*, library.title as source_name
+      FROM bookmarks
+      LEFT JOIN library ON bookmarks.source = library.uuid
+      WHERE context LIKE ? OR source_name LIKE ?
+      ORDER BY bookmark_ord ASC
+      ''',
+      ['%$keyword%', '%$keyword%'],
     );
 
     return List.generate(maps.length, (i) {
-      return BookmarkHumor.loadFromTable(maps[i]);
+      return BookmarkHumor.loadFromTable({
+        ...maps[i],
+        'source_name': maps[i]['source_name'] ?? maps[i]['source'],
+      });
     });
   }
 

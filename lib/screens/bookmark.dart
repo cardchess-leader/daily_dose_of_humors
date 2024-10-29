@@ -83,7 +83,6 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen>
         : await ref
             .read(bookmarkProvider.notifier)
             .getBookmarksByKeyword(searchTerm);
-
     setState(() {
       bookmarks = loadedBookmarks;
       isLoading = false;
@@ -285,8 +284,8 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen>
                   return SizedBox(
                     width: itemWidth,
                     child: InkWell(
-                      onTap: () {
-                        Navigator.of(context).push(
+                      onTap: () async {
+                        await Navigator.of(context).push(
                           MaterialPageRoute(
                             builder: (ctx) => ProductScreen(
                               bundle: bundle,
@@ -295,6 +294,7 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen>
                             ),
                           ),
                         );
+                        _loadBookmarks();
                       },
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,

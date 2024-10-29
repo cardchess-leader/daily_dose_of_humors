@@ -90,7 +90,6 @@ class UserSettingsNotifier extends StateNotifier<Map<String, bool>> {
   }
 
   Future<void> toggleSettings(String key) async {
-    print('token is: ${await FirebaseMessaging.instance.getToken()}');
     final prefs = await SharedPreferences.getInstance();
     final currentValue = state[key] ?? false;
     state = {
@@ -230,7 +229,6 @@ class AdNotifier extends StateNotifier<void> {
           _interstitialAd = ad;
         },
         onAdFailedToLoad: (LoadAdError error) {
-          print('InterstitialAd failed to load: $error');
           loadAd();
         },
       ),
@@ -277,19 +275,16 @@ class ServerNotifier extends StateNotifier<void> {
         final data = jsonDecode(response.body);
 
         // Handle the data as needed
-        print('Humor List: ${data['humorList']}');
         return data['humorList']
             .map<DailyHumor>((json) => DailyHumor.loadFromServer(
                 {...json, 'source_name': 'Daily Dose of Humors'}))
             .toList();
       } else {
         // Handle errors
-        print('Error: ${response.statusCode} - ${response.body}');
         return [];
       }
     } catch (e) {
       // Handle any exceptions that occur during the request
-      print('Request failed: $e');
       return [];
     }
   }
@@ -316,16 +311,13 @@ class ServerNotifier extends StateNotifier<void> {
       // Check if the request was successful
       if (response.statusCode == 200) {
         // Decode the JSON response
-        print('response is 200: $response');
         ref.read(appStateProvider.notifier).submitUserHumors();
         return null;
       } else {
-        print('response is: ${response.body}');
         return jsonDecode(response.body)['error'];
       }
     } catch (e) {
       // Handle any exceptions that occur during the request
-      print('response is: error: $e');
       return 'Unexpected error. Please try again later.';
     }
   }
@@ -344,7 +336,6 @@ class ServerNotifier extends StateNotifier<void> {
       }
     } catch (e) {
       // Handle any exceptions that occur during the request
-      print('response is: error: $e');
       return false;
     }
   }
@@ -356,24 +347,21 @@ class ServerNotifier extends StateNotifier<void> {
 
       // Send a GET request to the Firebase function
       final response = await http.get(url);
+
       // Check if the request was successful
       if (response.statusCode == 200) {
         // Decode the JSON response
         final data = jsonDecode(response.body);
 
         // Handle the data as needed
-        print('Bundle Set: ${data['bundleSetList']}');
         return data['bundleSetList']
             .map<BundleSet>((json) => BundleSet.fromJson(json))
             .toList();
       } else {
-        // Handle errors
-        print('Error: ${response.statusCode} - ${response.body}');
         return [];
       }
     } catch (e) {
       // Handle any exceptions that occur during the request
-      print('Request failed: $e');
       return [];
     }
   }
@@ -390,19 +378,15 @@ class ServerNotifier extends StateNotifier<void> {
       if (response.statusCode == 200) {
         // Decode the JSON response
         final data = jsonDecode(response.body);
-        print('bundleSet.uuid is: ${bundleSet.uuid}');
-        print('data is: ${data}');
         return data['bundleList']
             .map<Bundle>((json) => Bundle.fromJson(json))
             .toList();
       } else {
         // Handle errors
-        print('Error: ${response.statusCode} - ${response.body}');
         return [];
       }
     } catch (e) {
       // Handle any exceptions that occur during the request
-      print('Request failedaaa: $e');
       return [];
     }
   }
@@ -422,12 +406,10 @@ class ServerNotifier extends StateNotifier<void> {
         return Bundle.fromJson(data['bundle']);
       } else {
         // Handle errors
-        print('Error: ${response.statusCode} - ${response.body}');
         return null;
       }
     } catch (e) {
       // Handle any exceptions that occur during the request
-      print('Request failed: $e');
       return null;
     }
   }
@@ -444,20 +426,16 @@ class ServerNotifier extends StateNotifier<void> {
       if (response.statusCode == 200) {
         // Decode the JSON response
         final data = jsonDecode(response.body);
-        print('data is: ${data}');
-        print('data length is: ${data['humorList'].length}');
         return data['humorList']
             .map<Humor>((json) => DailyHumor.loadFromServer(
                 {...json, 'source_name': bundle.title}))
             .toList();
       } else {
         // Handle errors
-        print('Error: ${response.statusCode} - ${response.body}');
         return [];
       }
     } catch (e) {
       // Handle any exceptions that occur during the request
-      print('Request failed: $e');
       return [];
     }
   }
@@ -480,12 +458,10 @@ class ServerNotifier extends StateNotifier<void> {
             .toList();
       } else {
         // Handle errors
-        print('Error: ${response.statusCode} - ${response.body}');
         return [];
       }
     } catch (e) {
       // Handle any exceptions that occur during the request
-      print('Request failed: $e');
       return [];
     }
   }
@@ -542,7 +518,6 @@ class AppStateNotifier extends StateNotifier<Map<String, dynamic>> {
   }
 
   void submitUserHumors() async {
-    print('submit count remaining is: ${state['submit_count_remaining']}');
     if (state['submit_count_remaining'] <= 0) {
       return;
     }

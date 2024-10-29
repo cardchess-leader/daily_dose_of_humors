@@ -42,10 +42,7 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
           onTap: () => {
             Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (ctx) => ShopCategoryScreen(bundleSet: bundleSet
-                    // title: bundleSet.title,
-                    // subtitle: bundleSet.subtitle,
-                    ),
+                builder: (ctx) => ShopCategoryScreen(bundleSet: bundleSet),
               ),
             )
           },

@@ -400,7 +400,6 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
           child: Text(
             _isDaily()
                 ? widget.humorCategory!.title
-                // : humorList[_humorIndex].getCategoryData().title,
                 : humorList[_humorIndex].sourceName,
             style: const TextStyle(
               fontWeight: FontWeight.bold,
