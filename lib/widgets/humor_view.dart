@@ -8,6 +8,7 @@ import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:animated_flip_counter/animated_flip_counter.dart';
 import 'package:daily_dose_of_humors/models/humor.dart';
 import 'package:daily_dose_of_humors/util/util.dart';
+import 'package:daily_dose_of_humors/models/category.dart';
 
 class HumorView extends ConsumerStatefulWidget {
   final Humor humor;
@@ -30,7 +31,6 @@ class _HumorViewState extends ConsumerState<HumorView> {
   @override
   void initState() {
     super.initState();
-    print('humorview init');
     DatabaseReference likesCountRef =
         FirebaseDatabase.instance.ref('likes/${widget.humor.uuid}');
     likesCountSubscription =
@@ -65,11 +65,16 @@ class _HumorViewState extends ConsumerState<HumorView> {
       child: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 10),
         child: Text(
-          text,
+          widget.humor.categoryCode == CategoryCode.FUNNY_QUOTES
+              ? '"$text"\n\n- ${widget.humor.author} -'
+              : text,
           style: TextStyle(
             fontSize: fontSize,
             fontWeight: FontWeight.w600,
             color: textColor,
+            fontStyle: widget.humor.categoryCode == CategoryCode.FUNNY_QUOTES
+                ? FontStyle.italic
+                : FontStyle.normal,
           ),
           textAlign: TextAlign.center,
         ),
