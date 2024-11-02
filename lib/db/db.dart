@@ -137,7 +137,7 @@ class DatabaseHelper {
       SELECT bookmarks.*, library.title as source_name
       FROM bookmarks
       LEFT JOIN library ON bookmarks.source = library.uuid
-      ORDER BY bookmarks.bookmark_ord ASC
+      ORDER BY bookmarks.bookmark_ord DESC
     ''');
 
     print('getAllBookmarks is: $maps');
@@ -164,7 +164,7 @@ class DatabaseHelper {
       FROM bookmarks
       LEFT JOIN library ON bookmarks.source = library.uuid
       WHERE context LIKE ? OR source_name LIKE ?
-      ORDER BY bookmark_ord ASC
+      ORDER BY bookmark_ord DESC
       ''',
       ['%$keyword%', '%$keyword%'],
     );

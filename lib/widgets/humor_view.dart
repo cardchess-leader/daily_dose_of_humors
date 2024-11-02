@@ -76,7 +76,9 @@ class _HumorViewState extends ConsumerState<HumorView> {
                 ? FontStyle.italic
                 : FontStyle.normal,
           ),
-          textAlign: TextAlign.center,
+          textAlign: widget.humor.categoryCode == CategoryCode.TRIVIA_QUIZ
+              ? TextAlign.start
+              : TextAlign.center,
         ),
       ),
     );

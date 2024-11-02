@@ -107,7 +107,9 @@ class DailyHumor extends Humor {
                 CategoryCode.YOUR_HUMORS, // Return null if no match is found
           ),
           context: document['context'],
-          contextList: document['context_list'].cast<String>(),
+          contextList:
+              (document['context_list'] as List<dynamic>?)?.cast<String>() ??
+                  [],
           punchline: document['punchline'],
           aiAnalysis: document['ai_analysis'] ?? '',
           author: document['author'],
