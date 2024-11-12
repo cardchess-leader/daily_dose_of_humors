@@ -230,9 +230,8 @@ class DatabaseHelper {
   Future<List<Bundle>> getAllBundles() async {
     try {
       final db = await database;
-      final List<Map<String, dynamic>> maps = await db.query('library');
-
-      print('maps is: ${maps}');
+      final List<Map<String, dynamic>> maps =
+          await db.query('library', orderBy: 'bundle_id DESC');
 
       return List.generate(maps.length, (i) {
         return Bundle.fromJson({

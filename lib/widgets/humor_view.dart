@@ -64,21 +64,35 @@ class _HumorViewState extends ConsumerState<HumorView> {
     return Center(
       child: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 10),
-        child: Text(
-          widget.humor.categoryCode == CategoryCode.FUNNY_QUOTES
-              ? '"$text"\n\n- ${widget.humor.author} -'
-              : text,
-          style: TextStyle(
-            fontSize: fontSize,
-            fontWeight: FontWeight.w600,
-            color: textColor,
-            fontStyle: widget.humor.categoryCode == CategoryCode.FUNNY_QUOTES
-                ? FontStyle.italic
-                : FontStyle.normal,
-          ),
-          textAlign: widget.humor.categoryCode == CategoryCode.TRIVIA_QUIZ
-              ? TextAlign.start
-              : TextAlign.center,
+        child: Column(
+          children: [
+            Text(
+              text,
+              style: TextStyle(
+                fontSize: fontSize,
+                fontWeight: FontWeight.w600,
+                color: textColor,
+                fontStyle:
+                    widget.humor.categoryCode == CategoryCode.FUNNY_QUOTES
+                        ? FontStyle.italic
+                        : FontStyle.normal,
+              ),
+              textAlign: widget.humor.categoryCode == CategoryCode.TRIVIA_QUIZ
+                  ? TextAlign.start
+                  : TextAlign.center,
+            ),
+            if (widget.humor.categoryCode == CategoryCode.FUNNY_QUOTES)
+              Text(
+                '\n- ${widget.humor.author} -',
+                style: TextStyle(
+                  fontSize: fontSize * 0.75,
+                  fontWeight: FontWeight.w600,
+                  color: textColor,
+                  fontStyle: FontStyle.italic,
+                ),
+                textAlign: TextAlign.center,
+              ),
+          ],
         ),
       ),
     );

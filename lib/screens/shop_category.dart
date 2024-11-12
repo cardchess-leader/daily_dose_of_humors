@@ -56,26 +56,25 @@ class _ShopCategoryScreenState extends ConsumerState<ShopCategoryScreen> {
                       builder: (context, snapshot) {
                         if (snapshot.connectionState ==
                             ConnectionState.waiting) {
-                          return Column(
+                          return const Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               AspectRatio(
                                 aspectRatio: 140 / 200,
                                 child: Card(
-                                  color:
-                                      const Color.fromARGB(255, 255, 254, 200),
+                                  color: Color.fromARGB(255, 255, 254, 200),
                                   margin: EdgeInsets.zero,
                                   child: Center(
                                     child: LoadingWidget(
-                                      color: textColor,
+                                      color: Colors.black,
                                       size: 50,
                                     ),
                                   ),
                                 ),
                               ),
-                              const SizedBox(height: 10), // placeholder
-                              const Text(''), // placeholder
-                              const Text(''), // placeholder
+                              SizedBox(height: 10), // placeholder
+                              Text(''), // placeholder
+                              Text(''), // placeholder
                             ],
                           );
                         } else if (snapshot.hasError || snapshot.data == null) {

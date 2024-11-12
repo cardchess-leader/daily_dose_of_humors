@@ -4,7 +4,7 @@ import 'package:daily_dose_of_humors/models/manual.dart';
 
 enum CategoryCode {
   DAD_JOKES,
-  KNOCK_KNOCK_JOKES,
+  DIALOG_JOKES,
   ONE_LINERS,
   DARK_HUMORS,
   TRICKY_RIDDLES,
@@ -12,7 +12,10 @@ enum CategoryCode {
   FUNNY_QUOTES,
   STORY_JOKES,
   MYSTERY_PUZZLES,
+  KNOCK_KNOCK_JOKES,
   YOUR_HUMORS,
+  MISC_PUNCHLINE,
+  MISC_NO_PUNCHLINE,
 }
 
 class Category {

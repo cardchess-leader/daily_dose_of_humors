@@ -177,8 +177,9 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen>
                           )
                         : Image.asset(
                             humor.getCategoryData().imgPath!,
-                            width: 80,
-                            color: const Color.fromARGB(50, 0, 0, 0),
+                            width: humor.getCategoryData().imgSize,
+                            color:
+                                darken(humor.getCategoryData().themeColor, 0.2),
                           ),
                   ),
                   Column(
@@ -436,7 +437,7 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen>
             builder: (ctx) => AddHumorScreen(
               (humor) => setState(
                 () {
-                  bookmarks.add(humor);
+                  bookmarks.insert(0, humor);
                   ref.read(bookmarkProvider.notifier).addBookmark(humor);
                 },
               ),

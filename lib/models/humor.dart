@@ -34,8 +34,9 @@ abstract class Humor {
   SharedFormat? toSharedFormat() {
     switch (categoryCode) {
       case CategoryCode.DAD_JOKES:
-      case CategoryCode.KNOCK_KNOCK_JOKES:
+      case CategoryCode.DIALOG_JOKES:
       case CategoryCode.DARK_HUMORS:
+      case CategoryCode.KNOCK_KNOCK_JOKES:
         return SharedFormat(
           option1BtnText: 'With Punchline',
           option1Format:
