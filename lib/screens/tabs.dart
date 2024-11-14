@@ -1,21 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lottie/lottie.dart';
 import 'package:daily_dose_of_humors/screens/home.dart';
 import 'package:daily_dose_of_humors/screens/shop.dart';
 import 'package:daily_dose_of_humors/screens/bookmark.dart';
 import 'package:daily_dose_of_humors/screens/settings.dart';
+import 'package:daily_dose_of_humors/providers/app_state.dart';
 
-class TabsScreen extends StatefulWidget {
+class TabsScreen extends ConsumerStatefulWidget {
   const TabsScreen({super.key});
 
   @override
-  State<TabsScreen> createState() {
+  ConsumerState<TabsScreen> createState() {
     return _TabsScreenState();
   }
 }
 
-class _TabsScreenState extends State<TabsScreen>
+class _TabsScreenState extends ConsumerState<TabsScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   int _selectedPageIndex = 0;
@@ -47,6 +50,9 @@ class _TabsScreenState extends State<TabsScreen>
 
   void _selectPage(int index) {
     setState(() {
+      if (ref.read(userSettingsProvider)['vibration'] ?? false) {
+        HapticFeedback.mediumImpact();
+      }
       _selectedPageIndex = index;
     });
   }

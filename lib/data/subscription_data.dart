@@ -103,7 +103,8 @@ const lifetimeSubscription = Subscription(
   text1: 'BEST VALUE',
   text2: 'Lifetime',
   text3: 'KRW 29,900 only',
-  text4: 'One-time payment only',
+  // text4: 'One-time payment only',
+  text4: 'Pay once, enjoy forever!',
   lottiePath: 'assets/lottie/lifetime-face.json',
   perks: [
     _removeAdsPerk,

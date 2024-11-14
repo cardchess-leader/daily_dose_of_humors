@@ -280,6 +280,7 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen>
               children: List.generate(
                 bundles.length,
                 (index) {
+                  // print('re-generate-list?');
                   final bundle = bundles[index];
                   final heroTagUuid = GLOBAL.uuid.v4();
                   return SizedBox(
@@ -295,7 +296,9 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen>
                             ),
                           ),
                         );
-                        _loadBookmarks();
+                        WidgetsBinding.instance.addPostFrameCallback((_) {
+                          _loadBookmarks();
+                        });
                       },
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -305,11 +308,13 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen>
                             child: Hero(
                               tag: heroTagUuid,
                               child: Card(
-                                  color: Colors.amber,
-                                  margin: EdgeInsets.zero,
-                                  clipBehavior: Clip.hardEdge,
-                                  child: CustomNetworkImage(
-                                      bundle.coverImgList[0])),
+                                color: Colors.amber,
+                                margin: EdgeInsets.zero,
+                                clipBehavior: Clip.hardEdge,
+                                child: CustomNetworkImage(
+                                  bundle.coverImgList[0],
+                                ),
+                              ),
                             ),
                           ),
                           const SizedBox(height: 10),

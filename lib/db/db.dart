@@ -35,7 +35,8 @@ class DatabaseHelper {
             ai_analysis TEXT NOT NULL,
             author TEXT NOT NULL,
             sender TEXT NOT NULL,
-            source TEXT NOT NULL
+            source TEXT NOT NULL,
+            img_url TEXT NOT NULL
           );
         ''');
         await db.execute('''
@@ -50,7 +51,8 @@ class DatabaseHelper {
             ai_analysis TEXT NOT NULL,
             sender TEXT NOT NULL,
             source TEXT NOT NULL,
-            uuid TEXT UNIQUE NOT NULL
+            uuid TEXT UNIQUE NOT NULL,
+            img_url TEXT NOT NULL
           );
         ''');
         await db.execute('''

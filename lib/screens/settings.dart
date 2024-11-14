@@ -1,8 +1,9 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:in_app_review/in_app_review.dart';
 import 'package:daily_dose_of_humors/providers/app_state.dart';
 import 'package:daily_dose_of_humors/screens/subscription.dart';
 import 'package:daily_dose_of_humors/widgets/lottie_icon.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:daily_dose_of_humors/widgets/app_bar.dart';
 import 'package:daily_dose_of_humors/util/global_var.dart';
 
@@ -180,7 +181,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             lottiePath: 'assets/lottie/thumbs.json',
             title: 'Rate Us',
             isDarkMode: isDarkMode,
-            onTap: () => {},
+            onTap: () {
+              final InAppReview inAppReview = InAppReview.instance;
+              inAppReview.openStoreListing();
+            },
           ),
           generateSettingTile(
             lottiePath: 'assets/lottie/mail-open.json',

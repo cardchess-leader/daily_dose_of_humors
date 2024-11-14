@@ -176,7 +176,7 @@ const humorCategoryList = [
   Category(
     title: 'Misc Humors',
     imgPath: 'assets/icons/laughing.png',
-    imgSize: 50,
+    imgSize: 45,
     description: 'All other types of amazing humors!',
     numDailyNew: 0,
     themeColor: Color.fromARGB(255, 123, 140, 218),
@@ -186,6 +186,7 @@ const humorCategoryList = [
   Category(
     title: 'Misc Humors',
     imgPath: 'assets/icons/laughing.png',
+    imgSize: 45,
     description: 'All other types of amazing humors!',
     numDailyNew: 0,
     themeColor: Color.fromARGB(255, 123, 140, 218),

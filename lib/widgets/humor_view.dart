@@ -1,5 +1,6 @@
 import 'dart:math'; // For using pi
 import 'dart:async'; // Import for StreamSubscription
+import 'package:daily_dose_of_humors/providers/app_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -9,13 +10,16 @@ import 'package:animated_flip_counter/animated_flip_counter.dart';
 import 'package:daily_dose_of_humors/models/humor.dart';
 import 'package:daily_dose_of_humors/util/util.dart';
 import 'package:daily_dose_of_humors/models/category.dart';
+import 'package:daily_dose_of_humors/widgets/network_image.dart';
 
 class HumorView extends ConsumerStatefulWidget {
   final Humor humor;
+  final bool isPreview;
 
   const HumorView({
     super.key,
     required this.humor,
+    this.isPreview = false,
   });
 
   @override
@@ -66,21 +70,32 @@ class _HumorViewState extends ConsumerState<HumorView> {
         padding: const EdgeInsets.symmetric(horizontal: 10),
         child: Column(
           children: [
-            Text(
-              text,
-              style: TextStyle(
-                fontSize: fontSize,
-                fontWeight: FontWeight.w600,
-                color: textColor,
-                fontStyle:
-                    widget.humor.categoryCode == CategoryCode.FUNNY_QUOTES
-                        ? FontStyle.italic
-                        : FontStyle.normal,
+            if (widget.humor.imgUrl != '' && !viewPunchLine) ...[
+              CustomNetworkImage(
+                widget.humor.imgUrl,
+                renderNothingOnError: true,
               ),
-              textAlign: widget.humor.categoryCode == CategoryCode.TRIVIA_QUIZ
-                  ? TextAlign.start
-                  : TextAlign.center,
-            ),
+              SizedBox(height: 20),
+            ],
+            Text(text,
+                style: TextStyle(
+                  fontSize: fontSize,
+                  fontWeight: FontWeight.w600,
+                  color: textColor,
+                  fontStyle:
+                      widget.humor.categoryCode == CategoryCode.FUNNY_QUOTES
+                          ? FontStyle.italic
+                          : FontStyle.normal,
+                ), textAlign: (() {
+              if (!(widget.isPreview && viewPunchLine) &&
+                  (widget.humor.categoryCode == CategoryCode.TRIVIA_QUIZ ||
+                      widget.humor.categoryCode ==
+                          CategoryCode.MYSTERY_PUZZLES)) {
+                return TextAlign.start;
+              } else {
+                return TextAlign.center;
+              }
+            })()),
             if (widget.humor.categoryCode == CategoryCode.FUNNY_QUOTES)
               Text(
                 '\n- ${widget.humor.author} -',
@@ -147,7 +162,9 @@ class _HumorViewState extends ConsumerState<HumorView> {
       onDoubleTap: widget.humor.punchline != ''
           ? () {
               setState(() {
-                HapticFeedback.mediumImpact();
+                if (ref.read(userSettingsProvider)['vibration'] ?? false) {
+                  HapticFeedback.mediumImpact();
+                }
                 viewPunchLine = !viewPunchLine;
               });
             }

@@ -12,6 +12,7 @@ abstract class Humor {
   final String source;
   final String sourceName;
   final int humorIndex;
+  final String imgUrl;
 
   Humor({
     required this.uuid,
@@ -25,6 +26,7 @@ abstract class Humor {
     required this.source,
     required this.sourceName,
     this.humorIndex = 0,
+    this.imgUrl = '',
   });
 
   Category getCategoryData() {
@@ -89,6 +91,7 @@ class DailyHumor extends Humor {
     required super.author,
     required super.sender,
     required super.source,
+    super.imgUrl,
     super.aiAnalysis,
     required super.sourceName,
     this.isNew = false,
@@ -112,6 +115,7 @@ class DailyHumor extends Humor {
               (document['context_list'] as List<dynamic>?)?.cast<String>() ??
                   [],
           punchline: document['punchline'],
+          imgUrl: document['img_url'] ?? '',
           aiAnalysis: document['ai_analysis'] ?? '',
           author: document['author'],
           sender: document['sender'],
@@ -134,6 +138,7 @@ class DailyHumor extends Humor {
               ? []
               : document['context_list'].split('@@@'),
           punchline: document['punchline'],
+          imgUrl: document['img_url'] ?? '',
           aiAnalysis: document['ai_analysis'],
           author: document['author'],
           sender: document['sender'],
@@ -154,6 +159,7 @@ class DailyHumor extends Humor {
       'sender': sender,
       'source': source,
       'uuid': uuid,
+      'img_url': imgUrl,
     };
     return map;
   }
@@ -171,6 +177,7 @@ class BookmarkHumor extends Humor {
     required super.context,
     required super.contextList,
     required super.punchline,
+    super.imgUrl,
     super.aiAnalysis,
     required super.author,
     required super.sender,
@@ -196,6 +203,7 @@ class BookmarkHumor extends Humor {
               ? []
               : document['context_list'].split('@@@'),
           punchline: document['punchline'],
+          imgUrl: document['img_url'] ?? '',
           aiAnalysis: document['ai_analysis'],
           author: document['author'],
           sender: document['sender'],
@@ -213,6 +221,7 @@ class BookmarkHumor extends Humor {
           context: dailyHumor.context,
           contextList: dailyHumor.contextList,
           punchline: dailyHumor.punchline,
+          imgUrl: dailyHumor.imgUrl,
           aiAnalysis: dailyHumor.aiAnalysis,
           author: dailyHumor.author,
           sender: dailyHumor.sender,
@@ -231,6 +240,7 @@ class BookmarkHumor extends Humor {
       'context': context,
       'context_list': contextList.join('@@@'),
       'punchline': punchline,
+      'img_url': imgUrl,
       'ai_analysis': aiAnalysis,
       'author': author,
       'sender': sender,

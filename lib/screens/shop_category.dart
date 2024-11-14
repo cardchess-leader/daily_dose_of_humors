@@ -102,11 +102,12 @@ class _ShopCategoryScreenState extends ConsumerState<ShopCategoryScreen> {
                                   child: Hero(
                                     tag: heroTagUuid,
                                     child: Card(
-                                      // color: Colors.amber,
+                                      color: Color.fromARGB(255, 255, 254, 200),
                                       margin: EdgeInsets.zero,
                                       clipBehavior: Clip.hardEdge,
                                       child: CustomNetworkImage(
-                                          bundle.coverImgList[0]),
+                                        bundle.coverImgList[0],
+                                      ),
                                     ),
                                   ),
                                 ),

@@ -3,10 +3,12 @@ import 'package:cached_network_image/cached_network_image.dart';
 
 class CustomNetworkImage extends StatelessWidget {
   final String imageUrl;
+  final bool renderNothingOnError;
 
   const CustomNetworkImage(
     this.imageUrl, {
     super.key,
+    this.renderNothingOnError = false,
   });
 
   @override
@@ -19,12 +21,18 @@ class CustomNetworkImage extends StatelessWidget {
       placeholder: (context, url) => const Center(
         child: CircularProgressIndicator(),
       ),
-      errorWidget: (context, url, error) => const Center(
-        child: Text(
-          'Unable to\nload image...',
-          textAlign: TextAlign.center,
-        ),
-      ),
+      errorWidget: (context, url, error) {
+        if (renderNothingOnError) {
+          return SizedBox(height: 0);
+        } else {
+          return const Center(
+            child: Text(
+              'Unable to\nload image...',
+              textAlign: TextAlign.center,
+            ),
+          );
+        }
+      },
       cacheKey: imageUrl, // Ensure caching based on URL
       useOldImageOnUrlChange: true, // Use cached image during rebuild
     );

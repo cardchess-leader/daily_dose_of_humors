@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:upgrader/upgrader.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:daily_dose_of_humors/providers/app_state.dart';
@@ -74,7 +75,11 @@ class _MyAppState extends ConsumerState<MyApp> {
         textTheme: _getTextTheme(context, Brightness.dark),
       ),
       themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
-      home: const TabsScreen(),
+      home: UpgradeAlert(
+        showIgnore: false,
+        showLater: false,
+        child: const TabsScreen(),
+      ),
       navigatorObservers: [routeObserver],
     );
   }

@@ -364,11 +364,14 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
   void _handleFabPress() async {
     if (_isLoading || humorList.isEmpty) {
       _showSimpleSnackbar('Please wait until humors are fully loaded...');
-    } else if (widget.buildHumorScreenFrom == BuildHumorScreenFrom.preview) {
+    } else if (isPreview()) {
       _showSimpleSnackbar('Thumbs up not available for preview humors...');
     } else {
       setState(() {
-        HapticFeedback.mediumImpact();
+        if (ref.read(userSettingsProvider)['vibration'] ?? false) {
+          HapticFeedback.mediumImpact();
+        }
+
         _isFabAnimating = true;
         _fabLottieAnimController.reset();
         _fabLottieAnimController.forward();
@@ -382,6 +385,10 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
             'You already gave ${GLOBAL.MAX_THUMBSUP_COUNT} thumbs-ups for today!');
       }
     }
+  }
+
+  bool isPreview() {
+    return widget.buildHumorScreenFrom == BuildHumorScreenFrom.preview;
   }
 
   @override
@@ -451,8 +458,7 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
                         controller: _pageController,
                         itemCount: humorList.length,
                         itemBuilder: (context, index) => HumorView(
-                          humor: humorList[index],
-                        ),
+                            humor: humorList[index], isPreview: isPreview()),
                         onPageChanged: (pageIndex) {
                           ref.watch(adProvider.notifier).incrementCounter();
                           _humorIndex = pageIndex;
@@ -501,22 +507,21 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
               ),
               onPressed: () => _onItemTapped(0),
             ),
-            if (widget.buildHumorScreenFrom != BuildHumorScreenFrom.preview)
+            if (!isPreview())
               IconButton(
                 tooltip: 'share this humor',
                 icon: getBottomNavLottie('assets/lottie/share.json', textColor,
                     _shareAnimController),
                 onPressed: () => _onItemTapped(1),
               ),
-            if (widget.buildHumorScreenFrom != BuildHumorScreenFrom.preview)
+            if (!isPreview())
               IconButton(
                 tooltip: 'bookmark this humor',
                 icon: getBottomNavLottie(
                     bookmarkLottieAsset, textColor, _bookmarkAnimController),
                 onPressed: () => _onItemTapped(2),
               ),
-            if (widget.buildHumorScreenFrom != BuildHumorScreenFrom.preview &&
-                _currentHumorHasAnalysis())
+            if (!isPreview() && _currentHumorHasAnalysis())
               IconButton(
                 tooltip: 'ai humor analysis',
                 icon: Image.asset(

@@ -476,8 +476,6 @@ class AppStateNotifier extends StateNotifier<Map<String, dynamic>> {
   final Ref ref;
   final showAppReviewPopupArray = [
     2,
-    3,
-    4,
     8,
     16,
     24,
@@ -531,16 +529,11 @@ class AppStateNotifier extends StateNotifier<Map<String, dynamic>> {
       'app_open_count': state['app_open_count'] + 1,
     };
     syncAppState();
-    print('app open counter is: ${state['app_open_count']}');
     showAppReviewPopup();
   }
 
   Future<void> showAppReviewPopup() async {
     final InAppReview inAppReview = InAppReview.instance;
-
-    print('app availability is: ${await inAppReview.isAvailable()}');
-    print(
-        'contains is: ${showAppReviewPopupArray.contains(state['app_open_count'])}');
 
     if (await inAppReview.isAvailable() &&
         showAppReviewPopupArray.contains(state['app_open_count'])) {
