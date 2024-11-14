@@ -162,7 +162,7 @@ class _HumorCategoryCardState extends State<HumorCategoryCard>
                       maxLines: 2,
                       style: TextStyle(
                         fontWeight: FontWeight.w600,
-                        fontSize: 18,
+                        fontSize: 17.5,
                         fontStyle: FontStyle.italic,
                         color: adaptiveTextColor,
                       ),

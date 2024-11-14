@@ -13,6 +13,7 @@ import 'package:daily_dose_of_humors/models/humor.dart';
 import 'package:daily_dose_of_humors/models/category.dart';
 import 'package:daily_dose_of_humors/models/bundle_set.dart';
 import 'package:daily_dose_of_humors/models/bundle.dart';
+import 'package:in_app_review/in_app_review.dart';
 
 class SubscriptionStatusNotifier extends StateNotifier<Subscription> {
   SubscriptionStatusNotifier() : super(freeSubscription) {
@@ -473,23 +474,45 @@ final serverProvider = StateNotifierProvider<ServerNotifier, void>((ref) {
 
 class AppStateNotifier extends StateNotifier<Map<String, dynamic>> {
   final Ref ref;
+  final showAppReviewPopupArray = [
+    2,
+    3,
+    4,
+    8,
+    16,
+    24,
+    32,
+    40,
+    50,
+    60,
+    70,
+    80,
+    90,
+    100
+  ];
+  var _initialized = false;
 
   AppStateNotifier(this.ref)
       : super({
           'likes_count_remaining': 0,
           'submit_count_remaining': 0,
           'last_reset_date': '0000-00-00',
-        }) {
-    _initializeAppState();
-  }
+          'app_open_count': 0,
+        });
 
-  Future<void> _initializeAppState() async {
+  Future<void> initializeAppState() async {
+    if (_initialized) {
+      return;
+    }
+    _initialized = true;
+    print('_initializeAppState');
     final prefs = await SharedPreferences.getInstance();
     state = {
       ...state,
       'likes_count_remaining': prefs.getInt('likes_count_remaining') ?? 0,
       'submit_count_remaining': prefs.getInt('submit_count_remaining') ?? 0,
       'last_reset_date': prefs.getString('last_reset_date') ?? '0000-00-00',
+      'app_open_count': prefs.getInt('app_open_count') ?? 0,
     };
 
     final resetAppStateFromServerResult = await ref
@@ -497,12 +520,33 @@ class AppStateNotifier extends StateNotifier<Map<String, dynamic>> {
         .resetAppStateFromServer(state['last_reset_date']);
     if (resetAppStateFromServerResult != false) {
       state = {
+        ...state,
         'likes_count_remaining': GLOBAL.MAX_THUMBSUP_COUNT,
         'submit_count_remaining': GLOBAL.MAX_SUBMIT_COUNT,
         'last_reset_date': resetAppStateFromServerResult,
       };
-      syncAppState();
     }
+    state = {
+      ...state,
+      'app_open_count': state['app_open_count'] + 1,
+    };
+    syncAppState();
+    print('app open counter is: ${state['app_open_count']}');
+    showAppReviewPopup();
+  }
+
+  Future<void> showAppReviewPopup() async {
+    final InAppReview inAppReview = InAppReview.instance;
+
+    print('app availability is: ${await inAppReview.isAvailable()}');
+    print(
+        'contains is: ${showAppReviewPopupArray.contains(state['app_open_count'])}');
+
+    if (await inAppReview.isAvailable() &&
+        showAppReviewPopupArray.contains(state['app_open_count'])) {
+      inAppReview.requestReview();
+    }
+    inAppReview.requestReview();
   }
 
   Future<bool> hitThumbsUpFab() async {

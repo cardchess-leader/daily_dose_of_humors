@@ -116,7 +116,7 @@ class _ManualWidgetState extends State<ManualWidget>
                             manualItem.text,
                             style: TextStyle(
                               color: widget.color,
-                              fontSize: 20,
+                              fontSize: 19,
                               fontWeight: FontWeight.w600,
                             ),
                           ),

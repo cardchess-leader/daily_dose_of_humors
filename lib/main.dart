@@ -56,6 +56,7 @@ class _MyAppState extends ConsumerState<MyApp> {
   @override
   Widget build(BuildContext context) {
     final isDarkMode = ref.watch(userSettingsProvider)['darkMode'] ?? false;
+    ref.read(appStateProvider.notifier).initializeAppState();
 
     return MaterialApp(
       title: 'Flutter Demo',
