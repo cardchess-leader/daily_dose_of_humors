@@ -22,8 +22,8 @@ class ShopCategoryScreen extends ConsumerStatefulWidget {
 class _ShopCategoryScreenState extends ConsumerState<ShopCategoryScreen> {
   @override
   Widget build(BuildContext context) {
-    bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    final textColor = isDarkMode ? Colors.white : Colors.black;
+    ref.read(iapProvider.notifier).loadAllIapSkuList();
+    final priceMap = ref.watch(iapProvider)['product_details'].price;
 
     return Scaffold(
       appBar: AppBar(
@@ -121,7 +121,7 @@ class _ShopCategoryScreenState extends ConsumerState<ShopCategoryScreen> {
                                   ),
                                 ),
                                 Text(
-                                  ' ${bundle.price}',
+                                  ' ${priceMap[bundle.productId] ?? ''}',
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 ),

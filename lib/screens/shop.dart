@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:daily_dose_of_humors/widgets/app_bar.dart';
+import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:scroll_snap_list/scroll_snap_list.dart';
 import 'package:daily_dose_of_humors/screens/shop_category.dart';
 import 'package:daily_dose_of_humors/screens/product.dart';
@@ -24,7 +25,9 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
   Widget categorySectionGenerator({
     required BundleSet bundleSet,
     required Color textColor,
+    required Map<String, ProductDetails> productDetails,
   }) {
+    ref.read(iapProvider.notifier).loadAllIapSkuList();
     return Column(
       children: [
         ListTile(
@@ -127,7 +130,7 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
                                   ),
                                 ),
                                 Text(
-                                  ' ${snapshot.data?[index].price ?? ''}',
+                                  ' ${productDetails[snapshot.data?[index].productId]?.price ?? ''}',
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 ),
@@ -184,6 +187,8 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
                           (bundleSet) => categorySectionGenerator(
                             bundleSet: bundleSet,
                             textColor: textColor,
+                            productDetails:
+                                ref.watch(iapProvider)['product_details'],
                           ),
                         )
                         .toList() ??

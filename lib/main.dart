@@ -58,6 +58,7 @@ class _MyAppState extends ConsumerState<MyApp> {
   Widget build(BuildContext context) {
     final isDarkMode = ref.watch(userSettingsProvider)['darkMode'] ?? false;
     ref.read(appStateProvider.notifier).initializeAppState();
+    ref.read(iapProvider.notifier).loadAllIapSkuList();
 
     return MaterialApp(
       title: 'Flutter Demo',

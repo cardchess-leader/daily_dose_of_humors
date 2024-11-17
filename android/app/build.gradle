@@ -1,13 +1,12 @@
 plugins {
     id "com.android.application"
     // START: FlutterFire Configuration
-    id 'com.google.gms.google-services'
+    id "com.google.gms.google-services"
     // END: FlutterFire Configuration
     id "kotlin-android"
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id "dev.flutter.flutter-gradle-plugin"
 }
-
 
 // Load keystore properties after the plugins block
 def keystoreProperties = new Properties()
@@ -75,4 +74,11 @@ android {
 
 flutter {
     source = "../.."
+}
+
+dependencies {
+    // Add the Android Billing Library version 7.1.1
+    implementation 'com.android.billingclient:billing:7.1.1'
+
+    // Add any other required dependencies here
 }

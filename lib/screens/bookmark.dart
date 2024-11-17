@@ -280,7 +280,6 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen>
               children: List.generate(
                 bundles.length,
                 (index) {
-                  // print('re-generate-list?');
                   final bundle = bundles[index];
                   final heroTagUuid = GLOBAL.uuid.v4();
                   return SizedBox(

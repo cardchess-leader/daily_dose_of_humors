@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:lottie/lottie.dart';
 import 'package:daily_dose_of_humors/models/bundle.dart';
 import 'package:daily_dose_of_humors/models/category.dart';
@@ -9,12 +11,7 @@ import 'package:daily_dose_of_humors/providers/app_state.dart';
 import 'package:daily_dose_of_humors/screens/humor_screen.dart';
 import 'package:daily_dose_of_humors/util/global_var.dart';
 
-enum ProductMessage {
-  Buy,
-  Download,
-  ReDownload,
-  View,
-}
+enum ProductMessage { Buy, Download, ReDownload, View }
 
 class ProductScreen extends ConsumerStatefulWidget {
   final Bundle bundle;
@@ -33,29 +30,72 @@ class ProductScreen extends ConsumerStatefulWidget {
 }
 
 class _ProductScreenState extends ConsumerState<ProductScreen> {
-  final controller = PageController();
+  late StreamSubscription<List<PurchaseDetails>> _subscription;
   ScaffoldMessengerState? _scaffoldMessengerState;
-  var productMessage = ProductMessage
-      .Buy; // Process: raw >> purchase >> library (fromLibrary assumes downloaded)
-  var isLoading = false; // is currently loading (downloading)
+
+  var productMessage = ProductMessage.Buy;
+  var isLoading = false;
+  var purchaseInProcess = false;
 
   @override
   void initState() {
     super.initState();
+    setupPurchaseListener();
     initProductMessage();
+  }
+
+  void setupPurchaseListener() {
+    _subscription = InAppPurchase.instance.purchaseStream.listen(
+      _listenToPurchaseUpdated,
+      onDone: () => _subscription.cancel(),
+      onError: (_) =>
+          showSnackbar('Oops! Your purchase didn’t go through. Try again!'),
+    );
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // Save a reference to ScaffoldMessengerState in didChangeDependencies
     _scaffoldMessengerState = ScaffoldMessenger.of(context);
   }
 
   @override
   void dispose() {
+    _subscription.cancel();
     _scaffoldMessengerState?.clearSnackBars();
     super.dispose();
+  }
+
+  void showSnackbar(String message) {
+    _scaffoldMessengerState
+      ?..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(
+        duration: const Duration(seconds: 5),
+        content: Text(message),
+      ));
+  }
+
+  void _listenToPurchaseUpdated(List<PurchaseDetails> purchaseDetailsList) {
+    for (final purchaseDetails in purchaseDetailsList) {
+      if (purchaseDetails.productID == widget.bundle.productId) {
+        switch (purchaseDetails.status) {
+          case PurchaseStatus.purchased:
+            InAppPurchase.instance.completePurchase(purchaseDetails);
+            setState(() => productMessage = ProductMessage.Download);
+            showSnackbar(
+                'Purchase successful! You can now download the humor bundle!');
+            break;
+
+          case PurchaseStatus.error:
+            showSnackbar('Purchase failed. Please try again.');
+            break;
+
+          default:
+            break;
+        }
+      }
+    }
+    setState(() => purchaseInProcess = false);
   }
 
   Future<void> initProductMessage() async {
@@ -65,113 +105,88 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
       final isInLibrary =
           (await ref.read(libraryProvider.notifier).getAllBundles())
               .any((bundle) => bundle.uuid == widget.bundle.uuid);
+
       if (isInLibrary) {
-        setState(() {
-          productMessage = ProductMessage.ReDownload;
-        });
+        productMessage = ProductMessage.ReDownload;
+      } else if (ref
+          .read(iapProvider.notifier)
+          .isSkuPurchased(widget.bundle.productId)) {
+        productMessage = ProductMessage.Download;
       } else {
-        // Check if purchased or not => Set product message accordingly! (Fetch from Store SDK)
+        productMessage = ProductMessage.Buy;
       }
     }
+    setState(() {});
   }
 
   Future<void> loadPreview() async {
-    if (isLoading) {
-      return;
-    }
-    setState(() {
-      isLoading = true;
-    });
-    // 1. Load the bundle preview from server
+    if (isLoading) return;
+
+    setState(() => isLoading = true);
+
     final previewHumors = await ref
         .read(serverProvider.notifier)
         .previewHumorBundle(widget.bundle);
 
-    setState(() {
-      isLoading = false;
-      if (previewHumors.isNotEmpty) {
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (ctx) => HumorScreen(
-                buildHumorScreenFrom: BuildHumorScreenFrom.preview,
-                humorList: previewHumors),
-          ),
-        );
-      }
-    });
+    if (previewHumors.isNotEmpty && mounted) {
+      Navigator.of(context).push(MaterialPageRoute(
+        builder: (_) => HumorScreen(
+          buildHumorScreenFrom: BuildHumorScreenFrom.preview,
+          humorList: previewHumors,
+        ),
+      ));
+    }
+
+    setState(() => isLoading = false);
   }
 
   Future<void> downloadBundle() async {
-    if (isLoading) {
-      return;
-    }
-    setState(() {
-      isLoading = true;
-    });
-    // 1. Download all bundle humors
-    final downloadSuccess = await (() async {
-      final bundleHumors = await ref
-          .read(serverProvider.notifier)
-          .downloadHumorBundle(widget.bundle);
-      if (bundleHumors.isEmpty) {
-        return false;
-      }
-      // 2. Put them (both bundle & bundle humors) into library
-      return await ref
-          .read(libraryProvider.notifier)
-          .saveBundleHumorsIntoLibrary(widget.bundle, bundleHumors);
-    })();
+    if (isLoading) return;
+
+    setState(() => isLoading = true);
+
+    final bundleHumors = await ref
+        .read(serverProvider.notifier)
+        .downloadHumorBundle(widget.bundle);
+    final downloadSuccess = bundleHumors.isNotEmpty &&
+        await ref
+            .read(libraryProvider.notifier)
+            .saveBundleHumorsIntoLibrary(widget.bundle, bundleHumors);
 
     setState(() {
       isLoading = false;
-      late String snackBarMessage;
-      if (downloadSuccess) {
-        snackBarMessage =
-            'Download Successful!\nCheck downloaded humors from Bookmarks > Library tab!';
-        productMessage = ProductMessage.View;
-      } else {
-        snackBarMessage =
-            'Download failed unexpectedly...\nPlease check your internet connection and try again!';
-      }
-      ScaffoldMessenger.of(context)
-        ..hideCurrentSnackBar()
-        ..showSnackBar(
-          SnackBar(
-            duration: const Duration(milliseconds: 5000),
-            content: Text(snackBarMessage),
-          ),
-        );
+      productMessage = downloadSuccess ? ProductMessage.View : productMessage;
+      showSnackbar(downloadSuccess
+          ? 'Download successful! Check the Library tab in Bookmarks!'
+          : 'Download failed. Please check your internet connection and try again.');
     });
   }
 
   Future<void> viewAllHumors() async {
-    if (isLoading) {
-      return;
-    }
-    setState(() {
-      isLoading = true;
-    });
+    if (isLoading) return;
+
+    setState(() => isLoading = true);
+
     final bundleHumors = await ref
         .read(libraryProvider.notifier)
         .getAllBundleHumors(widget.bundle);
+
     if (mounted) {
-      ScaffoldMessenger.of(context).hideCurrentSnackBar();
-      setState(() {
-        isLoading = false;
-      });
-      await Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (ctx) => HumorScreen(
-            buildHumorScreenFrom: BuildHumorScreenFrom.bookmark,
-            humorList: bundleHumors,
-          ),
+      setState(() => isLoading = false);
+      Navigator.of(context).push(MaterialPageRoute(
+        builder: (_) => HumorScreen(
+          buildHumorScreenFrom: BuildHumorScreenFrom.bookmark,
+          humorList: bundleHumors,
         ),
-      );
+      ));
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    ref.read(iapProvider.notifier).loadAllIapSkuList();
+    ProductDetails productDetails =
+        ref.watch(iapProvider)['product_details'][widget.bundle.productId];
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final textColor = isDarkMode ? Colors.white : Colors.black;
 
@@ -412,13 +427,19 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                           borderRadius: BorderRadius.circular(30.0),
                         ),
                       ),
-                      onPressed: () => {
-                        setState(() {
-                          productMessage = ProductMessage.Download;
-                        })
-                      },
-                      child: const Text(
-                        'Buy at \$2.99',
+                      onPressed: purchaseInProcess
+                          ? null
+                          : () {
+                              InAppPurchase.instance.buyNonConsumable(
+                                purchaseParam: PurchaseParam(
+                                    productDetails: productDetails),
+                              );
+                              setState(() {
+                                purchaseInProcess = true;
+                              });
+                            },
+                      child: Text(
+                        'Buy at ${productDetails.price}',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,

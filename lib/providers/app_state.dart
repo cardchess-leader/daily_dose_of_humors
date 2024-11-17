@@ -5,6 +5,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:riverpod/riverpod.dart';
+import 'package:in_app_review/in_app_review.dart';
+import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:daily_dose_of_humors/data/subscription_data.dart';
 import 'package:daily_dose_of_humors/util/global_var.dart';
 import 'package:daily_dose_of_humors/models/subscription.dart';
@@ -13,7 +15,6 @@ import 'package:daily_dose_of_humors/models/humor.dart';
 import 'package:daily_dose_of_humors/models/category.dart';
 import 'package:daily_dose_of_humors/models/bundle_set.dart';
 import 'package:daily_dose_of_humors/models/bundle.dart';
-import 'package:in_app_review/in_app_review.dart';
 
 class SubscriptionStatusNotifier extends StateNotifier<Subscription> {
   SubscriptionStatusNotifier() : super(freeSubscription) {
@@ -466,6 +467,27 @@ class ServerNotifier extends StateNotifier<void> {
       return [];
     }
   }
+
+  Future<List<String>> getAvailableSkuList() async {
+    // Construct the full URL with query parameters
+    final Uri url = Uri.parse('${GLOBAL.serverPath()}/getAvailableSkuList');
+
+    // Send a GET request to the Firebase function
+    final response = await http.get(url);
+
+    // Check if the request was successful
+    if (response.statusCode == 200) {
+      // Decode the JSON response
+      final data = jsonDecode(response.body);
+
+      return (data['availableSkuList'] as List<dynamic>)
+          .map((sku) => sku.toString())
+          .toList();
+    } else {
+      // Handle errors
+      return [];
+    }
+  }
 }
 
 final serverProvider = StateNotifierProvider<ServerNotifier, void>((ref) {
@@ -580,4 +602,70 @@ class AppStateNotifier extends StateNotifier<Map<String, dynamic>> {
 final appStateProvider =
     StateNotifierProvider<AppStateNotifier, Map<String, dynamic>>((ref) {
   return AppStateNotifier(ref);
+});
+
+class IAPNotifier extends StateNotifier<Map<String, dynamic>> {
+  var _initialized = false;
+  final Ref ref;
+  final purchasedSkuList = <String>{};
+  IAPNotifier(this.ref)
+      : super({
+          'product_details': {},
+        }) {
+    setupPurchaseUpdateListener();
+    restorePurchases();
+  }
+
+  Future<void> restorePurchases() async {
+    await InAppPurchase.instance.restorePurchases();
+  }
+
+  Future<void> loadAllIapSkuList() async {
+    if (_initialized) {
+      return;
+    }
+    // Fetch all available sku lists
+    final availSkuSet =
+        (await ref.read(serverProvider.notifier).getAvailableSkuList()).toSet();
+    final ProductDetailsResponse response =
+        await InAppPurchase.instance.queryProductDetails(availSkuSet);
+    if (response.notFoundIDs.isNotEmpty) {
+      // Handle the error.
+    }
+    List<ProductDetails> productDetails = response.productDetails;
+
+    // Convert product details into a Map<String, String> where key is the product ID, and value is the price.
+    final productDetailsMap = {
+      for (var productDetail in productDetails) productDetail.id: productDetail,
+    };
+    state = {
+      ...state,
+      'product_details': productDetailsMap,
+    };
+
+    _initialized = true;
+  }
+
+  Future<void> setupPurchaseUpdateListener() async {
+    final Stream purchaseUpdated = InAppPurchase.instance.purchaseStream;
+
+    purchaseUpdated.listen((purchaseDetailsList) {
+      for (final purchaseDetail in purchaseDetailsList) {
+        final status = purchaseDetail.status;
+        if (status == PurchaseStatus.purchased ||
+            status == PurchaseStatus.restored) {
+          purchasedSkuList.add(purchaseDetail.productId);
+        }
+      }
+    });
+  }
+
+  bool isSkuPurchased(String sku) {
+    return purchasedSkuList.contains(sku);
+  }
+}
+
+final iapProvider =
+    StateNotifierProvider<IAPNotifier, Map<String, dynamic>>((ref) {
+  return IAPNotifier(ref);
 });
