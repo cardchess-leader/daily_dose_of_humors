@@ -23,7 +23,7 @@ class _ShopCategoryScreenState extends ConsumerState<ShopCategoryScreen> {
   @override
   Widget build(BuildContext context) {
     ref.read(iapProvider.notifier).loadAllIapSkuList();
-    final priceMap = ref.watch(iapProvider)['product_details'].price;
+    final productDetailsMap = ref.watch(iapProvider)['product_details'];
 
     return Scaffold(
       appBar: AppBar(
@@ -121,7 +121,7 @@ class _ShopCategoryScreenState extends ConsumerState<ShopCategoryScreen> {
                                   ),
                                 ),
                                 Text(
-                                  ' ${priceMap[bundle.productId] ?? ''}',
+                                  ' ${productDetailsMap[bundle.productId].price ?? ''}',
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 ),

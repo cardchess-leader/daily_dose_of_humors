@@ -525,7 +525,6 @@ class AppStateNotifier extends StateNotifier<Map<String, dynamic>> {
       return;
     }
     _initialized = true;
-    print('_initializeAppState');
     final prefs = await SharedPreferences.getInstance();
     state = {
       ...state,
@@ -561,7 +560,6 @@ class AppStateNotifier extends StateNotifier<Map<String, dynamic>> {
         showAppReviewPopupArray.contains(state['app_open_count'])) {
       inAppReview.requestReview();
     }
-    inAppReview.requestReview();
   }
 
   Future<bool> hitThumbsUpFab() async {
@@ -650,11 +648,11 @@ class IAPNotifier extends StateNotifier<Map<String, dynamic>> {
     final Stream purchaseUpdated = InAppPurchase.instance.purchaseStream;
 
     purchaseUpdated.listen((purchaseDetailsList) {
-      for (final purchaseDetail in purchaseDetailsList) {
-        final status = purchaseDetail.status;
+      for (final purchaseDetails in purchaseDetailsList) {
+        final status = purchaseDetails.status;
         if (status == PurchaseStatus.purchased ||
             status == PurchaseStatus.restored) {
-          purchasedSkuList.add(purchaseDetail.productId);
+          purchasedSkuList.add(purchaseDetails.productID);
         }
       }
     });
