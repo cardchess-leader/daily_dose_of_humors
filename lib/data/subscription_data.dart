@@ -27,6 +27,7 @@ const _aiHumorAnalysis = Perk(
 const freeSubscription = Subscription(
   subscriptionCode: SubscriptionCode.FREE,
   subscriptionName: 'Free',
+  productId: '',
   text1: '',
   text2: '',
   text3: '',
@@ -40,18 +41,19 @@ const freeSubscription = Subscription(
 const monthlySubscription = Subscription(
   subscriptionCode: SubscriptionCode.MONTHLY,
   subscriptionName: 'Monthly',
+  productId: 'subscription_monthly',
   text1: 'MOST AFFORDABLE',
   text2: '1 Month',
-  text3: 'KRW 2,900 per month',
-  text4: '≈ KRW 475.00 / week only',
+  text3: 'per month',
+  text4: 'Renews every month!',
   lottiePath: 'assets/lottie/monthly-face.json',
   maxBookmarks: 0,
   perks: [
     _removeAdsPerk,
     _unlockContentsPerk,
     Perk(
-      title: 'Enable Bookmarks',
-      subtitle: 'Enable upto 200 bookmarks', // match this with actual
+      title: 'More Bookmarks',
+      subtitle: 'Save upto 200 bookmarks', // match this with actual
       imgPath: 'assets/images/bookmark-color.png',
       color: Colors.blue,
     ),
@@ -70,10 +72,11 @@ const monthlySubscription = Subscription(
 const yearlySubscription = Subscription(
   subscriptionCode: SubscriptionCode.YEARLY,
   subscriptionName: 'Yearly',
+  productId: 'subscription_yearly',
   text1: 'MOST POPULAR',
   text2: '1 Year',
-  text3: 'KRW 9,900 per year',
-  text4: '≈ KRW 190.38 / week only',
+  text3: 'per year',
+  text4: 'Renews every year!',
   lottiePath: 'assets/lottie/yearly-face.json',
   perks: [
     _removeAdsPerk,
@@ -100,10 +103,10 @@ const yearlySubscription = Subscription(
 const lifetimeSubscription = Subscription(
   subscriptionCode: SubscriptionCode.LIFETIME,
   subscriptionName: 'Lifetime',
+  productId: 'lifetime',
   text1: 'BEST VALUE',
   text2: 'Lifetime',
-  text3: 'KRW 29,900 only',
-  // text4: 'One-time payment only',
+  text3: 'only',
   text4: 'Pay once, enjoy forever!',
   lottiePath: 'assets/lottie/lifetime-face.json',
   perks: [

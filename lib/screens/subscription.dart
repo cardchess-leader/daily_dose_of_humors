@@ -199,15 +199,35 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
                                               fontSize: 30,
                                             ),
                                           ),
-                                          Text(
-                                            subscriptionTypes[index].text3,
-                                            textAlign: TextAlign.center,
-                                            style: const TextStyle(
-                                              color: Colors.black,
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 20,
-                                            ),
-                                          ),
+                                          ref.watch(iapProvider)[
+                                                          'product_details'][
+                                                      subscriptionTypes[index]
+                                                          .productId] ==
+                                                  null
+                                              ? Lottie.asset(
+                                                  'assets/lottie/loading.json',
+                                                  width: 35,
+                                                  height: 35,
+                                                  delegates: LottieDelegates(
+                                                    values: [
+                                                      ValueDelegate.colorFilter(
+                                                        ['**'],
+                                                        value: const ColorFilter
+                                                            .mode(Colors.black,
+                                                            BlendMode.src),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                )
+                                              : Text(
+                                                  '${ref.watch(iapProvider)['product_details'][subscriptionTypes[index].productId].price} ${subscriptionTypes[index].text3}',
+                                                  textAlign: TextAlign.center,
+                                                  style: const TextStyle(
+                                                    color: Colors.black,
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 20,
+                                                  ),
+                                                ),
                                           const SizedBox(height: 20),
                                           Container(
                                             height: 3,
@@ -253,7 +273,6 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
                         color: const Color.fromARGB(54, 63, 81, 181),
                         borderRadius: BorderRadius.circular(5),
                       ),
-                      // margin: const EdgeInsets.symmetric(horizontal: 4),
                     ),
                     const SizedBox(height: 30),
                     Row(
@@ -337,7 +356,11 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
                         .color, // Background color
                     foregroundColor: Colors.white, // Text color
                   ),
-                  onPressed: _handleSubscription,
+                  onPressed: ref.watch(iapProvider)['product_details']
+                              [subscriptionTypes[focusedIndex].productId] ==
+                          null
+                      ? null
+                      : _handleSubscription,
                   child: const Text(
                     'Start My Subscription',
                     style: TextStyle(

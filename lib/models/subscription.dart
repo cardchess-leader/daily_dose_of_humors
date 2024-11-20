@@ -13,6 +13,7 @@ class Subscription {
   final SubscriptionCode subscriptionCode;
   /* descriptive info */
   final String subscriptionName;
+  final String? productId;
   final String text1;
   final String text2;
   final String text3;
@@ -26,6 +27,7 @@ class Subscription {
   const Subscription({
     required this.subscriptionCode,
     required this.subscriptionName,
+    this.productId,
     required this.text1,
     required this.text2,
     required this.text3,

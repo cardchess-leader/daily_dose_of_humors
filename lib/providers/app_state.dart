@@ -625,16 +625,20 @@ class IAPNotifier extends StateNotifier<Map<String, dynamic>> {
     // Fetch all available sku lists
     final availSkuSet =
         (await ref.read(serverProvider.notifier).getAvailableSkuList()).toSet();
+    // availSkuSet
+    //     .add('subscription:yearly'); // Also query for yearly subscription item
     final ProductDetailsResponse response =
         await InAppPurchase.instance.queryProductDetails(availSkuSet);
     if (response.notFoundIDs.isNotEmpty) {
       // Handle the error.
+      print('response.notFoundIDs is: ${response.notFoundIDs}');
     }
-    List<ProductDetails> productDetails = response.productDetails;
+    List<ProductDetails> productDetailsList = response.productDetails;
 
     // Convert product details into a Map<String, String> where key is the product ID, and value is the price.
     final productDetailsMap = {
-      for (var productDetail in productDetails) productDetail.id: productDetail,
+      for (var productDetails in productDetailsList)
+        productDetails.id: productDetails,
     };
     state = {
       ...state,
