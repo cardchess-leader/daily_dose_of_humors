@@ -3,10 +3,12 @@ import 'package:flutter/services.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:upgrader/upgrader.dart';
+import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:daily_dose_of_humors/providers/app_state.dart';
 import 'package:daily_dose_of_humors/screens/tabs.dart';
+import 'package:daily_dose_of_humors/util/global_var.dart';
 
 final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
 
@@ -17,6 +19,15 @@ void main() async {
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
   ]);
+
+  try {
+    await Purchases.configure(
+      PurchasesConfiguration(GLOBAL.getRevCatApiKey()),
+    );
+    print('RevenueCat configured successfully.');
+  } catch (e) {
+    print('Failed to configure RevenueCat: $e');
+  }
 
   try {
     await Firebase.initializeApp(); // Try to initialize Firebase

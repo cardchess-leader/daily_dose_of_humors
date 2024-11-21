@@ -184,9 +184,11 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
 
   @override
   Widget build(BuildContext context) {
+    ref.watch(iapProvider);
     ref.read(iapProvider.notifier).loadAllIapSkuList();
-    ProductDetails productDetails =
-        ref.watch(iapProvider)['product_details'][widget.bundle.productId];
+    ProductDetails? productDetails = ref
+        .read(iapProvider.notifier)
+        .getProductDetails(widget.bundle.productId);
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final textColor = isDarkMode ? Colors.white : Colors.black;
 
@@ -427,7 +429,7 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                           borderRadius: BorderRadius.circular(30.0),
                         ),
                       ),
-                      onPressed: purchaseInProcess
+                      onPressed: purchaseInProcess || (productDetails == null)
                           ? null
                           : () {
                               InAppPurchase.instance.buyNonConsumable(
@@ -439,7 +441,7 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                               });
                             },
                       child: Text(
-                        'Buy at ${productDetails.price}',
+                        'Buy at ${productDetails?.price}',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,

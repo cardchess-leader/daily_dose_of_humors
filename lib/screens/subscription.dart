@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:scroll_snap_list/scroll_snap_list.dart';
 import 'package:lottie/lottie.dart';
 import 'package:daily_dose_of_humors/models/subscription.dart';
@@ -18,8 +20,61 @@ class SubscriptionScreen extends ConsumerStatefulWidget {
 }
 
 class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
+  final subscriptionSuccessMsg =
+      'Subscription successful!\nPlease enjoy the app with all subscription benefits! :)';
+  final subscriptionFailMsg =
+      'Subscription failed unexpectedly...\nPlease try again later :(';
+  late StreamSubscription<List<PurchaseDetails>> _subscription;
+  ScaffoldMessengerState? _scaffoldMessengerState;
   final controller = PageController(initialPage: 1, viewportFraction: 0.5);
   int focusedIndex = 1;
+
+  @override
+  void initState() {
+    super.initState();
+    setupPurchaseListener();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _scaffoldMessengerState = ScaffoldMessenger.of(context);
+  }
+
+  @override
+  void dispose() {
+    _subscription.cancel();
+    super.dispose();
+  }
+
+  void setupPurchaseListener() {
+    _subscription = InAppPurchase.instance.purchaseStream.listen(
+      _listenToPurchaseUpdated,
+      onDone: () => _subscription.cancel(),
+      onError: (_) {
+        showSnackbar(subscriptionFailMsg);
+      },
+    );
+  }
+
+  void _listenToPurchaseUpdated(List<PurchaseDetails> purchaseDetailsList) {
+    for (final purchaseDetails in purchaseDetailsList) {
+      if (purchaseDetails.productID.contains('subscription')) {
+        switch (purchaseDetails.status) {
+          case PurchaseStatus.purchased:
+            InAppPurchase.instance.completePurchase(purchaseDetails);
+            showSnackbar(subscriptionSuccessMsg);
+            Navigator.pop(context);
+            break;
+          case PurchaseStatus.error:
+            showSnackbar(subscriptionFailMsg);
+            break;
+          default:
+            break;
+        }
+      }
+    }
+  }
 
   Widget generateListTile(Perk perk, bool isDarkMode) {
     return Container(
@@ -80,28 +135,50 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
     );
   }
 
-  Future<void> _handleSubscription() async {
-    final subscriptionResult = await ref
-        .read(subscriptionStatusProvider.notifier)
-        .updateSubscription(subscriptionTypes[focusedIndex].subscriptionCode);
-
-    if (mounted) {
-      ScaffoldMessenger.of(context).hideCurrentSnackBar();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(subscriptionResult
-              ? 'Subscription successful!\nPlease enjoy the app with all subscription benefits! :)'
-              : 'Subscription failed unexpectedly...\nPlease try again later :('),
-        ),
+  Future<void> subscribe(Subscription subscription) async {
+    if (subscription.subscriptionCode == SubscriptionCode.LIFETIME) {
+      InAppPurchase.instance.buyNonConsumable(
+        purchaseParam: PurchaseParam(
+            productDetails: ref
+                .read(iapProvider.notifier)
+                .getIapDetails(subscription.productId!)!),
       );
-      if (subscriptionResult) {
-        Navigator.pop(context);
-      }
+    } else {
+      ref
+          .read(iapProvider.notifier)
+          .purchaseSubscription(subscription.productId!);
     }
+  }
+
+  bool isSubscriptionAvailable(Subscription targetSubscription) {
+    if (ref
+            .read(iapProvider.notifier)
+            .getPriceString(targetSubscription.productId!) ==
+        null) {
+      return false;
+    } else if (ref.read(subscriptionStatusProvider).subscriptionCode ==
+        SubscriptionCode.LIFETIME) {
+      return false;
+    } else if (ref.read(subscriptionStatusProvider).subscriptionCode ==
+        targetSubscription.subscriptionCode) {
+      return false;
+    }
+    return true;
+  }
+
+  void showSnackbar(String message) {
+    _scaffoldMessengerState
+      ?..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(
+        duration: const Duration(seconds: 5),
+        content: Text(message),
+      ));
   }
 
   @override
   Widget build(BuildContext context) {
+    ref.watch(iapProvider);
+    ref.read(iapProvider.notifier).loadAllIapSkuList();
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
@@ -199,10 +276,13 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
                                               fontSize: 30,
                                             ),
                                           ),
-                                          ref.watch(iapProvider)[
-                                                          'product_details'][
-                                                      subscriptionTypes[index]
-                                                          .productId] ==
+                                          ref
+                                                      .read(
+                                                          iapProvider.notifier)
+                                                      .getPriceString(
+                                                          subscriptionTypes[
+                                                                  index]
+                                                              .productId!) ==
                                                   null
                                               ? Lottie.asset(
                                                   'assets/lottie/loading.json',
@@ -220,7 +300,7 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
                                                   ),
                                                 )
                                               : Text(
-                                                  '${ref.watch(iapProvider)['product_details'][subscriptionTypes[index].productId].price} ${subscriptionTypes[index].text3}',
+                                                  '${ref.read(iapProvider.notifier).getPriceString(subscriptionTypes[index].productId!)} ${subscriptionTypes[index].text3}',
                                                   textAlign: TextAlign.center,
                                                   style: const TextStyle(
                                                     color: Colors.black,
@@ -356,11 +436,10 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
                         .color, // Background color
                     foregroundColor: Colors.white, // Text color
                   ),
-                  onPressed: ref.watch(iapProvider)['product_details']
-                              [subscriptionTypes[focusedIndex].productId] ==
-                          null
-                      ? null
-                      : _handleSubscription,
+                  onPressed:
+                      isSubscriptionAvailable(subscriptionTypes[focusedIndex])
+                          ? () => subscribe(subscriptionTypes[focusedIndex])
+                          : null,
                   child: const Text(
                     'Start My Subscription',
                     style: TextStyle(

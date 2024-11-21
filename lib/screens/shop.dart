@@ -25,9 +25,8 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
   Widget categorySectionGenerator({
     required BundleSet bundleSet,
     required Color textColor,
-    required Map<String, ProductDetails> productDetails,
+    // required Map<String, ProductDetails> productDetails,
   }) {
-    ref.read(iapProvider.notifier).loadAllIapSkuList();
     return Column(
       children: [
         ListTile(
@@ -130,7 +129,7 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
                                   ),
                                 ),
                                 Text(
-                                  ' ${productDetails[snapshot.data?[index].productId]?.price ?? ''}',
+                                  ' ${ref.read(iapProvider.notifier).getPriceString(snapshot.data?[index].productId ?? '')}',
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 ),
@@ -151,6 +150,8 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
 
   @override
   Widget build(BuildContext context) {
+    ref.watch(iapProvider);
+    ref.read(iapProvider.notifier).loadAllIapSkuList();
     bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final textColor = isDarkMode ? Colors.white : Colors.black;
 
@@ -187,8 +188,6 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
                           (bundleSet) => categorySectionGenerator(
                             bundleSet: bundleSet,
                             textColor: textColor,
-                            productDetails:
-                                ref.watch(iapProvider)['product_details'],
                           ),
                         )
                         .toList() ??

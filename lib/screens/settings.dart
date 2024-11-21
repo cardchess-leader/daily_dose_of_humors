@@ -99,7 +99,20 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             lottiePath: 'assets/lottie/history.json',
             title: 'Restore Purchases',
             isDarkMode: isDarkMode,
-            onTap: () => {},
+            onTap: () async {
+              final restoreResult =
+                  await ref.read(iapProvider.notifier).restorePurchases();
+              setState(() {
+                ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(restoreResult
+                        ? 'Restore purchases successful!'
+                        : 'There was an error restoring your purchases. \nPlease try again later.'),
+                  ),
+                );
+              });
+            },
           ),
           const SizedBox(height: 24),
           generateHeader('App Preferences'),

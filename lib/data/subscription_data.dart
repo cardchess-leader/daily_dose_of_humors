@@ -27,7 +27,6 @@ const _aiHumorAnalysis = Perk(
 const freeSubscription = Subscription(
   subscriptionCode: SubscriptionCode.FREE,
   subscriptionName: 'Free',
-  productId: '',
   text1: '',
   text2: '',
   text3: '',
@@ -41,7 +40,7 @@ const freeSubscription = Subscription(
 const monthlySubscription = Subscription(
   subscriptionCode: SubscriptionCode.MONTHLY,
   subscriptionName: 'Monthly',
-  productId: 'subscription_monthly',
+  productId: 'subscription:monthly',
   text1: 'MOST AFFORDABLE',
   text2: '1 Month',
   text3: 'per month',
@@ -72,7 +71,7 @@ const monthlySubscription = Subscription(
 const yearlySubscription = Subscription(
   subscriptionCode: SubscriptionCode.YEARLY,
   subscriptionName: 'Yearly',
-  productId: 'subscription_yearly',
+  productId: 'subscription:yearly',
   text1: 'MOST POPULAR',
   text2: '1 Year',
   text3: 'per year',
@@ -103,7 +102,7 @@ const yearlySubscription = Subscription(
 const lifetimeSubscription = Subscription(
   subscriptionCode: SubscriptionCode.LIFETIME,
   subscriptionName: 'Lifetime',
-  productId: 'lifetime',
+  productId: 'subscription_lifetime',
   text1: 'BEST VALUE',
   text2: 'Lifetime',
   text3: 'only',

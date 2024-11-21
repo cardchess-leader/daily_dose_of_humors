@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -7,6 +8,7 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:riverpod/riverpod.dart';
 import 'package:in_app_review/in_app_review.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
+import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:daily_dose_of_humors/data/subscription_data.dart';
 import 'package:daily_dose_of_humors/util/global_var.dart';
 import 'package:daily_dose_of_humors/models/subscription.dart';
@@ -17,36 +19,46 @@ import 'package:daily_dose_of_humors/models/bundle_set.dart';
 import 'package:daily_dose_of_humors/models/bundle.dart';
 
 class SubscriptionStatusNotifier extends StateNotifier<Subscription> {
-  SubscriptionStatusNotifier() : super(freeSubscription) {
-    _loadSubscriptionStatus();
-  }
-  Future<void> _loadSubscriptionStatus() async {
-    final prefs = await SharedPreferences.getInstance();
-    // there should be get from the server (Google Get Subscription Status) part to check for subscription status
-    final subscriptionCode = prefs.getInt('subscriptionStatus') ??
-        0; // check this with server subscription value
-    state = Subscription.getSubscriptionByCode(
-        SubscriptionCode.values[subscriptionCode]);
-  }
+  final Ref ref;
+  SubscriptionStatusNotifier(this.ref) : super(freeSubscription);
 
-  Future<bool> updateSubscription(SubscriptionCode code) async {
-    final prefs = await SharedPreferences.getInstance();
-    final newSubscription = Subscription.getSubscriptionByCode(code);
-    state = newSubscription;
-    await prefs.setInt(
-        'subscriptionStatus', newSubscription.subscriptionCode.index);
-    return true;
+  Future<void> updateSubscriptionStatus() async {
+    try {
+      if (ref
+          .read(iapProvider.notifier)
+          .isSkuPurchased('subscription_lifetime')) {
+        state = Subscription.getSubscriptionByCode(SubscriptionCode.LIFETIME);
+        return;
+      } else {
+        CustomerInfo customerInfo = await Purchases.getCustomerInfo();
+        List<String> activeSubscriptionList = [];
+        // Iterate over all entitlements
+        for (var entry in customerInfo.entitlements.all.entries) {
+          String entitlementId = entry.key; // The entitlement identifier
+          EntitlementInfo entitlementInfo = entry.value;
+          if (entitlementInfo.isActive) {
+            activeSubscriptionList.add(entitlementId);
+          }
+        }
+        if (activeSubscriptionList.contains('subscription:yearly')) {
+          state = Subscription.getSubscriptionByCode(SubscriptionCode.YEARLY);
+        } else if (activeSubscriptionList.contains('subscription:monthly')) {
+          state = Subscription.getSubscriptionByCode(SubscriptionCode.MONTHLY);
+        }
+      }
+    } catch (e) {
+      print("Error loading entitlements: $e");
+    }
   }
 
   bool isSubscribed() {
-    return state.subscriptionCode != SubscriptionCode.FREE &&
-        state.subscriptionCode != SubscriptionCode.MONTHLY;
+    return state.subscriptionCode != SubscriptionCode.FREE;
   }
 }
 
 final subscriptionStatusProvider =
     StateNotifierProvider<SubscriptionStatusNotifier, Subscription>((ref) {
-  return SubscriptionStatusNotifier();
+  return SubscriptionStatusNotifier(ref);
 });
 
 class UserSettingsNotifier extends StateNotifier<Map<String, bool>> {
@@ -602,72 +614,144 @@ final appStateProvider =
   return AppStateNotifier(ref);
 });
 
-class IAPNotifier extends StateNotifier<Map<String, dynamic>> {
+class IAPNotifier extends StateNotifier<bool> {
   var _initialized = false;
   final Ref ref;
-  final purchasedSkuList = <String>{};
-  IAPNotifier(this.ref)
-      : super({
-          'product_details': {},
-        }) {
+  final Set<String> purchasedSkuList = {};
+  final Map<String, ProductDetails> iapDetails = {};
+  final Map<String, StoreProduct> subscriptionDetails = {};
+  late StreamSubscription _purchaseSubscription;
+
+  IAPNotifier(this.ref) : super(false) {
     setupPurchaseUpdateListener();
     restorePurchases();
   }
 
-  Future<void> restorePurchases() async {
-    await InAppPurchase.instance.restorePurchases();
+  Future<bool> restorePurchases() async {
+    try {
+      await InAppPurchase.instance.restorePurchases();
+      return true;
+    } catch (e) {
+      print('Error restoring purchases: $e');
+      return false;
+    }
   }
 
   Future<void> loadAllIapSkuList() async {
-    if (_initialized) {
-      return;
-    }
-    // Fetch all available sku lists
-    final availSkuSet =
-        (await ref.read(serverProvider.notifier).getAvailableSkuList()).toSet();
-    // availSkuSet
-    //     .add('subscription:yearly'); // Also query for yearly subscription item
-    final ProductDetailsResponse response =
-        await InAppPurchase.instance.queryProductDetails(availSkuSet);
-    if (response.notFoundIDs.isNotEmpty) {
-      // Handle the error.
-      print('response.notFoundIDs is: ${response.notFoundIDs}');
-    }
-    List<ProductDetails> productDetailsList = response.productDetails;
+    if (_initialized) return;
 
-    // Convert product details into a Map<String, String> where key is the product ID, and value is the price.
-    final productDetailsMap = {
-      for (var productDetails in productDetailsList)
-        productDetails.id: productDetails,
-    };
-    state = {
-      ...state,
-      'product_details': productDetailsMap,
-    };
+    try {
+      // Fetch all available SKU lists from your backend
+      final availSkuSet =
+          (await ref.read(serverProvider.notifier).getAvailableSkuList())
+              .toSet();
+      availSkuSet.add('subscription_lifetime'); // Query lifetime subscription
 
-    _initialized = true;
+      // Query product details from InAppPurchase
+      final ProductDetailsResponse response =
+          await InAppPurchase.instance.queryProductDetails(availSkuSet);
+      if (response.notFoundIDs.isNotEmpty) {
+        print('response.notFoundIDs: ${response.notFoundIDs}');
+      }
+
+      for (final productDetails in response.productDetails) {
+        iapDetails[productDetails.id] = productDetails;
+      }
+
+      // Query subscription details from RevenueCat
+      List<String> productIds = ['subscription'];
+      List<StoreProduct> products = await Purchases.getProducts(productIds,
+          productCategory: ProductCategory.subscription);
+
+      for (var product in products) {
+        subscriptionDetails[product.identifier] = product;
+      }
+
+      // Update state with product details
+      state = true;
+
+      _initialized = true;
+    } catch (e) {
+      print('Error loading IAP SKUs: $e');
+    }
+  }
+
+  ProductDetails? getProductDetails(String productId) {
+    return iapDetails[productId];
+  }
+
+  String? getPriceString(String productId) {
+    if (iapDetails[productId] != null) {
+      return iapDetails[productId]!.price;
+    } else if (subscriptionDetails[productId] != null) {
+      return subscriptionDetails[productId]!.priceString;
+    }
+    return null;
   }
 
   Future<void> setupPurchaseUpdateListener() async {
-    final Stream purchaseUpdated = InAppPurchase.instance.purchaseStream;
+    final Stream<List<PurchaseDetails>> purchaseUpdated =
+        InAppPurchase.instance.purchaseStream;
 
-    purchaseUpdated.listen((purchaseDetailsList) {
+    _purchaseSubscription = purchaseUpdated.listen((purchaseDetailsList) {
       for (final purchaseDetails in purchaseDetailsList) {
         final status = purchaseDetails.status;
         if (status == PurchaseStatus.purchased ||
             status == PurchaseStatus.restored) {
           purchasedSkuList.add(purchaseDetails.productID);
+          if (purchaseDetails.productID.contains('subscription')) {
+            ref
+                .read(subscriptionStatusProvider.notifier)
+                .updateSubscriptionStatus();
+          }
+        } else if (status == PurchaseStatus.error) {
+          print('Error in purchase: ${purchaseDetails.error}');
         }
       }
     });
   }
 
-  bool isSkuPurchased(String sku) {
-    return purchasedSkuList.contains(sku);
+  bool isSkuPurchased(String sku) => purchasedSkuList.contains(sku);
+
+  Future<bool> purchaseSubscription(String productId) async {
+    try {
+      // Purchase the selected product
+      if (subscriptionDetails[productId] == null) {
+        throw Error();
+      }
+      CustomerInfo customerInfo = await Purchases.purchaseStoreProduct(
+        subscriptionDetails[productId]!,
+      );
+
+      // Check if the purchase is active
+      if ((customerInfo.entitlements.all['subscription:monthly']?.isActive ??
+              false) ||
+          (customerInfo.entitlements.all['subscription:yearly']?.isActive ??
+              false)) {
+        ref
+            .read(subscriptionStatusProvider.notifier)
+            .updateSubscriptionStatus();
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      print('Error purchasing subscription: $e');
+      return false;
+    }
+  }
+
+  ProductDetails? getIapDetails(String productId) {
+    return iapDetails[productId];
+  }
+
+  @override
+  void dispose() {
+    _purchaseSubscription.cancel();
+    super.dispose();
   }
 }
 
-final iapProvider =
-    StateNotifierProvider<IAPNotifier, Map<String, dynamic>>((ref) {
+final iapProvider = StateNotifierProvider<IAPNotifier, bool>((ref) {
   return IAPNotifier(ref);
 });
