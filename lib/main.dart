@@ -88,6 +88,9 @@ class _MyAppState extends ConsumerState<MyApp> {
     // Watch for dark mode settings
     final isDarkMode = ref.watch(userSettingsProvider)['darkMode'] ?? false;
 
+    // Initialize firebase auth
+    ref.read(authProvider.notifier).initializeAuth();
+
     // Initialize application state
     ref.read(appStateProvider.notifier).initializeAppState();
 

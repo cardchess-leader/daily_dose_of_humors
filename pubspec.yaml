@@ -60,6 +60,7 @@ dependencies:
   in_app_review: ^2.0.9
   upgrader: ^11.3.0
   purchases_flutter: ^8.2.2
+  firebase_auth: ^5.3.3
 
 dev_dependencies:
   flutter_test:

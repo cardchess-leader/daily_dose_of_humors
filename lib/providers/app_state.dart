@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:riverpod/riverpod.dart';
 import 'package:in_app_review/in_app_review.dart';
@@ -891,4 +892,41 @@ class IAPNotifier extends StateNotifier<bool> {
 
 final iapProvider = StateNotifierProvider<IAPNotifier, bool>((ref) {
   return IAPNotifier(ref);
+});
+
+final firebaseAuthProvider = Provider<FirebaseAuth>((ref) {
+  return FirebaseAuth.instance;
+});
+
+// Auth notifier to handle user state
+class AuthNotifier extends StateNotifier<User?> {
+  final FirebaseAuth firebaseAuth;
+
+  AuthNotifier(this.firebaseAuth) : super(null);
+
+  Future<void> initializeAuth() async {
+    // Check if a user is already signed in
+    firebaseAuth.authStateChanges().listen((user) {
+      state = user;
+    });
+
+    // Sign in anonymously if no user is signed in
+    if (firebaseAuth.currentUser == null) {
+      await signInAnonymously();
+    }
+  }
+
+  Future<void> signInAnonymously() async {
+    try {
+      final userCredential = await firebaseAuth.signInAnonymously();
+      state = userCredential.user; // Update the state with the signed-in user
+    } catch (e) {
+      print("Error during anonymous sign-in: $e");
+    }
+  }
+}
+
+// Provide AuthNotifier as a Riverpod StateNotifierProvider
+final authProvider = StateNotifierProvider<AuthNotifier, User?>((ref) {
+  return AuthNotifier(ref.watch(firebaseAuthProvider));
 });
