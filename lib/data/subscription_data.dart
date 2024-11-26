@@ -46,7 +46,7 @@ const monthlySubscription = Subscription(
   text3: 'per month',
   text4: 'Renews every month!',
   lottiePath: 'assets/lottie/monthly-face.json',
-  maxBookmarks: 0,
+  maxBookmarks: 200,
   perks: [
     _removeAdsPerk,
     _unlockContentsPerk,

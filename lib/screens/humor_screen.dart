@@ -162,7 +162,7 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
           break;
         case 4:
           return showSubscriptionSnackbar(
-              'Bookmark feature is exclusive to subscribers.\nWould you like to find out subscription benefits?');
+              'Bookmark limit reached!\nUpgrade your plan to unlock more bookmarks! :)');
         case 5:
           snackBarMsg = 'Could not add bookmark.\nPlease try again later.';
           break;
