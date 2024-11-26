@@ -11,12 +11,35 @@ class BundleSet {
     required this.bundleList,
   });
 
-  BundleSet.fromJson(Map<String, dynamic> json)
-      : uuid = json['uuid'] ?? '',
-        title = json['title'] ?? '',
-        subtitle = json['subtitle'] ?? '',
-        bundleList = (json['bundle_list'] as List<dynamic>?)
-                ?.map((uuid) => uuid as String)
+  factory BundleSet.fromJson(Map<String, dynamic> json) {
+    try {
+      return BundleSet(
+        uuid: json['uuid'] as String? ?? '',
+        title: json['title'] as String? ?? '',
+        subtitle: json['subtitle'] as String? ?? '',
+        bundleList: (json['bundle_list'] as List<dynamic>?)
+                ?.whereType<String>() // Select only elements of type String
                 .toList() ??
-            [];
+            [],
+      );
+    } catch (e) {
+      // Handle any unexpected JSON structure or type issues gracefully
+      print('Error parsing BundleSet JSON: $e');
+      return const BundleSet(
+        uuid: '',
+        title: '',
+        subtitle: '',
+        bundleList: [],
+      );
+    }
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'uuid': uuid,
+      'title': title,
+      'subtitle': subtitle,
+      'bundle_list': bundleList,
+    };
+  }
 }

@@ -14,39 +14,51 @@ final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
 
 void main() async {
   WidgetsFlutterBinding
-      .ensureInitialized(); // Ensure the WidgetsBinding is initialized
+      .ensureInitialized(); // Ensure WidgetsBinding is initialized
 
+  // Set preferred screen orientation
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
   ]);
 
+  // Initialize Firebase with error handling
+  await initializeFirebase();
+
+  // Initialize RevenueCat with error handling
+  await initializeRevenueCat();
+
+  // Initialize Mobile Ads
+  MobileAds.instance.initialize();
+
+  // Optimize image cache
+  PaintingBinding.instance.imageCache
+    ..maximumSize = 100 // Number of images
+    ..maximumSizeBytes = 200 << 20; // 100MB cache size
+
+  // Run the app
+  runApp(const ProviderScope(child: MyApp()));
+}
+
+Future<void> initializeFirebase() async {
+  try {
+    await Firebase.initializeApp();
+    print('Firebase initialized successfully.');
+  } catch (e, stackTrace) {
+    debugPrint('Failed to initialize Firebase: $e\n$stackTrace');
+    // Consider notifying the user or logging to a service like Firebase Crashlytics
+  }
+}
+
+Future<void> initializeRevenueCat() async {
   try {
     await Purchases.configure(
       PurchasesConfiguration(GLOBAL.getRevCatApiKey()),
     );
     print('RevenueCat configured successfully.');
-  } catch (e) {
-    print('Failed to configure RevenueCat: $e');
+  } catch (e, stackTrace) {
+    debugPrint('Failed to configure RevenueCat: $e\n$stackTrace');
+    // Handle errors gracefully, maybe disable IAP features
   }
-
-  try {
-    await Firebase.initializeApp(); // Try to initialize Firebase
-  } catch (e) {
-    // Handle the error when Firebase initialization fails
-    print('Failed to initialize Firebase: $e');
-    // Optionally, show a user-friendly message or take specific actions
-  }
-
-  MobileAds.instance.initialize();
-  PaintingBinding.instance.imageCache.maximumSize = 100; // Number of images
-  PaintingBinding.instance.imageCache.maximumSizeBytes =
-      200 << 20; // 100MB cache size
-
-  runApp(
-    const ProviderScope(
-      child: MyApp(),
-    ),
-  );
 }
 
 class MyApp extends ConsumerStatefulWidget {
@@ -57,12 +69,13 @@ class MyApp extends ConsumerStatefulWidget {
 }
 
 class _MyAppState extends ConsumerState<MyApp> {
+  // Utility method to get text theme based on brightness
   TextTheme _getTextTheme(BuildContext context, Brightness brightness) {
-    final textTheme = Theme.of(context).textTheme;
+    final baseTextTheme = Theme.of(context).textTheme;
     return GoogleFonts.patrickHandTextTheme(
       brightness == Brightness.light
-          ? textTheme
-          : textTheme.apply(
+          ? baseTextTheme
+          : baseTextTheme.apply(
               bodyColor: Colors.white,
               displayColor: Colors.white,
               decorationColor: Colors.white,
@@ -72,12 +85,17 @@ class _MyAppState extends ConsumerState<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+    // Watch for dark mode settings
     final isDarkMode = ref.watch(userSettingsProvider)['darkMode'] ?? false;
+
+    // Initialize application state
     ref.read(appStateProvider.notifier).initializeAppState();
+
+    // Load IAP SKUs
     ref.read(iapProvider.notifier).loadAllIapSkuList();
 
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Daily Dose of Humor',
       theme: ThemeData(
         textTheme: _getTextTheme(context, Brightness.light),
         useMaterial3: true,

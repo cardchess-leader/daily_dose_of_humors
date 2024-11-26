@@ -8,12 +8,11 @@ enum SubscriptionCode {
   LIFETIME,
 }
 
-// No subscription -> null
+/// Represents a subscription plan.
 class Subscription {
   final SubscriptionCode subscriptionCode;
-  /* descriptive info */
   final String subscriptionName;
-  final String? productId;
+  final String? productId; // Null if no product ID is associated
   final String text1;
   final String text2;
   final String text3;
@@ -21,7 +20,6 @@ class Subscription {
   final String lottiePath;
   final List<Perk> perks;
   final Color color;
-  /* valuewise info */
   final int maxBookmarks;
 
   const Subscription({
@@ -38,20 +36,26 @@ class Subscription {
     required this.maxBookmarks,
   });
 
+  /// Retrieves a [Subscription] by its [SubscriptionCode].
   static Subscription getSubscriptionByCode(SubscriptionCode code) {
-    return subscriptionTypes.firstWhere(
-      (subscription) => subscription.subscriptionCode == code,
-      orElse: () =>
-          freeSubscription, // Return -1 if no element meets the condition
-    );
+    try {
+      return subscriptionTypes.firstWhere(
+        (subscription) => subscription.subscriptionCode == code,
+      );
+    } catch (e) {
+      print('Error retrieving subscription for code $code: $e');
+      return freeSubscription; // Fallback to FREE subscription
+    }
   }
 }
 
+/// Represents a subscription perk.
 class Perk {
   final String title;
   final String subtitle;
   final String imgPath;
   final Color color;
+
   const Perk({
     required this.title,
     required this.subtitle,

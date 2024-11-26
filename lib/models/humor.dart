@@ -1,5 +1,6 @@
 import 'package:daily_dose_of_humors/models/category.dart';
 
+/// Abstract base class for Humor
 abstract class Humor {
   final String uuid;
   final CategoryCode categoryCode;
@@ -14,7 +15,7 @@ abstract class Humor {
   final int humorIndex;
   final String imgUrl;
 
-  Humor({
+  const Humor({
     required this.uuid,
     required this.categoryCode,
     required this.context,
@@ -29,10 +30,12 @@ abstract class Humor {
     this.imgUrl = '',
   });
 
+  /// Retrieves the associated [Category] based on [categoryCode].
   Category getCategoryData() {
     return Category.getCategoryByCode(categoryCode);
   }
 
+  /// Generates a sharing format for the humor based on its category.
   SharedFormat? toSharedFormat() {
     switch (categoryCode) {
       case CategoryCode.DAD_JOKES:
@@ -75,12 +78,13 @@ abstract class Humor {
     }
   }
 
+  /// Converts humor to a map for database or serialization.
   Map<String, dynamic> humorToMap();
 }
 
+/// Class for daily humor
 class DailyHumor extends Humor {
-  // Both daily and bundle humors
-  bool isNew;
+  final bool isNew;
 
   DailyHumor({
     required super.uuid,
@@ -91,80 +95,72 @@ class DailyHumor extends Humor {
     required super.author,
     required super.sender,
     required super.source,
-    super.imgUrl,
-    super.aiAnalysis,
     required super.sourceName,
     this.isNew = false,
     super.humorIndex,
+    super.imgUrl,
+    super.aiAnalysis,
   });
 
-  /// Constructor for loading humors from server
-  DailyHumor.loadFromServer(
-      Map<String, dynamic> document) // Construct from Firebase server
-      : isNew = document['is_new'] ?? false,
-        super(
-          humorIndex: document['index'],
-          uuid: document['uuid'],
-          categoryCode: CategoryCode.values.firstWhere(
-            (e) => e.name == document['category'],
-            orElse: () =>
-                CategoryCode.YOUR_HUMORS, // Return null if no match is found
-          ),
-          context: document['context'],
-          contextList:
-              (document['context_list'] as List<dynamic>?)?.cast<String>() ??
-                  [],
-          punchline: document['punchline'],
-          imgUrl: document['img_url'] ?? '',
-          aiAnalysis: document['ai_analysis'] ?? '',
-          author: document['author'],
-          sender: document['sender'],
-          source: document['source'],
-          sourceName: document['source_name'],
-        );
+  /// Creates a [DailyHumor] from server data.
+  factory DailyHumor.loadFromServer(Map<String, dynamic> document) {
+    return DailyHumor(
+      uuid: document['uuid'] ?? '',
+      categoryCode: _parseCategoryCode(document['category']),
+      context: document['context'] ?? '',
+      contextList:
+          (document['context_list'] as List<dynamic>?)?.cast<String>() ?? [],
+      punchline: document['punchline'] ?? '',
+      imgUrl: document['img_url'] ?? '',
+      aiAnalysis: document['ai_analysis'] ?? '',
+      author: document['author'] ?? 'Anonymous',
+      sender: document['sender'] ?? '',
+      source: document['source'] ?? '',
+      sourceName: document['source_name'] ?? '',
+      humorIndex: document['index'] ?? 0,
+      isNew: document['is_new'] ?? false,
+    );
+  }
 
-  DailyHumor.loadFromTable(Map<String, dynamic> document)
-      : isNew = false,
-        super(
-          humorIndex: document['humor_index'],
-          uuid: document['uuid'],
-          categoryCode: CategoryCode.values.firstWhere(
-            (e) => e.name == document['category'],
-            orElse: () =>
-                CategoryCode.YOUR_HUMORS, // Return null if no match is found
-          ),
-          context: document['context'],
-          contextList: document['context_list'] == ''
-              ? []
-              : document['context_list'].split('@@@'),
-          punchline: document['punchline'],
-          imgUrl: document['img_url'] ?? '',
-          aiAnalysis: document['ai_analysis'],
-          author: document['author'],
-          sender: document['sender'],
-          source: document['source'],
-          sourceName: document['source_name'],
-        );
+  /// Creates a [DailyHumor] from a database table row.
+  factory DailyHumor.loadFromTable(Map<String, dynamic> document) {
+    return DailyHumor(
+      uuid: document['uuid'],
+      categoryCode: _parseCategoryCode(document['category']),
+      context: document['context'] ?? '',
+      contextList: document['context_list'] == ''
+          ? []
+          : document['context_list'].split('@@@'),
+      punchline: document['punchline'] ?? '',
+      imgUrl: document['img_url'] ?? '',
+      aiAnalysis: document['ai_analysis'] ?? '',
+      author: document['author'] ?? 'Anonymous',
+      sender: document['sender'] ?? '',
+      source: document['source'] ?? '',
+      sourceName: document['source_name'] ?? '',
+      humorIndex: document['humor_index'] ?? 0,
+    );
+  }
 
   @override
   Map<String, dynamic> humorToMap() {
-    final Map<String, dynamic> map = {
-      'author': author,
+    return {
+      'uuid': uuid,
       'category': categoryCode.name,
       'context': context,
       'context_list': contextList.join('@@@'),
       'humor_index': humorIndex,
       'punchline': punchline,
       'ai_analysis': aiAnalysis,
+      'author': author,
       'sender': sender,
       'source': source,
-      'uuid': uuid,
       'img_url': imgUrl,
     };
-    return map;
   }
 }
 
+/// Class for bookmarked humor
 class BookmarkHumor extends Humor {
   int? bookmarkOrd;
   final DateTime bookmarkAddedDate;
@@ -172,84 +168,91 @@ class BookmarkHumor extends Humor {
   BookmarkHumor({
     required super.uuid,
     this.bookmarkOrd,
-    DateTime? bookmarkAddedDate, // exclusive to bookmark humor
+    DateTime? bookmarkAddedDate,
     required super.categoryCode,
     required super.context,
     required super.contextList,
     required super.punchline,
-    super.imgUrl,
-    super.aiAnalysis,
     required super.author,
     required super.sender,
     required super.source,
     required super.sourceName,
     super.humorIndex,
+    super.imgUrl,
+    super.aiAnalysis,
   }) : bookmarkAddedDate = bookmarkAddedDate ?? DateTime.now();
 
-  BookmarkHumor.loadFromTable(
-      Map<String, dynamic> document) // Construct from Firebase server
-      : bookmarkAddedDate = DateTime.parse(document['bookmark_added_date']),
-        bookmarkOrd = document['bookmark_ord'],
-        super(
-          humorIndex: document['humor_index'],
-          uuid: document['uuid'],
-          categoryCode: CategoryCode.values.firstWhere(
-            (e) => e.name == document['category'],
-            orElse: () =>
-                CategoryCode.YOUR_HUMORS, // Return null if no match is found
-          ),
-          context: document['context'],
-          contextList: document['context_list'] == ''
-              ? []
-              : document['context_list'].split('@@@'),
-          punchline: document['punchline'],
-          imgUrl: document['img_url'] ?? '',
-          aiAnalysis: document['ai_analysis'],
-          author: document['author'],
-          sender: document['sender'],
-          source: document['source'],
-          sourceName: document['source_name'],
-        );
+  /// Creates a [BookmarkHumor] from a database table row.
+  factory BookmarkHumor.loadFromTable(Map<String, dynamic> document) {
+    return BookmarkHumor(
+      uuid: document['uuid'],
+      bookmarkOrd: document['bookmark_ord'],
+      bookmarkAddedDate: DateTime.parse(document['bookmark_added_date']),
+      categoryCode: _parseCategoryCode(document['category']),
+      context: document['context'] ?? '',
+      contextList: document['context_list'] == ''
+          ? []
+          : document['context_list'].split('@@@'),
+      punchline: document['punchline'] ?? '',
+      imgUrl: document['img_url'] ?? '',
+      aiAnalysis: document['ai_analysis'] ?? '',
+      author: document['author'] ?? 'Anonymous',
+      sender: document['sender'] ?? '',
+      source: document['source'] ?? '',
+      sourceName: document['source_name'] ?? '',
+      humorIndex: document['humor_index'] ?? 0,
+    );
+  }
 
-  BookmarkHumor.convertFromDailyHumor(DailyHumor dailyHumor)
-      : bookmarkAddedDate = DateTime.now(),
-        bookmarkOrd = null,
-        super(
-          humorIndex: dailyHumor.humorIndex,
-          uuid: dailyHumor.uuid,
-          categoryCode: dailyHumor.categoryCode,
-          context: dailyHumor.context,
-          contextList: dailyHumor.contextList,
-          punchline: dailyHumor.punchline,
-          imgUrl: dailyHumor.imgUrl,
-          aiAnalysis: dailyHumor.aiAnalysis,
-          author: dailyHumor.author,
-          sender: dailyHumor.sender,
-          source: dailyHumor.source,
-          sourceName: dailyHumor.sourceName,
-        );
+  /// Converts [DailyHumor] to [BookmarkHumor].
+  factory BookmarkHumor.convertFromDailyHumor(DailyHumor dailyHumor) {
+    return BookmarkHumor(
+      uuid: dailyHumor.uuid,
+      categoryCode: dailyHumor.categoryCode,
+      context: dailyHumor.context,
+      contextList: dailyHumor.contextList,
+      punchline: dailyHumor.punchline,
+      imgUrl: dailyHumor.imgUrl,
+      aiAnalysis: dailyHumor.aiAnalysis,
+      author: dailyHumor.author,
+      sender: dailyHumor.sender,
+      source: dailyHumor.source,
+      sourceName: dailyHumor.sourceName,
+      bookmarkAddedDate: DateTime.now(),
+    );
+  }
 
   @override
   Map<String, dynamic> humorToMap() {
-    final Map<String, dynamic> map = {
-      'humor_index': humorIndex,
+    return {
       'uuid': uuid,
-      'bookmark_ord': bookmarkOrd, // even if this value is null, use it!
+      'bookmark_ord': bookmarkOrd,
       'bookmark_added_date': bookmarkAddedDate.toIso8601String(),
       'category': categoryCode.name,
       'context': context,
       'context_list': contextList.join('@@@'),
       'punchline': punchline,
-      'img_url': imgUrl,
       'ai_analysis': aiAnalysis,
       'author': author,
       'sender': sender,
       'source': source,
+      'img_url': imgUrl,
     };
-    return map;
   }
 }
 
+/// Utility to parse [CategoryCode] safely.
+CategoryCode _parseCategoryCode(dynamic category) {
+  if (category is String) {
+    return CategoryCode.values.firstWhere(
+      (e) => e.name == category,
+      orElse: () => CategoryCode.YOUR_HUMORS,
+    );
+  }
+  return CategoryCode.YOUR_HUMORS;
+}
+
+/// Format class for sharing humor
 class SharedFormat {
   final String dialogSubject;
   final String dialogBody;
