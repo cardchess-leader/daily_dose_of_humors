@@ -23,7 +23,7 @@ class GLOBAL {
   static String serverPath() {
     return IS_PRODUCTION
         ? 'https://us-central1-daily-dose-of-humors.cloudfunctions.net'
-        : 'http://10.0.2.2:5001/daily-dose-of-humors/us-central1';
+        : 'https://us-central1-daily-dose-of-humors.cloudfunctions.net';
   }
 
   static String getRevCatApiKey() {

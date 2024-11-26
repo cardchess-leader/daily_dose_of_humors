@@ -73,7 +73,6 @@ class Bundle {
       'language_code': languageCode,
       'product_id': productId,
       'release_date': releaseDate,
-      'price': price,
     };
   }
 

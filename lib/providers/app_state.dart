@@ -509,7 +509,8 @@ class ServerNotifier extends StateNotifier<void> {
 
   /// Fetch humor bundle sets.
   Future<List<BundleSet>> fetchHumorBundleSets() async {
-    final Uri url = Uri.parse('${GLOBAL.serverPath()}/getBundleSetList');
+    final Uri url = Uri.parse(
+        '${GLOBAL.serverPath()}/getBundleSetList?isAdmin=${GLOBAL.IS_PRODUCTION ? 'false' : 'true'}');
 
     final data = await _getRequest(url);
 

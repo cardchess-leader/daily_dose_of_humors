@@ -225,6 +225,7 @@ class BookmarkHumor extends Humor {
   @override
   Map<String, dynamic> humorToMap() {
     return {
+      'humor_index': humorIndex,
       'uuid': uuid,
       'bookmark_ord': bookmarkOrd,
       'bookmark_added_date': bookmarkAddedDate.toIso8601String(),
