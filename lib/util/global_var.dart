@@ -7,11 +7,16 @@ class GLOBAL {
   static const uuid = Uuid();
   static final random = Random();
   static const aspectRatio = 3 / 4.1;
+  static const REVENUECAT_ANDROID_API_KEY = 'goog_kUyKgRBqIPMrJTmyjmQYKhGxSCO';
+  static const REVENUECAT_IOS_API_KEY = 'goog_kUyKgRBqIPMrJTmyjmQYKhGxSCO';
+  static const PRIVACY_POLICY_URL =
+      'https://boardcollie.netlify.app/daily%20dose%20of%20humors/privacy.html';
+  static const TERMS_OF_SERVICE_URL =
+      'https://boardcollie.netlify.app/daily%20dose%20of%20humors/terms_of_service.html';
+  static const EMAIL_ADDRESS = 'support@boardcollie.io';
   /* EDIT BELOW VALUES FOR NEW BUILD */
   static const VERSION_NO = 'v1.0.1';
   static const IS_PRODUCTION = true; // Make this true before build
-  static const REVENUECAT_ANDROID_API_KEY = 'goog_kUyKgRBqIPMrJTmyjmQYKhGxSCO';
-  static const REVENUECAT_IOS_API_KEY = 'goog_kUyKgRBqIPMrJTmyjmQYKhGxSCO';
   /* EDIT BELOW VALUES FOR APP CONFIG CHANGE */
   static const SHOW_AD_FREQUENCY =
       100; // after how many page swipes the ad should show

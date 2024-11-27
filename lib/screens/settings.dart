@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:in_app_review/in_app_review.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:daily_dose_of_humors/providers/app_state.dart';
 import 'package:daily_dose_of_humors/screens/subscription.dart';
 import 'package:daily_dose_of_humors/widgets/lottie_icon.dart';
 import 'package:daily_dose_of_humors/widgets/app_bar.dart';
 import 'package:daily_dose_of_humors/util/global_var.dart';
+import 'package:daily_dose_of_humors/util/util.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -203,7 +205,21 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             lottiePath: 'assets/lottie/mail-open.json',
             title: 'Contact Us',
             isDarkMode: isDarkMode,
-            onTap: () => {},
+            onTap: () async {
+              final Uri emailUri = Uri(
+                scheme: 'mailto',
+                path: GLOBAL.EMAIL_ADDRESS, // Replace with your email address
+                query: encodeQueryParameters(<String, String>{
+                  'subject': 'Inquiry About Daily Dose of Humors',
+                  'body':
+                      'If you have any questions or feedback about our app, we\'d love to hear from you. \n\nPlease feel free to share your thoughts with us!'
+                }),
+              );
+
+              if (await canLaunchUrl(emailUri)) {
+                await launchUrl(emailUri);
+              }
+            },
           ),
           const SizedBox(height: 24),
           generateHeader('Legal'),
@@ -211,13 +227,29 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             lottiePath: 'assets/lottie/file.json',
             title: 'Terms Of Service',
             isDarkMode: isDarkMode,
-            onTap: () => {},
+            onTap: () async {
+              final url = Uri.parse(
+                  GLOBAL.TERMS_OF_SERVICE_URL); // Replace with your URL
+              if (await canLaunchUrl(url)) {
+                await launchUrl(url,
+                    mode:
+                        LaunchMode.externalApplication); // Opens in the browser
+              }
+            },
           ),
           generateSettingTile(
             lottiePath: 'assets/lottie/verified.json',
             title: 'Privacy Policy',
             isDarkMode: isDarkMode,
-            onTap: () => {},
+            onTap: () async {
+              final url =
+                  Uri.parse(GLOBAL.PRIVACY_POLICY_URL); // Replace with your URL
+              if (await canLaunchUrl(url)) {
+                await launchUrl(url,
+                    mode:
+                        LaunchMode.externalApplication); // Opens in the browser
+              }
+            },
           ),
           Container(
             alignment: Alignment.center,
