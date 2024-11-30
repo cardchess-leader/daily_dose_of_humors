@@ -1,0 +1,10 @@
+flutter_native_splash:
+  color: "#ffffff" # Background color for normal mode
+  color_dark: "#000000" # Background color for dark mode
+  image: assets/launcher/splash.png # Splash image for normal mode
+  image_dark: assets/launcher/splash_dark.png # Splash image for dark mode
+  android: true
+  ios: true
+  web: false
+  android_gravity: center
+  ios_content_mode: center

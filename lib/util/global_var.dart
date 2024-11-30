@@ -8,7 +8,7 @@ class GLOBAL {
   static final random = Random();
   static const aspectRatio = 3 / 4.1;
   static const REVENUECAT_ANDROID_API_KEY = 'goog_kUyKgRBqIPMrJTmyjmQYKhGxSCO';
-  static const REVENUECAT_IOS_API_KEY = 'goog_kUyKgRBqIPMrJTmyjmQYKhGxSCO';
+  static const REVENUECAT_IOS_API_KEY = 'appl_nIBTlTrOxElyjKldCIDZWaKhHSj';
   static const PRIVACY_POLICY_URL =
       'https://boardcollie.netlify.app/daily%20dose%20of%20humors/privacy.html';
   static const TERMS_OF_SERVICE_URL =

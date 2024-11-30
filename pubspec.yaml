@@ -16,7 +16,7 @@ publish_to: "none" # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.0.3+8
+version: 1.0.5+10
 
 environment:
   sdk: ">=3.4.3 <4.0.0"
@@ -63,6 +63,7 @@ dependencies:
   firebase_auth: ^5.3.3
   url_launcher: ^6.3.1
   device_info_plus: ^11.1.1
+  flutter_launcher_icons: ^0.14.1
 
 dev_dependencies:
   flutter_test:
@@ -95,6 +96,7 @@ flutter:
     - assets/images/
     - assets/lottie/
     - assets/lottie/card-lottie/
+    - assets/launcher/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
