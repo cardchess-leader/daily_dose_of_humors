@@ -9,7 +9,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.example.dailyDoseOfHumors</string>
+	<string>com.boardcollie.daily-dose-of-humors</string>
 	<key>PROJECT_ID</key>
 	<string>daily-dose-of-humors</string>
 	<key>STORAGE_BUCKET</key>
@@ -25,6 +25,8 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:710204387067:ios:0884ee5b650d9bc6b44a5e</string>
+	<string>1:710204387067:ios:247340e92f8f4579b44a5e</string>
+	<key>DATABASE_URL</key>
+	<string>https://daily-dose-of-humors-default-rtdb.firebaseio.com</string>
 </dict>
 </plist>
