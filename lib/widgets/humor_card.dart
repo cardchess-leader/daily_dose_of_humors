@@ -90,11 +90,11 @@ class _HumorCategoryCardState extends State<HumorCategoryCard>
       height: 500,
       child: Card(
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20.0),
+          borderRadius: BorderRadius.circular(25.0),
         ),
         color: isDarkMode ? darkenThemeColor : Colors.white,
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(20.0),
+          borderRadius: BorderRadius.circular(25.0),
           child: Column(
             children: [
               Expanded(

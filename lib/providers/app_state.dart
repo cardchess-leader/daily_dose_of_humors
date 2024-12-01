@@ -651,7 +651,7 @@ class AppStateNotifier extends StateNotifier<Map<String, dynamic>> {
       final dynamic resetResult = await ref
           .read(serverProvider.notifier)
           .resetAppStateFromServer(state['last_reset_date']);
-      if (resetResult != false) {
+      if (resetResult != null) {
         state = {
           ...state,
           'likes_count_remaining': GLOBAL.MAX_THUMBSUP_COUNT,
@@ -791,7 +791,9 @@ class IAPNotifier extends StateNotifier<bool> {
       }
 
       // Query subscription details from RevenueCat
-      const productIds = ['subscription'];
+      final productIds = Platform.isAndroid
+          ? ['subscription']
+          : ['subscription_monthly', 'subscription_yearly'];
       final products = await Purchases.getProducts(
         productIds,
         productCategory: ProductCategory.subscription,

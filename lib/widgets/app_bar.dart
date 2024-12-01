@@ -28,17 +28,19 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     }
 
     return AppBar(
+      centerTitle: false, // Ensures the title is not centered
       toolbarHeight: kToolbarHeight + additionalHeight,
       backgroundColor: backgroundColor,
       title: Column(
         mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment:
+            CrossAxisAlignment.start, // Align content to the start (left)
         children: [
-          const SizedBox(height: 20),
+          const SizedBox(height: 20), // Adjust spacing for better layout
           Text(
             heading,
             style: TextStyle(
-              fontSize: 30, // Adjusted for better fit in AppBar
+              fontSize: 30, // Adjusted for AppBar height
               fontWeight: FontWeight.bold,
               color: titleColor,
             ),

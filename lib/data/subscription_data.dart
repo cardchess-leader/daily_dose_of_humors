@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:daily_dose_of_humors/models/subscription.dart';
 import 'package:daily_dose_of_humors/util/global_var.dart';
@@ -37,10 +38,11 @@ const freeSubscription = Subscription(
   color: Colors.amberAccent,
 );
 
-const monthlySubscription = Subscription(
+final monthlySubscription = Subscription(
   subscriptionCode: SubscriptionCode.MONTHLY,
   subscriptionName: 'Monthly',
-  productId: 'subscription:monthly',
+  productId:
+      Platform.isAndroid ? 'subscription:monthly' : 'subscription_monthly',
   text1: 'MOST AFFORDABLE',
   text2: '1 Month',
   text3: 'per month',
@@ -68,10 +70,10 @@ const monthlySubscription = Subscription(
   color: Colors.red,
 );
 
-const yearlySubscription = Subscription(
+final yearlySubscription = Subscription(
   subscriptionCode: SubscriptionCode.YEARLY,
   subscriptionName: 'Yearly',
-  productId: 'subscription:yearly',
+  productId: Platform.isAndroid ? 'subscription:yearly' : 'subscription_yearly',
   text1: 'MOST POPULAR',
   text2: '1 Year',
   text3: 'per year',
