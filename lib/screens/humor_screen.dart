@@ -309,7 +309,6 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
             builder: (ctx) => const SubscriptionScreen(),
           ),
         );
-        setState(() {});
       },
     );
     showSnackbar(msg, action: snackBarAction);
@@ -393,6 +392,7 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
 
   @override
   Widget build(BuildContext context) {
+    ref.watch(subscriptionStatusProvider);
     bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
     Color textColor = isDarkMode ? Colors.white : Colors.black;
     Color themeColor = _isDaily()
@@ -460,7 +460,12 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
                         itemBuilder: (context, index) => HumorView(
                             humor: humorList[index], isPreview: isPreview()),
                         onPageChanged: (pageIndex) {
-                          ref.watch(adProvider.notifier).incrementCounter();
+                          if (!ref
+                                  .read(subscriptionStatusProvider.notifier)
+                                  .isSubscribed() &&
+                              _isDaily()) {
+                            ref.watch(adProvider.notifier).incrementCounter();
+                          }
                           _humorIndex = pageIndex;
                           initBookmark();
                         },
