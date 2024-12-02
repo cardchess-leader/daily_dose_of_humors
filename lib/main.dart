@@ -9,12 +9,14 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:daily_dose_of_humors/providers/app_state.dart';
 import 'package:daily_dose_of_humors/screens/tabs.dart';
 import 'package:daily_dose_of_humors/util/global_var.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 
 final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
 
 void main() async {
-  WidgetsFlutterBinding
-      .ensureInitialized(); // Ensure WidgetsBinding is initialized
+  final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  // Preserve the splash screen until resources are fully loaded
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
   // Set preferred screen orientation
   await SystemChrome.setPreferredOrientations([
@@ -27,6 +29,9 @@ void main() async {
   // Initialize RevenueCat with error handling
   await initializeRevenueCat();
 
+  // Initialize Remote Config Values
+  RemoteConfigService.initialize();
+
   // Initialize Mobile Ads
   MobileAds.instance.initialize();
 
@@ -35,8 +40,17 @@ void main() async {
     ..maximumSize = 100 // Number of images
     ..maximumSizeBytes = 200 << 20; // 100MB cache size
 
+  removeSplashAfterDuration(700);
+
   // Run the app
   runApp(const ProviderScope(child: MyApp()));
+}
+
+Future<void> removeSplashAfterDuration(int duration) async {
+  await Future.delayed(Duration(
+      milliseconds: duration)); // Simulate extended loading time for stability
+
+  FlutterNativeSplash.remove(); // Remove splash screen after setup is complete
 }
 
 Future<void> initializeFirebase() async {

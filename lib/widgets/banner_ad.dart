@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:daily_dose_of_humors/providers/app_state.dart';
 
 class BannerAdWidget extends StatefulWidget {
   final void Function(double bannerHeight)? setBannerHeight;
@@ -35,14 +36,12 @@ class _BannerAdWidgetState extends State<BannerAdWidget> {
     }
 
     _anchoredAdaptiveAd = BannerAd(
-      adUnitId: Platform.isAndroid
-          ? 'ca-app-pub-3940256099942544/6300978111' // Test Ad Unit ID for Android
-          : 'ca-app-pub-3940256099942544/2934735716', // Test Ad Unit ID for iOS
+      adUnitId: RemoteConfigService.fetchStringValue(
+          Platform.isAndroid ? 'banner_ad_id_android' : 'banner_ad_id_ios'),
       size: size,
       request: const AdRequest(),
       listener: BannerAdListener(
         onAdLoaded: (Ad ad) {
-          print('$ad loaded: ${ad.responseInfo}');
           setState(() {
             _anchoredAdaptiveAd = ad as BannerAd;
             _isLoaded = true;

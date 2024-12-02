@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:riverpod/riverpod.dart';
 import 'package:in_app_review/in_app_review.dart';
@@ -107,12 +108,25 @@ class UserSettingsNotifier extends StateNotifier<Map<String, bool>> {
       // Request notification permissions
       final notificationSettings =
           await FirebaseMessaging.instance.requestPermission();
+      print('notificationSettings is: $notificationSettings');
 
       if (notificationSettings.authorizationStatus ==
           AuthorizationStatus.authorized) {
         state['notification'] = true;
-        await FirebaseMessaging.instance.subscribeToTopic("daily_humor");
-        await FirebaseMessaging.instance.subscribeToTopic("promotion");
+        // For iOS, ensure APNs token is available
+        print('authorized');
+        if (Platform.isIOS) {
+          final apnsToken = await FirebaseMessaging.instance.getAPNSToken();
+          if (apnsToken != null) {
+            print('APNs token: $apnsToken');
+            await _subscribeToTopics(); // Proceed to subscribe
+          } else {
+            print('APNs token not available. Skipping iOS subscriptions.');
+          }
+        } else {
+          // For Android, proceed directly
+          await _subscribeToTopics();
+        }
       }
 
       // Save default preferences
@@ -153,15 +167,35 @@ class UserSettingsNotifier extends StateNotifier<Map<String, bool>> {
   /// Manages notification topic subscriptions based on the user's preference.
   Future<void> _handleNotificationSubscription(bool enable) async {
     try {
+      // For iOS, ensure APNs token is available
+      if (Platform.isIOS) {
+        final apnsToken = await FirebaseMessaging.instance.getAPNSToken();
+        if (apnsToken == null) {
+          print('APNs token not available. Skipping iOS subscriptions.');
+          return;
+        } else {
+          print('apnsToken is: $apnsToken');
+        }
+      }
       if (enable) {
-        await FirebaseMessaging.instance.subscribeToTopic("daily_humor");
-        await FirebaseMessaging.instance.subscribeToTopic("promotion");
+        // Proceed with topic subscriptions
+        await _subscribeToTopics();
       } else {
         await FirebaseMessaging.instance.unsubscribeFromTopic("daily_humor");
         await FirebaseMessaging.instance.unsubscribeFromTopic("promotion");
       }
     } catch (e) {
       print('Error managing notification subscriptions: $e');
+    }
+  }
+
+  /// Subscribes to notification topics.
+  Future<void> _subscribeToTopics() async {
+    try {
+      await FirebaseMessaging.instance.subscribeToTopic("daily_humor");
+      await FirebaseMessaging.instance.subscribeToTopic("promotion");
+    } catch (e) {
+      print('Error subscribing to topics: $e');
     }
   }
 }
@@ -320,15 +354,18 @@ class AdNotifier extends StateNotifier<void> {
     _loadAd();
   }
 
-  final String adUnitId = Platform.isAndroid
-      ? 'ca-app-pub-3940256099942544/1033173712'
-      : 'ca-app-pub-3940256099942544/4411468910';
-
   InterstitialAd? _interstitialAd;
   int _counter = 0;
 
   /// Loads an interstitial ad.
   void _loadAd() {
+    if (!GLOBAL.IS_PRODUCTION) {
+      return;
+    }
+    final String adUnitId = RemoteConfigService.fetchStringValue(
+        Platform.isAndroid
+            ? 'interstitial_ad_id_android'
+            : 'interstitial_ad_id_ios');
     InterstitialAd.load(
       adUnitId: adUnitId,
       request: const AdRequest(),
@@ -375,6 +412,9 @@ class AdNotifier extends StateNotifier<void> {
 
   /// Shows the interstitial ad if it's ready.
   void showAd() {
+    if (!GLOBAL.IS_PRODUCTION) {
+      return;
+    }
     if (_interstitialAd != null) {
       print('Showing interstitial ad.');
       _interstitialAd!.show();
@@ -932,3 +972,46 @@ class AuthNotifier extends StateNotifier<User?> {
 final authProvider = StateNotifierProvider<AuthNotifier, User?>((ref) {
   return AuthNotifier(ref.watch(firebaseAuthProvider));
 });
+
+class RemoteConfigService {
+  static final FirebaseRemoteConfig _remoteConfig =
+      FirebaseRemoteConfig.instance;
+
+  /// Initializes the Firebase Remote Config with default values and fetches updates.
+  static Future<void> initialize() async {
+    try {
+      // Set configuration settings
+      await _remoteConfig.setConfigSettings(RemoteConfigSettings(
+        fetchTimeout: const Duration(minutes: 1),
+        minimumFetchInterval: const Duration(hours: 1),
+      ));
+
+      // Set default values
+      await _remoteConfig.setDefaults({
+        'banner_ad_id_android': GLOBAL.BANNER_AD_ID_ANDROID,
+        'banner_ad_id_ios': GLOBAL.BANNER_AD_ID_IOS,
+        'interstitial_ad_id_android': GLOBAL.INTERSTITIAL_AD_ID_ANDROID,
+        'interstitial_ad_id_ios': GLOBAL.INTERSTITIAL_AD_ID_IOS,
+      });
+
+      // Fetch and activate remote values
+      await _remoteConfig.fetchAndActivate();
+      print('Remote Config initialized and values fetched.');
+    } catch (e) {
+      print('Failed to fetch and activate Remote Config: $e');
+    }
+  }
+
+  /// Fetches a string value for the given key from the Remote Config.
+  /// Returns a fallback value if the key doesn't exist or fetching fails.
+  static String fetchStringValue(String key, {String fallback = ''}) {
+    try {
+      final value = _remoteConfig.getString(key);
+      print('key is: $value');
+      return value.isNotEmpty ? value : fallback;
+    } catch (e) {
+      print('Error fetching Remote Config value for key "$key": $e');
+      return fallback;
+    }
+  }
+}

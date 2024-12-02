@@ -64,6 +64,8 @@ dependencies:
   url_launcher: ^6.3.1
   device_info_plus: ^11.1.1
   flutter_launcher_icons: ^0.14.1
+  firebase_remote_config: ^5.1.5
+  firebase_analytics: ^11.3.5
 
 dev_dependencies:
   flutter_test:

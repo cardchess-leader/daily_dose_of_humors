@@ -483,7 +483,8 @@ class _HumorScreenState extends ConsumerState<HumorScreen>
               ],
             ),
           ),
-          if (!ref.read(subscriptionStatusProvider.notifier).isSubscribed())
+          if (GLOBAL.IS_PRODUCTION &&
+              !ref.read(subscriptionStatusProvider.notifier).isSubscribed())
             BannerAdWidget(
                 setBannerHeight: (bannerHeight) =>
                     _bannerHeight = bannerHeight),

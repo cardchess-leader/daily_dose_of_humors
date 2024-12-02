@@ -3,6 +3,8 @@ import 'dart:math';
 import 'package:uuid/uuid.dart';
 
 class GLOBAL {
+  /* Always set below value to false for all cases! (Except production build) */
+  static const IS_PRODUCTION = true; // Make this true before build
   /* DO NOT CHANGE BELOW VALUES */
   static const uuid = Uuid();
   static final random = Random();
@@ -13,13 +15,18 @@ class GLOBAL {
       'https://boardcollie.netlify.app/daily%20dose%20of%20humors/privacy.html';
   static const TERMS_OF_SERVICE_URL =
       'https://boardcollie.netlify.app/daily%20dose%20of%20humors/terms_of_service.html';
+  static const BANNER_AD_ID_ANDROID = 'ca-app-pub-3940256099942544/6300978111';
+  static const BANNER_AD_ID_IOS = 'ca-app-pub-3940256099942544/2934735716';
+  static const INTERSTITIAL_AD_ID_ANDROID =
+      'ca-app-pub-3940256099942544/1033173712';
+  static const INTERSTITIAL_AD_ID_IOS =
+      'ca-app-pub-3940256099942544/4411468910';
   static const EMAIL_ADDRESS = 'support@boardcollie.io';
   /* EDIT BELOW VALUES FOR NEW BUILD */
   static const VERSION_NO = 'v1.0.1';
-  static const IS_PRODUCTION = true; // Make this true before build
   /* EDIT BELOW VALUES FOR APP CONFIG CHANGE */
   static const SHOW_AD_FREQUENCY =
-      100; // after how many page swipes the ad should show
+      10; // after how many page swipes the ad should show
   static const SMALL_MAX_INT = 1000000; // max bookmark limit
   static const MAX_THUMBSUP_COUNT = 10; // max thumbs up (FAB) limit per day
   static const MAX_SUBMIT_COUNT =

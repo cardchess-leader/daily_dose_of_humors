@@ -103,7 +103,7 @@ class _HumorCategoryCardState extends State<HumorCategoryCard>
                     color: isDarkMode
                         ? lightenThemeColor
                         : widget.category.themeColor,
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(25),
                   ),
                   child: Column(
                     children: [
