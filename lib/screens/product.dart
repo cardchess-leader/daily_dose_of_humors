@@ -48,8 +48,10 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
     _subscription = InAppPurchase.instance.purchaseStream.listen(
       _listenToPurchaseUpdated,
       onDone: () => _subscription.cancel(),
-      onError: (_) =>
-          showSnackbar('Oops! Your purchase didn’t go through. Try again!'),
+      onError: (_) {
+        setState(() => purchaseInProcess = false);
+        showSnackbar('Oops! Your purchase didn’t go through. Try again!');
+      },
     );
   }
 

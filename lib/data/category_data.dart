@@ -158,9 +158,6 @@ const humorCategoryList = [
       ManualItem(
           lottiePath: 'assets/lottie/double-tap.json',
           text: 'Double-tap to find the answer.'),
-      ManualItem(
-          lottiePath: 'assets/lottie/double-tap.json',
-          text: 'Double-tap to find the answer.'),
     ],
   ),
   Category(

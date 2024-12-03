@@ -49,10 +49,16 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
 
   void setupPurchaseListener() {
     _subscription = InAppPurchase.instance.purchaseStream.listen(
-      _listenToPurchaseUpdated,
+      (purchaseDetailsList) {
+        if (mounted) {
+          _listenToPurchaseUpdated(purchaseDetailsList);
+        }
+      },
       onDone: () => _subscription.cancel(),
       onError: (_) {
-        showSnackbar(subscriptionFailMsg);
+        if (mounted) {
+          showSnackbar(subscriptionFailMsg);
+        }
       },
     );
   }
@@ -64,7 +70,12 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
           case PurchaseStatus.purchased:
             InAppPurchase.instance.completePurchase(purchaseDetails);
             showSnackbar(subscriptionSuccessMsg);
-            Navigator.pop(context);
+            if (mounted) {
+              Navigator.pop(context); // Ensure context is valid
+            }
+            break;
+          case PurchaseStatus.pending:
+            showSnackbar('Your purchase is pending.\nPlease wait...');
             break;
           case PurchaseStatus.error:
             showSnackbar(subscriptionFailMsg);
@@ -222,9 +233,14 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
                         dynamicItemSize: true,
                         dynamicSizeEquation: (distance) =>
                             1 - (distance / 3000).abs(),
-                        onItemFocus: (index) => setState(() {
-                          focusedIndex = index;
-                        }),
+                        onItemFocus: (index) {
+                          if (mounted) {
+                            setState(() {
+                              focusedIndex = index;
+                            });
+                          }
+                        },
+
                         itemBuilder: (context, index) => SizedBox(
                           width: 300,
                           child: Material(

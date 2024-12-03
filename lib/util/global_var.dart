@@ -4,7 +4,7 @@ import 'package:uuid/uuid.dart';
 
 class GLOBAL {
   /* Always set below value to false for all cases! (Except production build) */
-  static const IS_PRODUCTION = true; // Make this true before build
+  static const IS_PRODUCTION = false; // Make this true before build
   /* DO NOT CHANGE BELOW VALUES */
   static const uuid = Uuid();
   static final random = Random();

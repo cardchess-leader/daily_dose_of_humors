@@ -23,7 +23,7 @@ import 'package:daily_dose_of_humors/models/bundle.dart';
 class SubscriptionStatusNotifier extends StateNotifier<Subscription> {
   final Ref ref;
 
-  SubscriptionStatusNotifier(this.ref) : super(freeSubscription);
+  SubscriptionStatusNotifier(this.ref) : super(monthlySubscription);
 
   /// Updates the subscription status by checking active purchases or entitlements.
   Future<void> updateSubscriptionStatus() async {
@@ -52,12 +52,14 @@ class SubscriptionStatusNotifier extends StateNotifier<Subscription> {
       } else if (activeSubscriptionList.contains('subscription:monthly')) {
         state = Subscription.getSubscriptionByCode(SubscriptionCode.MONTHLY);
       } else {
-        state = freeSubscription; // Fallback to free subscription if no match
+        state =
+            monthlySubscription; // Fallback to free subscription if no match
       }
     } catch (e, stackTrace) {
       print("Error loading entitlements: $e");
       print(stackTrace);
-      state = freeSubscription; // Ensure the state falls back to FREE on errors
+      state =
+          monthlySubscription; // Ensure the state falls back to FREE on errors
     }
   }
 

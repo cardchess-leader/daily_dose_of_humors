@@ -12,16 +12,14 @@ const _removeAdsPerk = Perk(
 
 const _unlockContentsPerk = Perk(
   title: 'Unlock All Daily Contents',
-  subtitle:
-      'Unlock all subscriber-only daily contents, including mystery puzzles!',
+  subtitle: 'Unlock all subscriber-only daily contents!',
   imgPath: 'assets/images/unlock-color.png',
   color: Colors.green,
 );
 
 const _aiHumorAnalysis = Perk(
     title: 'AI Humor Analysis',
-    subtitle:
-        'You don\'t get why it\'s funny? No problem! AI bot will explain it to you!',
+    subtitle: 'You don\'t get why it\'s funny? AI bot will explain it to you!',
     imgPath: 'assets/images/humor-bot-color.png',
     color: Colors.purple);
 
@@ -61,8 +59,7 @@ final monthlySubscription = Subscription(
     _aiHumorAnalysis,
     Perk(
       title: 'Higher priority',
-      subtitle:
-          'High priority to show your submitted humors on daily dose of humors!',
+      subtitle: 'High priority to show your submitted humors!',
       imgPath: 'assets/images/submit-color.png',
       color: Colors.orange,
     ),
@@ -91,8 +88,7 @@ final yearlySubscription = Subscription(
     _aiHumorAnalysis,
     Perk(
       title: 'Higher priority',
-      subtitle:
-          'Higher priority to show your submitted humors on daily dose of humors!',
+      subtitle: 'Higher priority to show your submitted humors!',
       imgPath: 'assets/images/submit-color.png',
       color: Colors.orange,
     ),
@@ -122,8 +118,7 @@ const lifetimeSubscription = Subscription(
     _aiHumorAnalysis,
     Perk(
       title: 'Highest priority',
-      subtitle:
-          'Highest priority to show your submitted humors on daily dose of humors!',
+      subtitle: 'Highest priority to show your submitted humors!',
       imgPath: 'assets/images/submit-color.png',
       color: Colors.orange,
     ),
