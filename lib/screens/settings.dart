@@ -228,8 +228,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             title: 'Terms Of Service',
             isDarkMode: isDarkMode,
             onTap: () async {
-              final url = Uri.parse(
-                  GLOBAL.TERMS_OF_SERVICE_URL); // Replace with your URL
+              final url =
+                  Uri.parse(GLOBAL.getTosLink()); // Replace with your URL
               if (await canLaunchUrl(url)) {
                 await launchUrl(url,
                     mode:

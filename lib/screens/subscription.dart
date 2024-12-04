@@ -9,6 +9,7 @@ import 'package:daily_dose_of_humors/data/subscription_data.dart';
 import 'package:daily_dose_of_humors/widgets/lottie_icon.dart';
 import 'package:daily_dose_of_humors/util/util.dart';
 import 'package:daily_dose_of_humors/providers/app_state.dart';
+import 'package:daily_dose_of_humors/widgets/toslink.dart';
 
 class SubscriptionScreen extends ConsumerStatefulWidget {
   const SubscriptionScreen({
@@ -425,14 +426,14 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
               alignment: Alignment.bottomCenter,
               child: Container(
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 40),
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                       colors: [
                         isDarkMode ? Colors.black : Colors.white,
                         isDarkMode
-                            ? const Color.fromARGB(128, 0, 0, 0)
-                            : const Color.fromARGB(128, 255, 255, 255),
+                            ? const Color.fromARGB(200, 0, 0, 0)
+                            : const Color.fromARGB(200, 255, 255, 255),
                         isDarkMode
                             ? const Color.fromARGB(0, 0, 0, 0)
                             : const Color.fromARGB(0, 255, 255, 255),
@@ -445,25 +446,32 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
                         1.0,
                       ]),
                 ),
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: const Size(double.infinity, 50),
-                    backgroundColor: subscriptionTypes[focusedIndex]
-                        .color, // Background color
-                    foregroundColor: Colors.white, // Text color
-                  ),
-                  onPressed:
-                      isSubscriptionAvailable(subscriptionTypes[focusedIndex])
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: const Size(double.infinity, 50),
+                        backgroundColor: subscriptionTypes[focusedIndex]
+                            .color, // Background color
+                        foregroundColor: Colors.white, // Text color
+                      ),
+                      onPressed: isSubscriptionAvailable(
+                              subscriptionTypes[focusedIndex])
                           ? () => subscribe(subscriptionTypes[focusedIndex])
                           : null,
-                  child: const Text(
-                    'Start My Subscription',
-                    style: TextStyle(
-                      fontFamily: null,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
+                      child: const Text(
+                        'Start My Subscription',
+                        style: TextStyle(
+                          fontFamily: null,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
-                  ),
+                    // SizedBox(height: 10),
+                    TermsOfServiceLink(),
+                  ],
                 ),
               ),
             ),
