@@ -198,7 +198,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             isDarkMode: isDarkMode,
             onTap: () {
               final InAppReview inAppReview = InAppReview.instance;
-              inAppReview.openStoreListing();
+              inAppReview.openStoreListing(appStoreId: '6738765500');
             },
           ),
           generateSettingTile(

@@ -112,6 +112,7 @@ class _MyAppState extends ConsumerState<MyApp> {
     ref.read(iapProvider.notifier).loadAllIapSkuList();
 
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Daily Dose of Humor',
       theme: ThemeData(
         textTheme: _getTextTheme(context, Brightness.light),

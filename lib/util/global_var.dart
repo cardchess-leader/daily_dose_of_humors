@@ -23,7 +23,7 @@ class GLOBAL {
       'ca-app-pub-3940256099942544/4411468910';
   static const EMAIL_ADDRESS = 'support@boardcollie.io';
   /* EDIT BELOW VALUES FOR NEW BUILD */
-  static const VERSION_NO = 'v1.0.9';
+  static const VERSION_NO = 'v1.0.12';
   /* EDIT BELOW VALUES FOR APP CONFIG CHANGE */
   static const SHOW_AD_FREQUENCY =
       10; // after how many page swipes the ad should show

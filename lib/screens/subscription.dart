@@ -65,14 +65,16 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
   }
 
   void _listenToPurchaseUpdated(List<PurchaseDetails> purchaseDetailsList) {
+    bool hasPopped = false; // Prevent multiple pops
     for (final purchaseDetails in purchaseDetailsList) {
       if (purchaseDetails.productID.contains('subscription')) {
         switch (purchaseDetails.status) {
           case PurchaseStatus.purchased:
             InAppPurchase.instance.completePurchase(purchaseDetails);
             showSnackbar(subscriptionSuccessMsg);
-            if (mounted) {
-              Navigator.pop(context); // Ensure context is valid
+            if (!hasPopped && mounted) {
+              Navigator.pop(context);
+              hasPopped = true; // Ensure only one pop
             }
             break;
           case PurchaseStatus.pending:
