@@ -36,6 +36,8 @@ class _TermsOfServiceLinkState extends State<TermsOfServiceLink> {
   Widget build(BuildContext context) {
     final brightness = MediaQuery.of(context).platformBrightness;
     final textTheme = _getTextTheme(context, brightness);
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final blackOrWhite = isDarkMode ? Colors.white : Colors.black;
 
     return Padding(
       padding: const EdgeInsets.all(16.0),
@@ -43,7 +45,12 @@ class _TermsOfServiceLinkState extends State<TermsOfServiceLink> {
         text: TextSpan(
           style: textTheme.bodySmall, // Apply the dynamic font style here
           children: [
-            TextSpan(text: 'By subscribing, you agree to our '),
+            TextSpan(
+              text: 'By subscribing, you agree to our ',
+              style: textTheme.bodySmall?.copyWith(
+                color: blackOrWhite,
+              ),
+            ),
             TextSpan(
               text: 'Privacy Policy',
               style: textTheme.bodySmall?.copyWith(
@@ -54,7 +61,12 @@ class _TermsOfServiceLinkState extends State<TermsOfServiceLink> {
                   _launchUrl(GLOBAL.PRIVACY_POLICY_URL);
                 },
             ),
-            TextSpan(text: ' and '),
+            TextSpan(
+              text: ' and ',
+              style: textTheme.bodySmall?.copyWith(
+                color: blackOrWhite,
+              ),
+            ),
             TextSpan(
               text: 'Terms of Service',
               style: textTheme.bodySmall?.copyWith(
