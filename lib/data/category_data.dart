@@ -91,7 +91,7 @@ const humorCategoryList = [
     imgSize: 200,
     animDuration: 1100,
     description: 'Quiz of interesting trivia, often surprising and amusing.',
-    numDailyNew: 3,
+    numDailyNew: 1,
     subscriberOnly: false,
     themeColor: Color.fromARGB(255, 57, 199, 218),
     themeColor2: Color.fromARGB(255, 198, 230, 234),
